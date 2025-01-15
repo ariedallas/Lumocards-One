@@ -1,0 +1,16 @@
+{
+  "search": {
+    "archived search results limit": 5
+},
+  "text editor": "micro",
+  "card categories": {
+      "A": ["ADIO", "Audio"]
+    , "C": ["COMP", "Computer"]
+    , "D": ["DOMS", "Domestic"]
+    , "E": ["ERND", "Errand"]
+    , "F": ["FTHR", "Finance"]
+    , "P": ["PNTG", "Painting"]
+    , "R": ["MAKE", "Creative Projects"]
+    , "S": ["SELF", "Self Care"]
+  }
+}
