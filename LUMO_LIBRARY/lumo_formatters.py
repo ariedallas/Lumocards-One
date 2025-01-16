@@ -59,10 +59,11 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
     curr_dir_name = pathlib.Path(curr_name_abspath).parent.name
 
     if dst_dir == "Same Dir":
-        dst_dir = curr_dir_name
+        dst_dir = os.path.join(l_files.rootpath, "CARDS", curr_dir_name)
 
     category_change = (curr_name[0] != dst_name[0])
     dst_dir_name = pathlib.Path(dst_dir).name
+
     source = curr_name_abspath
     dest = os.path.join(dst_dir, dst_name)
 
@@ -75,6 +76,7 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
 
     if l_files.proceed("  Type 'cancel' to stop or press any key to continue > "):
         os.rename(source, dest)
+        print(source, dest)
         l_json_utils.rename_json_card(var_file_src=curr_name, var_file_dst=dst_name)
         l_json_utils.flexible_json_updater(var_file=dst_name, loc=dst_dir_name, update_category=category_change)
 

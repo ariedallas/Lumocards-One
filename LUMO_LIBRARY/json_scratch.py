@@ -3,7 +3,7 @@ import pprint
 import json
 
 
-with open ("../SUPPORT_FILES/INTERNAL_CARDS/R_CardSample.json") as fin:
+with open ("../SUPPORT_FILES/Z_INTERNAL_CARDS/R_CardSampleRecurring.json") as fin:
     data = json.load(fin)
 
 
