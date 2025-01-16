@@ -1,0 +1,16 @@
+{
+  "card location": "CARDS_F_RECURRING",
+  "card category abbreviation": "D",
+  "card category": "Domestic",
+  "calender event": null,
+  "calendar repeating event": null,
+  "recurring freq": 4,
+  "recurring freq time unit": "Day",
+  "last occurrence": "Jan 11 2025, Saturday",
+  "card created": "2025-01-15 22:55:47",
+  "tags": [
+    "default tag a",
+    "default tag b",
+    "default tag c"
+  ]
+}

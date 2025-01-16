@@ -12,7 +12,7 @@ import lumo_json_utilities as l_json_utils
 import lumo_search_cards as l_search
 import lumo_menus as l_menus
 
-categories = l_files.get_lumocards_categories()
+all_card_categories = l_files.get_lumocards_categories()
 default_text = '\n'.join(('...', '...', '...'))
 
 card_title_already_exists = False
@@ -90,7 +90,7 @@ def get_category_from_input():
 
 
 def category_check(result):
-    if result.upper() not in categories:
+    if result.upper() not in all_card_categories:
         l_animators.animate_text("Category letter currently doesn't exist", speed=.025)
         l_animators.animate_text("- or -", speed=.025)
         l_animators.animate_text("You entered something other than one letter.", speed=.025)
@@ -334,7 +334,7 @@ def write_card_and_json(filename_txt, folder, add_custom_steps=None):
             newcard.write(default_text)
 
     default_json = l_json_utils.make_dflt_json_dict(card_folder, c_abbr)
-    json_fullpath = l_json_utils.flexible_json_pathfinder(filename_txt)
+    json_fullpath = l_json_utils.get_json_card_fullpath(filename_txt)
     l_json_utils.write_json(var_file=json_fullpath, json_data=default_json)
 
     return formatted_card_fullpath, json_fullpath

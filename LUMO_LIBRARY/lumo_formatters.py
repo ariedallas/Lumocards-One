@@ -81,7 +81,7 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
 
 def card_deleter(var_card_path):
     card_fullpath = get_card_abspath(var_card_path)
-    json_fullpath = l_json_utils.flexible_json_pathfinder(var_card_path)
+    json_fullpath = l_json_utils.get_json_card_fullpath(var_card_path)
 
     send2trash.send2trash(card_fullpath)
     send2trash.send2trash(json_fullpath)

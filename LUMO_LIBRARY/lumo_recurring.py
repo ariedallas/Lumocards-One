@@ -10,10 +10,10 @@ import lumo_animationlibrary as l_animators
 reactivated_cards = []
 
 
-def test_for_reactivation(file):
-    tested_card_fullpath = l_json_utils.flexible_json_pathfinder(file)
+def test_for_reactivation(var_file):
+    json_fullpath = l_json_utils.get_json_card_fullpath(var_file)
 
-    with open(tested_card_fullpath) as fin:
+    with open(json_fullpath) as fin:
         json_data = json.load(fin)
 
     last = json_data["last occurrence"]
@@ -54,7 +54,7 @@ def remove_recurring_data(var_file):
 
 
 def update_recurring_data(var_file, var_settings=None, initialized=False):
-    json_fullpath = l_json_utils.flexible_json_pathfinder(var_file)
+    json_fullpath = l_json_utils.get_json_card_fullpath(var_file)
 
     with open(json_fullpath) as fin:
         json_data = json.load(fin)

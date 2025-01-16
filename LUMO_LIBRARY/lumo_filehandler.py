@@ -38,8 +38,9 @@ archived_cards_folder = os.path.join(rootpath, "CARDS/CARDS_D_ARCHIVED")
 checklist_cards_folder = os.path.join(rootpath, "CARDS/CARDS_E_CHECKLISTS")
 recurring_cards_folder = os.path.join(rootpath, "CARDS/CARDS_F_RECURRING")
 
+support_files_folder = os.path.join(rootpath, "SUPPORT_FILES")
 internal_cards_folder = os.path.join(rootpath, "SUPPORT_FILES/INTERNAL_CARDS")
-json_cards = os.path.join(rootpath, "SUPPORT_FILES/JSON_CARDS")
+json_cards_folder = os.path.join(rootpath, "SUPPORT_FILES/JSON_CARDS")
 temp_folder = os.path.join(rootpath, "SUPPORT_FILES/TEMP")
 
 sounds_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_SOUNDS")
@@ -70,7 +71,9 @@ def get_near_focus_cards():
     return fetched_cards
 
 def get_lumocards_categories():
-    json_settings = l_json_utils.read_and_get_json_data('SUPPORT_FILES/settings.json', is_json_card=False)
+    settings_fullpath = os.path.join(support_files_folder, 'settings.json')
+    json_settings = l_json_utils.read_and_get_json_data(var_rel_filename=None, var_file_abspath=settings_fullpath,
+                                                        is_json_card=False)
     categories = list(json_settings['card categories'].keys())
 
     return sorted(categories)
