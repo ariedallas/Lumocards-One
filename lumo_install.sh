@@ -1,7 +1,7 @@
 #! /usr/bin/bash
 
-VENV_PATH="lumo_runtime"
-REQUIREMENTS="requirements.txt"
+VENV_PATH="SUPPORT_FILES/LUMO_RUNTIME"
+REQUIREMENTS="SUPPORT_FILES/requirements.txt"
 
 echo ""
 echo "	Install Helper Script from Lumocards"
@@ -16,16 +16,15 @@ activate_venv() {
 create_venv() {
     echo "Creating Python virtual environment at $VENV_PATH..."
     mkdir -p "$VENV_PATH" && python3 -m venv "$VENV_PATH"
-    activate_venv
-    echo "Installation completed."
+    echo "Virtual environment completed and activated."
     #deactivate_venv
 }
 
 install_pkgs() {
     activate_venv
-    echo "Installing features to make Lumocards to work, including options to..."
+    echo "Installing features to make Lumocards to work, including options to"
     echo "work with Google Calendar, and make use of safe delete"
-    pip3 install --upgrade -r requirements.txt
+    pip3 install --upgrade -r $REQUIREMENTS
 }
 
 lumo_install() {
@@ -43,7 +42,7 @@ alias lumo="activate_venv"
 alias lumocards="python3 lumo_cardsrun.py"
 alias locard="python3 lumo_search_cards.py"
 alias newcard="python3 lumo_newcard.py"
-alias lightwalks="open  LIGHTWALK_CYCLES"
+alias lightwalks="open LIGHTWALK_CYCLES"
 alias lightwalk="python3 lumo_gettoday.py"
 alias pomodoro="python3 lumo_pomodoro.py"
 alias outlist="python3 lumo_outlist.py"

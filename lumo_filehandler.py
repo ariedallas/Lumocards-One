@@ -30,22 +30,22 @@ parent = (pathlib.Path(__file__).parent.name)
 rootpath = os.getcwd()
 desktop = f"{home}/Desktop"
 
-cards_near_folder = os.path.join(rootpath, "CARDS_A_FOCUS_NEAR")
-cards_middle_folder = os.path.join(rootpath, "CARDS_B_FOCUS_MIDDLE")
-cards_dist_folder = os.path.join(rootpath, "CARDS_C_FOCUS_DISTANT")
+cards_near_folder = os.path.join(rootpath, "CARDS/CARDS_A_FOCUS_NEAR")
+cards_middle_folder = os.path.join(rootpath, "CARDS/CARDS_B_FOCUS_MIDDLE")
+cards_dist_folder = os.path.join(rootpath, "CARDS/CARDS_C_FOCUS_DISTANT")
 
-archived_cards_folder = os.path.join(rootpath, "CARDS_D_ARCHIVED")
-checklist_cards_folder = os.path.join(rootpath, "CARDS_E_CHECKLISTS")
-recurring_cards_folder = os.path.join(rootpath, "CARDS_F_RECURRING")
+archived_cards_folder = os.path.join(rootpath, "CARDS/CARDS_D_ARCHIVED")
+checklist_cards_folder = os.path.join(rootpath, "CARDS/CARDS_E_CHECKLISTS")
+recurring_cards_folder = os.path.join(rootpath, "CARDS/CARDS_F_RECURRING")
 
 internal_cards_folder = os.path.join(rootpath, "INTERNAL_CARDS")
-json_cards = os.path.join(rootpath, "JSON_CARDS")
-temp_folder = os.path.join(rootpath, "TEMP")
+json_cards = os.path.join(rootpath, "SUPPORT_FILES/JSON_CARDS")
+temp_folder = os.path.join(rootpath, "SUPPORT_FILES/TEMP")
 logging_folder = os.path.join(rootpath, "LOGS_DATEDATABS")
 
-sounds_folder = os.path.join(rootpath, "Z_SOUNDS")
+sounds_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_SOUNDS")
 
-lightwalk_folder = os.path.join(rootpath, "LIGHTWALK_CYCLES")
+lightwalk_folder = os.path.join(rootpath, "PLANNER")
 lightwalk_filename = ("%s_lightwalk.txt") % today_frmttd.upper()
 lightwalk_file = os.path.join(lightwalk_folder, lightwalk_filename)
 
@@ -76,7 +76,7 @@ def get_near_focus_cards():
     return fetched_cards
 
 def get_lumocards_categories():
-    json_settings = l_json_utils.read_and_get_json_data('settings.json', is_json_card=False)
+    json_settings = l_json_utils.read_and_get_json_data('SUPPORT_FILES/settings.json', is_json_card=False)
     categories = list(json_settings['card categories'].keys())
 
     return sorted(categories)

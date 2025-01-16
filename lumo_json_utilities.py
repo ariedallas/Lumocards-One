@@ -39,7 +39,7 @@ def write_json(var_file, json_data):
 
 
 def get_category_from_json_settings(var_ltr):
-    with open('settings.json') as fin:
+    with open('SUPPORT_FILES/settings.json') as fin:
         data = json.load(fin)
 
     card_settings = data['card categories']
