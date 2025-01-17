@@ -24,29 +24,33 @@ def pomodoro(mins):
     print("{} minute timer started".format(mins))
     run(f'pw-play {selected_sound}', shell=True)
 
-    x = 1
-    while x < time_in_secs:
-        sleep(1)
-        mins_remaining = round(mins - (x // 60))
+    for x in range(time_in_secs):
+        mins_remaining = round(mins) - (x // 60)
         mins_as_dots = "." * mins_remaining
-        mins_as_space = " " * mins_remaining
-        print(f"{mins_as_dots}", end="\r")
+        blinker = "." * (mins_remaining - 1)
 
-        x += 1
+        print(f"  {mins_as_dots}", end="\r")
+        sleep(.1)
+        print(" " * 30, end="\r")
+        sleep(.1)
+
+        print(f"  {mins_as_dots}", end="\r")
+        sleep(.1)
+        print(" " * 30, end="\r")
+        sleep(.1)
+
+        print(f"  {blinker}", end="    \r")
+        sleep(.6)
 
     for n in range(3):
         run(f'pw-play {selected_sound}', shell=True)
 
+def pomodoro_test(mins):
 
-
-def dim_os():
-    pass
-
-
-def lum_os():
-    pass
+    for n in range(30):
+        print(n)
+        sleep(1)
 
 pomodoro(timer_duration)
-
 
 
