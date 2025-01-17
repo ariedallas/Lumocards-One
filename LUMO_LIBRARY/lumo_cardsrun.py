@@ -18,17 +18,22 @@ reassigned_cards = []
 reactivated_cards = l_recurring.get_recurring_cards()
 archived_cards = []
 deleted_cards = []
+days_since_birth = l_files.get_days_from_date(1988, 6, 12)
+day, day_num, month, year = l_files.isolate_date_units()
 
 
 def cards_intro():
-    print(f"You're using Lumocards {l_files.parent[-6:]}, Just FYI")
     print()
 
-    days_since_birth = l_files.get_days_from_date(1988, 6, 12)
-    l_animators.animate_text(f"IT'S DAY: {days_since_birth}", finish_delay=.25, speed=.075)
+    l_animators.animate_text(f"IT'S DAY: {days_since_birth}", speed=.075)
+    l_animators.animate_text(f"IT'S: {day.upper()}, {day_num} of {month.upper()}, {year}", speed=.075)
+    l_animators.animate_text(f"VERSION: {l_files.parents[1].name}", speed=.075)
+
     l_animators.animate_text("      ")
-    l_animators.animate_text("ACTIVE CARDS", speed=.075)
-    l_animators.standard_interval_printer([""])
+    l_animators.animate_text("RUNNING: NEAR FOCUS CARDS", speed=.075)
+
+    if l_files.proceed(" "):
+        l_animators.animate_text("...")
 
 
 def add_step_via_integers(card_steps, card_title, response_filtered):
@@ -406,9 +411,9 @@ def update_cards():
         l_files.mk_lightwalk()
 
     if len(cards_for_lightwalk) > 0:
-        l_files.basic_wrtr("\n\n", l_files.lightwalk_file)
-        l_files.basic_wrtr(f"ACTIVE CARD REVIEW: {l_files.cur_time_hr}", l_files.lightwalk_file)
-        l_files.basic_wrtr_list(cards_for_lightwalk, l_files.lightwalk_file)
+        l_files.basic_wrtr("\n\n", l_files.today_outline_fullpath)
+        l_files.basic_wrtr(f"ACTIVE CARD REVIEW: {l_files.cur_time_hr}", l_files.today_outline_fullpath)
+        l_files.basic_wrtr_list(cards_for_lightwalk, l_files.today_outline_fullpath)
 
 
     print()

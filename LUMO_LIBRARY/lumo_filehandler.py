@@ -4,29 +4,10 @@ import time
 import pathlib
 import lumo_json_utilities as l_json_utils
 
-# ---TIME--- #
-today = datetime.datetime.today()
-today_frmttd = today.strftime("%d%b%Y")
-today_frmttd_spaces = today.strftime("%d %b %Y")
-today_frmttd_log = today.strftime("%d %m %Y")
-today_frmttd_csv = today.strftime("%d %B %Y")
-today_dayof_year = today.strftime("%j")
-localtime = time.localtime(time.time())
-localhour = localtime[3]
-
-is_Sunday = (datetime.date.weekday(today) == 6)
-week_from_today = (today + datetime.timedelta(weeks=1)).strftime("%A, %B %d, %Y")
-
-tomrrw = today + datetime.timedelta(days=1)
-tomrrw_frmttd = tomrrw.strftime("%d%b %Y")
-
-cur_time = today.strftime("%H:%M:%S")
-cur_time_hr = "----------{}----------".format(cur_time)
-
-
 # ---FILES--- #
 home = pathlib.Path.home()
-parent = (pathlib.Path(__file__).parent.name)
+parent = pathlib.Path(__file__).parent.name
+parents = pathlib.Path(__file__).parents
 rootpath = pathlib.Path(__file__).parents[1]
 desktop = f"{home}/Desktop"
 
@@ -45,9 +26,32 @@ temp_folder = os.path.join(rootpath, "SUPPORT_FILES/TEMP")
 
 sounds_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_SOUNDS")
 
-lightwalk_folder = os.path.join(rootpath, "PLANNER")
-lightwalk_filename = f"{today_frmttd.upper()}_lightwalk.txt"
-lightwalk_file = os.path.join(lightwalk_folder, lightwalk_filename)
+
+# ---TIME--- #
+today = datetime.datetime.today()
+today_frmttd = today.strftime("%d%b%Y")
+today_frmttd_spaces = today.strftime("%d %b %Y")
+today_frmttd_log = today.strftime("%d %m %Y")
+today_frmttd_csv = today.strftime("%d %B %Y")
+today_dayof_year = today.strftime("%j")
+localtime = time.localtime(time.time())
+localhour = localtime[3]
+
+
+cur_time = today.strftime("%H:%M:%S")
+cur_time_hr = "----------{}----------".format(cur_time)
+
+def isolate_date_units():
+    day = today.strftime("%A")
+    day_num = today.strftime("%d")
+    month = today.strftime("%b")
+    year = today.strftime("%Y")
+
+    return day, day_num, month, year
+# ---- PLANNER ---- #
+planner_folder = os.path.join(rootpath, "PLANNER")
+today_outline_file = f"{today_frmttd.upper()}_outline.txt"
+today_outline_fullpath = os.path.join(planner_folder, today_outline_file)
 
 
 # ---- RESPONSES ---- #
@@ -126,11 +130,11 @@ def basic_wrtr_list(list, file):
 
 
 def mk_lightwalk():
-    basic_wrtr("LIGHTWALK: {}".format(today_frmttd_spaces.upper()), lightwalk_file)
+    basic_wrtr("LIGHTWALK: {}".format(today_frmttd_spaces.upper()), today_outline_fullpath)
 
 
 def exists_lightwalk_file():
-    if os.path.exists(lightwalk_file):
+    if os.path.exists(today_outline_fullpath):
         return True
 
 
@@ -149,3 +153,10 @@ def proceed(input_text="... "):
 
 if __name__ == '__main__':
     print("hello from main")
+
+# ---- ETC ---- #
+# is_Sunday = (datetime.date.weekday(today) == 6)
+# week_from_today = (today + datetime.timedelta(weeks=1)).strftime("%A, %B %d, %Y")
+#
+# tomrrw = today + datetime.timedelta(days=1)
+# tomrrw_frmttd = tomrrw.strftime("%d%b %Y")
