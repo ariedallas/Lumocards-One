@@ -12,7 +12,7 @@ def get_today_file():
 		path_match = os.path.join(l_files.planner_folder, f)
 		if header == l_files.today_frmttd.upper():
 			print(f"Opening Lightwalk file for {l_files.today_frmttd}")
-			subprocess.run([f'open {path_match}'], shell=True, executable='/bin/bash')
+			subprocess.run([f'open {path_match}'], shell=True)
 
 	print("\n")
 

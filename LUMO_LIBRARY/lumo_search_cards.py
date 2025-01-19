@@ -10,9 +10,11 @@ import lumo_animationlibrary as l_animators
 import lumo_formatters as l_formatters
 import lumo_menus as l_menus
 import lumo_recurring as l_recurring
+# import lumo_json_utilities as l_json_utils
 
 letters = string.ascii_lowercase
 letters_filtered = [l.upper() for l in letters if not (l == 'q') and not (l == 'x')]
+settings = l_files.get_json_settings()
 
 def test_match(lookfor):
 
@@ -170,7 +172,7 @@ def cardsearch_main_options(var_card, var_card_path, var_hotkey_dict, var_hotkey
         if response.upper() in var_hotkey_dict.keys():
 
             if var_hotkey_dict[response.upper()] == l_menus.action_open:
-                subprocess.run([f'micro {card_fullpath}'], shell=True, executable='/bin/bash')
+                subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
                 return "RELOOP", var_card_path
 
             elif var_hotkey_dict[response.upper()] == l_menus.action_modify:

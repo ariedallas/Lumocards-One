@@ -64,8 +64,6 @@ negative_user_responses = [
     ]
 
 # ---- FUCNTIONS ---- #
-
-
 def get_near_focus_cards():
     cardsA = [c for (_, _, c) in os.walk(cards_near_folder)]
 
@@ -75,12 +73,18 @@ def get_near_focus_cards():
     return fetched_cards
 
 def get_lumocards_categories():
+    settings = get_json_settings()
+    categories = list(settings['card categories'].keys())
+
+    return sorted(categories)
+
+
+def get_json_settings():
     settings_fullpath = os.path.join(rootpath, 'SUPPORT_FILES/settings.json')
     json_settings = l_json_utils.read_and_get_json_data(var_rel_filename=None, var_file_abspath=settings_fullpath,
                                                         is_json_card=False)
-    categories = list(json_settings['card categories'].keys())
+    return json_settings
 
-    return sorted(categories)
 
 # —--LUMOCARDS--- #
 near_focus_cards = get_near_focus_cards()
@@ -95,7 +99,6 @@ def basic_wrtr(content, file):
 
     with open(file, "a+") as fin:
         fin.write(content)
-        fin.write("\n")
 
 
 def basic_wrtr_custom_dir(content, file, custom_dir):
@@ -129,11 +132,12 @@ def basic_wrtr_list(list, file):
             fin.write("\n")
 
 
-def mk_lightwalk():
-    basic_wrtr("LIGHTWALK: {}".format(today_frmttd_spaces.upper()), today_outline_fullpath)
+def mk_planner():
+    basic_wrtr(f"LIGHTWALK: {today_frmttd_spaces.upper()}", today_outline_fullpath)
+    basic_wrtr("\n", today_outline_fullpath)
 
 
-def exists_lightwalk_file():
+def exists_planner_file():
     if os.path.exists(today_outline_fullpath):
         return True
 

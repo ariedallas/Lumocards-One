@@ -6,7 +6,7 @@ def animate_pause(no_of_lines: int, speed: float=.5):
         print()
         time.sleep(speed)
 
-def animate_text(text, speed: float=.025, finish_delay=.5):
+def animate_text(text, speed: float=.025, finish_delay: float=0):
     text_add_space = " " + text
     for n in range(len(text_add_space)):
         print(text_add_space[:n], end='\r')
@@ -15,6 +15,9 @@ def animate_text(text, speed: float=.025, finish_delay=.5):
     print(text, end="\r")
     time.sleep(speed)
     print(text)
+
+    if finish_delay:
+        time.sleep(finish_delay)
 
 def animate_text_fast(text):
     text_add_space = " " + text

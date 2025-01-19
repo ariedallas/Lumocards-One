@@ -10,9 +10,11 @@ import lumo_formatters as l_formatters
 import lumo_cardsdisplay_boxformatter as l_boxify
 import lumo_menus as l_menus
 
+settings = l_files.get_json_settings()
+
 reviewed_cards = []
 reviewed_recurring_cards = []
-cards_for_lightwalk = []
+todays_cards = []
 
 reassigned_cards = []
 reactivated_cards = l_recurring.get_recurring_cards()
@@ -22,15 +24,16 @@ days_since_birth = l_files.get_days_from_date(1988, 6, 12)
 day, day_num, month, year = l_files.isolate_date_units()
 
 
+
 def cards_intro():
     print()
 
     l_animators.animate_text(f"IT'S DAY: {days_since_birth}", speed=.075)
-    l_animators.animate_text(f"IT'S: {day.upper()}, {day_num} of {month.upper()}, {year}", speed=.075)
-    l_animators.animate_text(f"VERSION: {l_files.parents[1].name}", speed=.075)
+    l_animators.animate_text(f"IT'S: {day.upper()}, {day_num} of {month.upper()}, {year}", speed=.075, finish_delay=.5)
 
-    l_animators.animate_text("      ")
-    l_animators.animate_text("RUNNING: NEAR FOCUS CARDS", speed=.075)
+    l_animators.standard_interval_printer([f"VERSION: {l_files.parents[1].name}"], speed_interval=.5)
+    l_animators.standard_interval_printer([""], speed_interval=.5)
+    l_animators.standard_interval_printer(["RUNNING: NEAR FOCUS CARDS"], speed_interval=.5)
 
     if l_files.proceed(" "):
         l_animators.animate_text("...")
@@ -41,15 +44,11 @@ def add_step_via_integers(card_steps, card_title, response_filtered):
     max = len(card_steps)
     selected_integers_filtered = [num for num in selected_integers if
                                   (int(num) <= max and int(num) > 0)]
-    if selected_integers_filtered:
-        l_animators.animate_text("ADDING STEPS FROM NUMBER SHORTCUTS")
     for card_step in selected_integers_filtered:
         idx = int(card_step) - 1
 
-        formatted_output = "{}: {}".format(card_title, card_steps[idx])
-        full_message = ("'{}' was added to Lightwalk.".format(formatted_output))
-        l_animators.animate_text(full_message)
-        cards_for_lightwalk.append(formatted_output)
+        planner_feedback(card_title, card_steps[idx])
+
     for num in selected_integers:
         if int(num) > max or int(num) <= 0:
             l_animators.animate_text(f"Skipping number {num}, it shouldn't correspond to a step...")
@@ -109,9 +108,10 @@ def cardsrun_macro_hotwords(card_path, card, card_idx):
 
 
         elif route == 'edit':
-            fullpath_to_card = l_formatters.get_card_abspath(card_path)
+            card_fullpath = l_formatters.get_card_abspath(card_path)
             l_animators.animate_text((l_menus.hotkey_feedback[response_filtered.lower()][0]))
-            subprocess.run(['micro {}'.format(fullpath_to_card)], shell=True, executable='/bin/bash')
+            subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
+
 
             return "RELOOP"
 
@@ -138,12 +138,11 @@ def cardsrun_macro_hotwords(card_path, card, card_idx):
     else:
         reviewed_cards.append(card_path)
 
-        formatted_output = "{}: {}".format(card[0], response_filtered)
-        full_message = ("'{}' was added to Lightwalk.".format(formatted_output))
-        cards_for_lightwalk.append(formatted_output)
-        l_animators.animate_text(full_message)
+        card_title = card[0]
+        planner_feedback(card_title, response_filtered)
 
     return True
+
 
 def cardsrun_recurring_macro_hotwords(card_path, card, card_idx):
 
@@ -202,10 +201,11 @@ def cardsrun_recurring_macro_hotwords(card_path, card, card_idx):
 
         elif route == 'edit':
 
-            fullpath_to_card = os.path.join(l_files.cards_near_folder, card_path)
+            card_fullpath = os.path.join(l_files.recurring_cards_folder, card_path)
 
             l_animators.animate_text((l_menus.hotkey_feedback[response_filtered.lower()][0]))
-            subprocess.run(['micro {}'.format(fullpath_to_card)], shell=True, executable='/bin/bash')
+            subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
+
 
             return "RELOOP"
 
@@ -228,11 +228,7 @@ def cardsrun_recurring_macro_hotwords(card_path, card, card_idx):
 
     else:
         reviewed_recurring_cards.append(card_path)
-
-        formatted_output = "{}: {}".format(card[0], response_filtered)
-        full_message = ("'{}' was added to Lightwalk.".format(formatted_output))
-        cards_for_lightwalk.append(formatted_output)
-        print(full_message)
+        planner_feedback(card[0], response_filtered)
 
     return True
 
@@ -254,7 +250,7 @@ def cardsrun_macro_menu(var_card, var_card_path, var_hotkey_dict, var_hotkey_lis
         if response.upper() in var_hotkey_dict.keys():
 
             if var_hotkey_dict[response.upper()] == l_menus.action_open:
-                subprocess.run([f'micro {card_fullpath}'], shell=True, executable='/bin/bash')
+                subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
                 return "RELOOP", var_card_path
 
 
@@ -381,10 +377,18 @@ def review_and_write_recurring():
             remaining_cards = [x for x in reactivated_cards if x not in review_set]
 
 
+def planner_feedback(var_card_title, var_card_step):
+
+    formatted_output = f"{var_card_title}: {var_card_step}"
+    full_message = f"Added: '{formatted_output} 'to planner."
+    l_animators.standard_interval_printer([full_message])
+    todays_cards.append(formatted_output)
+
+
 def update_cards():
     print()
-    l_animators.animate_text("ADDING TO LIGHTWALK:")
-    l_animators.standard_interval_printer(cards_for_lightwalk)
+    l_animators.animate_text("ADDING TO PLANNER:")
+    l_animators.standard_interval_printer(todays_cards)
     print()
 
     if len(archived_cards) > 0:
@@ -406,14 +410,15 @@ def update_cards():
             for card in deleted_cards:
                 l_formatters.card_deleter(card)
 
-    if not l_files.exists_lightwalk_file():
-        l_animators.animate_text("Creating Lightwalk file for today...")
-        l_files.mk_lightwalk()
+    if not l_files.exists_planner_file():
+        l_animators.animate_text("Creating Planner file for today...")
+        l_files.mk_planner()
 
-    if len(cards_for_lightwalk) > 0:
-        l_files.basic_wrtr("\n\n", l_files.today_outline_fullpath)
-        l_files.basic_wrtr(f"ACTIVE CARD REVIEW: {l_files.cur_time_hr}", l_files.today_outline_fullpath)
-        l_files.basic_wrtr_list(cards_for_lightwalk, l_files.today_outline_fullpath)
+    if len(todays_cards) > 0:
+        l_files.basic_wrtr("\n", l_files.today_outline_fullpath)
+        l_files.basic_wrtr(f"NEAR FOCUS CARDS: {l_files.cur_time_hr}", l_files.today_outline_fullpath)
+        l_files.basic_wrtr("\n", l_files.today_outline_fullpath)
+        l_files.basic_wrtr_list(todays_cards, l_files.today_outline_fullpath)
 
 
     print()
@@ -431,9 +436,9 @@ def main():
             break
 
         print()
-        l_animators.animate_text(f"Status: {status}")
 
     if status == "EXIT CARD LIST":
+        print()
         response = l_files.proceed("Proceed to Recurring Cards? ")
 
         if response:

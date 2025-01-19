@@ -12,6 +12,8 @@ import lumo_json_utilities as l_json_utils
 import lumo_search_cards as l_search
 import lumo_menus as l_menus
 
+settings = l_files.get_json_settings()
+
 all_card_categories = l_files.get_lumocards_categories()
 default_text = '\n'.join(('...', '...', '...'))
 
@@ -182,7 +184,7 @@ def add_custom_or_default_steps():
         with open(scratchpad_file, "w") as fin:
             fin.write("")
 
-        subprocess.run(f"micro {scratchpad_file}", shell=True)
+        subprocess.run([f'{settings.get("text editor")} {scratchpad_file}'], shell=True)
 
         with open(scratchpad_file, "r") as fin:
             steps = [l for l in fin.readlines()]
