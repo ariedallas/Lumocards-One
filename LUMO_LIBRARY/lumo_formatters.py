@@ -49,8 +49,12 @@ def steps_preview(card_steps, steps_amt, steps_idx):
         card_steps_three = [f" {n} — {step_abbreviator(step)}" for n, step in
                             zip(range(4), card_steps[0:3])]
 
+    elif steps_amt == 0:
+        card_steps_three = [f" {n} — (empty)" for n in range(4)]
+
     else:
-        card_steps_three = [f" {n} — {step}" for n, step in default_card_steps]
+        card_steps_three = [f" {n} — {step}" for n, step in zip(range(4), default_card_steps)]
+
     return card_steps_three
 
 
