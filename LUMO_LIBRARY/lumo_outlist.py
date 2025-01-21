@@ -18,7 +18,7 @@ errand_card = l_formatters.abspath_to_card(errand_card_path)
 errand_card_title = errand_card_path[0]
 errand_card_steps = errand_card_path[1]
 
-checklist_cards = l_files.checklist_cards_ordrd
+checklist_cards = [card for card in os.listdir(l_files.checklist_cards_folder)]
 checklist_cards_filtered = []
 
 for path in checklist_cards:

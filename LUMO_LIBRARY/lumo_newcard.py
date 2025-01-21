@@ -2,6 +2,7 @@ import os
 import pathlib
 import sys
 import subprocess
+import time
 from argparse import ArgumentParser
 
 import lumo_filehandler as l_files
@@ -228,12 +229,12 @@ def create_card():
         print(f"Status: {status}")
 
         print()
-        l_animators.standard_interval_printer(focus_menu_l)
+        l_animators.standard_interval_printer(focus_menu_l, speed_interval=0)
         print()
-        l_animators.standard_interval_printer(schedule_menu_l)
+        l_animators.standard_interval_printer(schedule_menu_l, speed_interval=0)
         print()
-        l_animators.standard_interval_printer(l_menus.start_over_menu)
-        l_animators.standard_interval_printer(l_menus.quit_menu)
+        l_animators.standard_interval_printer(l_menus.start_over_menu, speed_interval=0)
+        l_animators.standard_interval_printer(l_menus.quit_menu, speed_interval=0)
         print()
         response = input("  Select where this card should go > ")
 

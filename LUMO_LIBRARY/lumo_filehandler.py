@@ -63,6 +63,7 @@ negative_user_responses = [
     , "cancel"
     ]
 
+
 # ---- FUCNTIONS ---- #
 def get_near_focus_cards():
     cardsA = [c for (_, _, c) in os.walk(cards_near_folder)]
@@ -71,6 +72,7 @@ def get_near_focus_cards():
     fetched_cards = list(filter(lambda c: not c.startswith('.'), cardsB))
 
     return fetched_cards
+
 
 def get_lumocards_categories():
     settings = get_json_settings()
@@ -86,14 +88,6 @@ def get_json_settings():
     return json_settings
 
 
-# —--LUMOCARDS--- #
-near_focus_cards = get_near_focus_cards()
-near_focus_cards_ordrd = sorted(near_focus_cards)
-
-active_cards_ordrd = sorted(near_focus_cards)
-
-checklist_cards = [card for card in os.listdir(checklist_cards_folder)]
-checklist_cards_ordrd = sorted(checklist_cards)
 
 def basic_wrtr(content, file):
 
