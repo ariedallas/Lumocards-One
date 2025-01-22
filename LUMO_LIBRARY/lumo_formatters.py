@@ -1,4 +1,5 @@
 import os
+import re
 import pathlib
 import sys
 import send2trash
@@ -140,16 +141,14 @@ def cycler(list_of_steps):
             sys.exit(0)
 
 
-def format_card_title(var=str):
+def format_card_title(var):
     try:
-        var = var.replace("_", " ")
+        subbed_underscores = var.replace("_", " ")
 
-        b = var.split()
-        c = b[0]
-        cc = b[1]
-        ccc = camelbreaks_stitch(cc).upper()
+        first, rest = subbed_underscores.split()
+        separated_by_caps = camelbreaks_stitch_two(rest).upper()
 
-        result = "{}  {}".format(c, ccc)
+        result = "{}: {}".format(first, separated_by_caps)
 
     except:
         var = var.replace("_", " ")
@@ -166,7 +165,7 @@ def add_blank_space(response):
         return response
 
 
-def camelbreaks(var=str):
+def camelbreaks(var):
     result = []
 
     for x in range(len(var)):
@@ -175,7 +174,8 @@ def camelbreaks(var=str):
     return result
 
 
-def camelbreaks_stitch(var=str):
+
+def camelbreaks_stitch(var):
     card_name = ""
     breaks = camelbreaks(var)
     stop = 0
@@ -189,6 +189,67 @@ def camelbreaks_stitch(var=str):
     card_name += "{}".format(var[stop:])
 
     return card_name
+
+
+def camelbreaks_two(var):
+    result = []
+
+    for x in range(len(var)):
+        if var[x].isupper():
+            result.append(x)
+
+    result.append(len(var))
+
+    return result
+
+
+def camelbreaks_stitch_two(var):
+    breaks = camelbreaks_two(var)
+    total_words = len(breaks) - 1
+
+    # add this back at the end
+    first_nums = re.match(r'\d+', var)
+
+    initial_group = []
+
+    for n in range(total_words):
+        start, stop = breaks[n], (breaks[n + 1])
+        word = var[start:stop]
+        initial_group.append(word)
+
+
+    additions = recursive_digit_split(initial_group)
+
+    card_name = " ".join(additions)
+
+    if first_nums:
+        updated_card_name = f"{first_nums.group()} {card_name}"
+        return updated_card_name
+
+
+    return card_name
+
+
+def recursive_digit_split(initial_group):
+    additions = []
+
+    for word in initial_group:
+        nums = re.search(r'\d+', word)
+
+        if nums:
+            m = nums.group()
+            result = word.split(m, 1)
+            first, second = result[0], result[1]
+            additions.append(first)
+            additions.append(m)
+
+            if second:
+                additions += recursive_digit_split([second])
+
+        else:
+            additions.append(word)
+
+    return additions
 
 
 def get_card_abspath(path):
@@ -266,4 +327,3 @@ def test_for_float(string):
 
 if __name__ == "__main__":
     print("Hello from main")
-    print(step_abbreviator("house call to the swamp thing"))

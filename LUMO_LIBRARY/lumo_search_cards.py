@@ -16,22 +16,32 @@ letters = string.ascii_lowercase
 letters_filtered = [l.upper() for l in letters if not (l == 'q') and not (l == 'x')]
 settings = l_files.get_json_settings()
 
-def test_match(lookfor):
+def test_match(queried):
 
-    return re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', lookfor)
+    unique_words =  re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', queried)
+    return unique_words
 
+def test_match_digit(queried, search_term):
+
+    digit_match = re.findall(fr'{search_term}\d*', queried)
+    return digit_match
 
 def iterate_and_find(searchterm, folder):
     possible_files = []
 
     for item in os.listdir(folder):
         unique_words = test_match(item)
+        digit_match = test_match_digit(queried=item, search_term=searchterm)
 
         for word in unique_words:
             if searchterm.capitalize() in word:
                 possible_files.append(item)
             elif searchterm in word:
                 possible_files.append(item)
+
+        if digit_match:
+            possible_files.append(item)
+
 
     return possible_files
 
@@ -78,7 +88,7 @@ def big_zipper(var_total_matches):
     dist_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[2]]
     recurring_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[3]]
     checklist_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[4]]
-    archived_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] ({len(var_total_matches[5])})"]
+    archived_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] ({len(var_total_matches[5])})"] if len(var_total_matches[5]) > 0 else []
 
 
     near_matches_formatted = ["  NEAR FOCUS CARDS:"] + near_matches_setup
@@ -100,26 +110,30 @@ def select_card_from_found(searchterm):
 
     found_matches, shortcut_file_matches = big_zipper_prep(var_searchterm=searchterm)
     total_amt_matches, all_matches_formatted, used_letters  = big_zipper(found_matches)
-    archived_matches_line = all_matches_formatted[5][1]
-    archives_letter = archived_matches_line[3]
 
     if total_amt_matches > 24:
         print(f"More than 24 possible matches for term '{searchterm}'... try something more specific.")
         return None, None
 
-    elif total_amt_matches == 0:
+    if total_amt_matches == 0:
         print(f"No matches found for your term '{searchterm}'... ")
         return None, None
 
-    for matches in all_matches_formatted:
-        if len(matches) > 1:
-            l_animators.standard_interval_printer(matches, speed_interval=0)
+    if len(all_matches_formatted[5]) > 1:
+        archived_matches_line = all_matches_formatted[5][1]
+        archives_letter = archived_matches_line[3]
+    else:
+        archives_letter = None
+
+    for matches_list in all_matches_formatted:
+        if len(matches_list) > 1:
+            l_animators.standard_interval_printer(matches_list, speed_interval=0)
             print()
 
     print(l_menus.exit_menu[0])
     print(l_menus.quit_menu[0])
 
-    while all_matches_formatted:
+    while True:
         response = input("\n  > ")
 
         if response.upper() == archives_letter:
@@ -128,6 +142,7 @@ def select_card_from_found(searchterm):
                   f"\n  i.e. there is/are ({len(found_matches[5])}) archived cards that pertain.")
             continue
 
+        # change this to be if ... in dict.keys() etc.
         if response.isalpha() and len(response) == 1 and (response.upper() in used_letters):
             letter_as_listindex = ord(response.lower()) - 97
 
