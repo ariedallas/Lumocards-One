@@ -15,15 +15,15 @@ main_card_steps = main_card[1]
 
 errand_card_path = os.path.join(l_files.internal_cards_folder, "Outlist_Errand.txt")
 errand_card = l_formatters.abspath_to_card(errand_card_path)
-errand_card_title = errand_card_path[0]
-errand_card_steps = errand_card_path[1]
+errand_card_title = errand_card[0]
+errand_card_steps = errand_card[1]
 
-checklist_cards = [card for card in os.listdir(l_files.checklist_cards_folder)]
+checklist_cards = sorted([card for card in os.listdir(l_files.checklist_cards_folder)])
 checklist_cards_filtered = []
 
 for path in checklist_cards:
 
-    if (path == main_card_path or path == errand_card_path):
+    if path == main_card_path or path == errand_card_path:
         continue
     else:
         checklist_cards_filtered.append(path)
@@ -40,20 +40,16 @@ def card_select(list_of_cards):
     letter_to_idx = input("\nSelect letter > ")
     match_letters = letters_filtered[0:len(list_of_cards)]
 
+    # change this to a dict lookup
     if letter_to_idx.isalpha() and len(letter_to_idx) == 1 and (letter_to_idx.upper() in match_letters):
         letter_as_listindex = ord(letter_to_idx.lower()) - 97
         outlist_path = list_of_cards[letter_as_listindex]
         outlist_card = l_formatters.path_to_card(outlist_path)
 
-        title = l_formatters.camelbreaks_stitch(outlist_card[0]).upper()
+        title = l_formatters.format_card_title(outlist_card[0]).upper()
         list_of_steps = outlist_card[1]
 
-        if "HOME" in title:
-            location = False
-        else:
-            location = True
-
-        return title, list_of_steps, location
+        return title, list_of_steps
 
     else:
         print("Try again, pls.")
@@ -65,43 +61,39 @@ def display_selected_outlist(var_title, var_steps):
     l_formatters.cycler(var_steps)
 
 
-def main_outlist_review(var_location):
-    if var_location:
+def main_outlist_review():
+    print()
+    rsp = l_files.proceed("Would you like to review the Essentials Checklist? ")
+    if rsp:
+        main_card_title_formatted = l_formatters.format_card_title(main_card_title).upper()
         print()
-        main_card_title_formatted = l_formatters.camelbreaks_stitch(main_card_title).upper()
-
         l_animators.animate_text(main_card_title_formatted)
+
         print()
         l_formatters.cycler(main_card_steps)
 
 
-def errand_outlist_review(var_location):
-    if var_location:
+def errand_outlist_review():
+    print()
+    rsp = l_files.proceed("Would you like to review the Errands Checklist? ")
+    if rsp:
+        errand_card_title_formatted = l_formatters.format_card_title(errand_card_title).upper()
         print()
-        main_card_title_formatted = l_formatters.camelbreaks_stitch(main_card_title).upper()
+        l_animators.animate_text(errand_card_title_formatted)
 
-        rsp = l_files.proceed("Would you like to review the Errands Card? ")
-        if rsp:
-            print()
-            l_animators.animate_text(main_card_title_formatted)
-            print()
-            l_formatters.cycler(main_card_steps)
+        print()
+        l_formatters.cycler(errand_card_steps)
 
 
 if __name__ == "__main__":
 
     print()
-    l_animators.animate_text("OUTLISTS")
+    l_animators.animate_text("CHECKLISTS")
     print()
 
     display_menu(checklist_cards_filtered)
-    title, steps, location = card_select(checklist_cards_filtered)
+    title, steps = card_select(checklist_cards_filtered)
     display_selected_outlist(var_title=title, var_steps=steps)
 
-    main_outlist_review(var_location=location)
-    errand_outlist_review(var_location=location)
-
-
-
-
-
+    main_outlist_review()
+    errand_outlist_review()
