@@ -259,19 +259,19 @@ def menu_modifying_card(selected_card, var_hotkey_list, var_hotkey_dict):
         if response.upper() in var_hotkey_dict.keys():
 
             if var_hotkey_dict[response.upper()] == action_set_near:
-                l_recurring.remove_recurring_data(var_file=selected_card)
+                l_recurring.remove_recurring_data(var_json_card=selected_card)
                 l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_near_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card set to ➝ Near Focus")
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == action_set_middle:
-                l_recurring.remove_recurring_data(var_file=selected_card)
+                l_recurring.remove_recurring_data(var_json_card=selected_card)
                 l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_middle_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card set to ➝ Middle Focus")
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == action_set_dist:
-                l_recurring.remove_recurring_data(var_file=selected_card)
+                l_recurring.remove_recurring_data(var_json_card=selected_card)
                 l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_dist_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card set to ➝ Distant Focus")
                 return "CARD REFOCUSED", None
@@ -284,7 +284,7 @@ def menu_modifying_card(selected_card, var_hotkey_list, var_hotkey_dict):
                 return None, retitled_card_path
 
             elif var_hotkey_dict[response.upper()] == action_archive:
-                l_recurring.remove_recurring_data(var_file=selected_card)
+                l_recurring.remove_recurring_data(var_json_card=selected_card)
                 l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.archived_cards_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card Archived")
                 return None, None

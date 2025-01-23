@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#!/usr/bin/bash
 
 VENV_PATH="SUPPORT_FILES/LUMO_RUNTIME"
 REQUIREMENTS="SUPPORT_FILES/requirements.txt"
@@ -41,10 +41,9 @@ alias lumo="activate_venv"
 alias lumocards="python3 LUMO_LIBRARY/lumo_cardsrun.py"
 alias locard="python3 LUMO_LIBRARY/lumo_search_cards.py"
 alias newcard="python3 LUMO_LIBRARY/lumo_newcard.py"
-alias lightwalks="open LIGHTWALK_CYCLES"
-alias lightwalk="python3 LUMO_LIBRARY/lumo_gettoday.py"
+alias planner="open PLANNER"
+alias today="python3 LUMO_LIBRARY/lumo_gettoday.py"
 alias pomodoro="python3 LUMO_LIBRARY/lumo_pomodoro.py"
-alias outlist="python3 LUMO_LIBRARY/lumo_outlist.py"
 alias checklist="python3 LUMO_LIBRARY/lumo_outlist.py"
 
 lumo

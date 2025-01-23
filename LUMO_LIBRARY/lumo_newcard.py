@@ -2,7 +2,6 @@ import os
 import pathlib
 import sys
 import subprocess
-import time
 from argparse import ArgumentParser
 
 import lumo_filehandler as l_files
@@ -21,23 +20,19 @@ default_text = '\n'.join(('...', '...', '...'))
 card_title_already_exists = False
 
 
-def lambda_menu(letter, msg):
-    return [f"  [{letter}] {msg}"]
+def arg_parser():
+    global parser
 
-
-def suitcaser():
-    global suitcase
-
-    suitcase = ArgumentParser(add_help=False)
-    suitcase.add_argument('-o', '--output', action='store_true',
-                          help="shows output")
-    suitcase.add_argument(
+    parser = ArgumentParser(add_help=False)
+    parser.add_argument('-o', '--output', action='store_true',
+                        help="shows output")
+    parser.add_argument(
         'category'
         , action='store'
         , metavar='Optional card category?'
         , help="Use an abbreviating letter"
     )
-    suitcase.add_argument(
+    parser.add_argument(
         # '-o'
         # , '--card_name'
         'cardname'
@@ -48,19 +43,20 @@ def suitcaser():
         , help="…?")
 
 
+# change this so that it returns the same kind of type, i.e. true / false
 def retrieve_available_arguments():
     if len(sys.argv) > 1:
-        result = suitcase.parse_args()
+        result = parser.parse_args()
         return result
     else:
         return False
 
 
-def get_card_from_argv(outcome):
-    cardname_as_list = [t.title() for t in outcome.cardname]
+def get_card_from_argv(parsed_options):
+    cardname_as_list = [t.title() for t in parsed_options.cardname]
     cardname = "".join(cardname_as_list)
 
-    result = outcome.category.upper()
+    result = parsed_options.category.upper()
     category = category_check(result)
 
     card_name = "_".join((category, cardname))
@@ -92,8 +88,8 @@ def get_category_from_input():
     return category_check(result)
 
 
-def category_check(result):
-    if result.upper() not in all_card_categories:
+def category_check(card_category):
+    if card_category.upper() not in all_card_categories:
         l_animators.animate_text("Category letter currently doesn't exist", speed=.025)
         l_animators.animate_text("- or -", speed=.025)
         l_animators.animate_text("You entered something other than one letter.", speed=.025)
@@ -102,7 +98,7 @@ def category_check(result):
         return 'R'
 
     else:
-        return result.upper()
+        return card_category.upper()
 
 
 def get_card_name():
@@ -138,12 +134,12 @@ def get_card_from_input():
     return result
 
 
-def prep_newcard_menu(var_menu, pop_letters=False):
+def prep_newcard_menu(menu, pop_letters=False):
     if pop_letters:
-        full_hotkey_set_dict = {f"{letters_filtered_copy.pop(0)}":f"{match}" for match in var_menu}
+        full_hotkey_set_dict = {f"{letters_filtered_copy.pop(0)}":f"{match}" for match in menu}
 
     else:
-        full_hotkey_set_dict = {f"{ltr}":f"{match}" for ltr, match in zip(l_menus.letters_filtered, var_menu)}
+        full_hotkey_set_dict = {f"{ltr}":f"{match}" for ltr, match in zip(l_menus.letters_filtered, menu)}
 
 
     full_hotkey_set_list = [f"  [{letter}] {action}" for letter, action in zip(
@@ -153,8 +149,8 @@ def prep_newcard_menu(var_menu, pop_letters=False):
     return full_hotkey_set_dict, full_hotkey_set_list
 
 
-def generate_quick_card(text_file):
-    formatted_card_fullpath = os.path.join(l_files.cards_near_folder, text_file)
+def generate_quick_card(card_filename):
+    formatted_card_fullpath = os.path.join(l_files.cards_near_folder, card_filename)
     with open(formatted_card_fullpath, "a+") as newcard:
         newcard.write(default_text)
 
@@ -322,10 +318,10 @@ def create_card():
             l_animators.animate_text("  Options available in this context are just shortcut letters.")
 
 
-def write_card_and_json(filename_txt, folder, add_custom_steps=None):
-    formatted_card_fullpath = os.path.join(folder, filename_txt)
+def write_card_and_json(card_filename, folder, add_custom_steps=None):
+    formatted_card_fullpath = os.path.join(folder, card_filename)
     card_folder = pathlib.Path(folder).name
-    c_abbr = filename_txt[0]
+    c_abbr = card_filename[0]
 
     if add_custom_steps:
         with open(formatted_card_fullpath, "w+") as newcard:
@@ -337,7 +333,7 @@ def write_card_and_json(filename_txt, folder, add_custom_steps=None):
             newcard.write(default_text)
 
     default_json = l_json_utils.make_dflt_json_dict(card_folder, c_abbr)
-    json_fullpath = l_json_utils.get_json_card_fullpath(filename_txt)
+    json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
     l_json_utils.write_json(var_file=json_fullpath, json_data=default_json)
 
     return formatted_card_fullpath, json_fullpath
@@ -360,12 +356,12 @@ def card_creation_loop():
         return None, None
 
 
-def card_menu_loop(reslt_card, reslt_path):
+def card_menu_loop(result_card, result_path):
 
-    if reslt_card and reslt_path:
+    if result_card and result_path:
         hotkey_dict, hotkey_list = l_menus.prep_newcard_menu(l_menus.newcard_main_actions, l_menus.letters_filtered.copy())
-        status, return_path = l_search.cardsearch_main_options(var_card=reslt_card,
-                                                               var_card_path=reslt_path,
+        status, return_path = l_search.cardsearch_main_options(var_card=result_card,
+                                                               var_card_path=result_path,
                                                                var_hotkey_dict=hotkey_dict,
                                                                var_hotkey_list=hotkey_list)
         while status == "RELOOP":
@@ -384,7 +380,7 @@ def card_menu_loop(reslt_card, reslt_path):
 
 
 def main():
-    suitcaser()
+    arg_parser()
     result_card, result_path = card_creation_loop()
     card_menu_loop(result_card, result_path)
 
@@ -392,3 +388,8 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+# ---- ETC. / UNUSED ---- #
+#
+# def lambda_menu(letter, msg):
+#     return [f"  [{letter}] {msg}"]

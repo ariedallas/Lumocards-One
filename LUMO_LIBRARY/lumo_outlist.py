@@ -10,13 +10,11 @@ letters_filtered = [l.upper() for l in letters if not (l == 'q') and not (l == '
 
 main_card_path = os.path.join(l_files.internal_cards_folder, "Outlist_Main.txt")
 main_card = l_formatters.abspath_to_card(main_card_path)
-main_card_title = main_card[0]
-main_card_steps = main_card[1]
+main_card_title, main_card_steps = main_card[0], main_card[1]
 
 errand_card_path = os.path.join(l_files.internal_cards_folder, "Outlist_Errand.txt")
 errand_card = l_formatters.abspath_to_card(errand_card_path)
-errand_card_title = errand_card[0]
-errand_card_steps = errand_card[1]
+errand_card_title, errand_card_steps = errand_card[0], errand_card[1]
 
 checklist_cards = sorted([card for card in os.listdir(l_files.checklist_cards_folder)])
 checklist_cards_filtered = []
@@ -27,6 +25,7 @@ for path in checklist_cards:
         continue
     else:
         checklist_cards_filtered.append(path)
+
 
 def display_menu(list_of_cards):
     fetched_cards = [l_formatters.path_to_card(path) for path in list_of_cards]
@@ -54,14 +53,15 @@ def card_select(list_of_cards):
     else:
         print("Try again, pls.")
 
-def display_selected_outlist(var_title, var_steps):
+
+def display_selected_checklist(card_title, card_steps):
     print()
-    l_animators.animate_text(title)
+    l_animators.animate_text(card_title)
     print()
-    l_formatters.cycler(var_steps)
+    l_formatters.cycler(card_steps)
 
 
-def main_outlist_review():
+def main_checklist_review():
     print()
     rsp = l_files.proceed("Would you like to review the Essentials Checklist? ")
     if rsp:
@@ -73,7 +73,7 @@ def main_outlist_review():
         l_formatters.cycler(main_card_steps)
 
 
-def errand_outlist_review():
+def errand_checklist_review():
     print()
     rsp = l_files.proceed("Would you like to review the Errands Checklist? ")
     if rsp:
@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     display_menu(checklist_cards_filtered)
     title, steps = card_select(checklist_cards_filtered)
-    display_selected_outlist(var_title=title, var_steps=steps)
+    display_selected_checklist(card_title=title, card_steps=steps)
 
-    main_outlist_review()
-    errand_outlist_review()
+    main_checklist_review()
+    errand_checklist_review()
