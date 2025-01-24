@@ -4,6 +4,7 @@ import time
 import pathlib
 import lumo_json_utilities as l_json_utils
 
+
 # ---FILES--- #
 home = pathlib.Path.home()
 parent = pathlib.Path(__file__).parent.name
@@ -34,12 +35,12 @@ today_frmttd_spaces = today.strftime("%d %b %Y")
 today_frmttd_log = today.strftime("%d %m %Y")
 today_frmttd_csv = today.strftime("%d %B %Y")
 today_dayof_year = today.strftime("%j")
-localtime = time.localtime(time.time())
-localhour = localtime[3]
+local_time = time.localtime(time.time())
+local_hour = local_time[3]
 
 
-cur_time = today.strftime("%H:%M:%S")
-cur_time_hr = "----------{}----------".format(cur_time)
+curr_time = today.strftime("%H:%M:%S")
+curr_time_hr = "----------{}----------".format(curr_time)
 
 def isolate_date_units():
     day = today.strftime("%A")
@@ -48,10 +49,12 @@ def isolate_date_units():
     year = today.strftime("%Y")
 
     return day, day_num, month, year
+
+
 # ---- PLANNER ---- #
 planner_folder = os.path.join(rootpath, "PLANNER")
-today_outline_file = f"{today_frmttd.upper()}_outline.txt"
-today_outline_fullpath = os.path.join(planner_folder, today_outline_file)
+today_planner_file = f"{today_frmttd.upper()}_planner.txt"
+today_planner_fullpath = os.path.join(planner_folder, today_planner_file)
 
 
 # ---- RESPONSES ---- #
@@ -66,10 +69,8 @@ negative_user_responses = [
 
 # ---- FUCNTIONS ---- #
 def get_near_focus_cards():
-    cardsA = [c for (_, _, c) in os.walk(cards_near_folder)]
-
-    cardsB = cardsA[0]
-    fetched_cards = list(filter(lambda c: not c.startswith('.'), cardsB))
+    cards = [c for c in os.listdir(cards_near_folder)]
+    fetched_cards = list(filter(lambda c: c[0].isalpha(), cards))
 
     return fetched_cards
 
@@ -83,62 +84,61 @@ def get_lumocards_categories():
 
 def get_json_settings():
     settings_fullpath = os.path.join(rootpath, 'SUPPORT_FILES/settings.json')
-    json_settings = l_json_utils.read_and_get_json_data(var_rel_filename=None, var_file_abspath=settings_fullpath,
+    json_settings = l_json_utils.read_and_get_json_data(json_filename=None, var_fullpath=settings_fullpath,
                                                         is_json_card=False)
     return json_settings
 
 
+def basic_wrtr(content, card_fullpath):
 
-def basic_wrtr(content, file):
-
-    with open(file, "a+") as fin:
+    with open(card_fullpath, "a+") as fin:
         fin.write(content)
 
 
-def basic_wrtr_custom_dir(content, file, custom_dir):
-    file_abspath = os.path.join(custom_dir, file)
+def basic_wrtr_custom_dir(content, card_filename, var_dir):
+    file_fullpath = os.path.join(var_dir, card_filename)
 
-    with open(file_abspath, "a+") as fin:
-        fin.write(content)
-        fin.write("\n")
-
-
-def over_wrtr(content, file):
-
-    with open(file, "w+") as fin:
+    with open(file_fullpath, "a+") as fin:
         fin.write(content)
         fin.write("\n")
 
 
-def over_wrtr_list(list, file):
+def over_wrtr(content, card_fullpath):
 
-    with open(file, "w+") as fin:
-        for item in list:
+    with open(card_fullpath, "w+") as fin:
+        fin.write(content)
+        fin.write("\n")
+
+
+def over_wrtr_list(var_list, card_fullpath):
+
+    with open(card_fullpath, "w+") as fin:
+        for item in var_list:
             fin.write(item)
             fin.write("\n")
 
 
-def basic_wrtr_list(list, file):
+def basic_wrtr_list(var_list, card_fullpath):
 
-    with open(file, "a+") as fin:
-        for item in list:
+    with open(card_fullpath, "a+") as fin:
+        for item in var_list:
             fin.write(item)
             fin.write("\n")
 
 
-def mk_planner():
-    basic_wrtr(f"LIGHTWALK: {today_frmttd_spaces.upper()}", today_outline_fullpath)
-    basic_wrtr("\n", today_outline_fullpath)
+def make_today_planner():
+    basic_wrtr(f"PLANNER: {today_frmttd_spaces.upper()}", today_planner_fullpath)
+    basic_wrtr("\n", today_planner_fullpath)
 
 
 def exists_planner_file():
-    if os.path.exists(today_outline_fullpath):
+    if os.path.exists(today_planner_fullpath):
         return True
 
 
-def get_days_from_date(birthyear, birthmonth, birthday):
+def get_days_from_date(birth_year, birth_month, birth_day):
     d_present = datetime.datetime.today().date()
-    d_birth = datetime.date(birthyear, birthmonth, birthday)
+    d_birth = datetime.date(birth_year, birth_month, birth_day)
 
     delta = d_present - d_birth
     return delta.days
@@ -151,6 +151,7 @@ def proceed(input_text="... "):
 
 if __name__ == '__main__':
     print("hello from main")
+    print(get_near_focus_cards())
 
 # ---- ETC ---- #
 # is_Sunday = (datetime.date.weekday(today) == 6)

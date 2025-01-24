@@ -1,9 +1,9 @@
 import lumo_formatters as l_formatter
 
 
-def display_card(sample_card, display_qty=6, length=50, height=10):
-    f_card_name = l_formatter.format_card_title(sample_card[0])
-    todo_items = sample_card[1]
+def display_card(var_card, display_qty=6, length=50, height=10):
+    f_card_name = l_formatter.format_card_title(var_card[0])
+    todo_items = var_card[1]
 
     print("|" + ("•" * length) + "|")
 
@@ -34,11 +34,11 @@ def display_centered_line(content="sample_content"):
         print("•{:^50}•".format(content))
 
 
-def display_centered_content(todo_items, display_qty):
+def display_centered_content(card_steps, display_qty):
 
     qty_list = [(str(num) + ") ") for num in range(1,display_qty+1)]
 
-    for letter, item in (zip(qty_list, todo_items)):
+    for letter, item in (zip(qty_list, card_steps)):
         display_centered_line(letter+item)
 
 

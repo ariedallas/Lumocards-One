@@ -34,9 +34,7 @@ def cards_intro():
     l_animators.standard_interval_printer([f"VERSION: {l_files.parents[1].name}"], speed_interval=.5)
     l_animators.standard_interval_printer([""], speed_interval=.5)
     l_animators.standard_interval_printer(["RUNNING: NEAR FOCUS CARDS"], speed_interval=.5)
-
-    if l_files.proceed(" "):
-        l_animators.animate_text("...")
+    l_animators.animate_text(" ...", speed=.075)
 
 
 def add_step_via_integers(card_steps, card_title, response_filtered):
@@ -119,7 +117,7 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
         elif route == 'archive':
             reviewed_cards.append(card_filename)
             archived_cards.append(card_filename)
-            print("Card completed: {}".format(l_files.cur_time_hr))
+            print("Card completed: {}".format(l_files.curr_time_hr))
             print(random.choice(l_menus.completed_hotkey_feedback_phrases))
 
 
@@ -257,12 +255,12 @@ def cardsrun_macro_menu(card_filename, card, hkey_dict, hkey_list):
             elif hkey_dict[response.upper()] == l_menus.action_modify:
 
                 hotkey_list, hotkey_dict = l_menus.prep_card_modify_menu(
-                                                            actions_set=l_menus.cardsrun_modify_menu_actions.copy(),
-                                                            var_submenu_cardpath=card_filename)
+                                                            actions_list=l_menus.cardsrun_modify_menu_actions.copy(),
+                                                            card_filename=card_filename)
 
-                status, possible_returned_card = l_menus.menu_modifying_card(selected_card=card_filename,
-                                                                             var_hotkey_list=hotkey_list,
-                                                                             var_hotkey_dict=hotkey_dict)
+                status, possible_returned_card = l_menus.menu_modify_card(selected_card=card_filename,
+                                                                          var_hotkey_list=hotkey_list,
+                                                                          var_hotkey_dict=hotkey_dict)
                 if possible_returned_card:
                     return "RELOOP", possible_returned_card
 
@@ -314,16 +312,16 @@ def cardsrun_macro_menu(card_filename, card, hkey_dict, hkey_list):
             print("In this context your options are hotkey letter such as 'a', 'c', or 'quit'.")
 
 
-def iterate_cards(list_of_cards, mode):
-    total_cards = len(list_of_cards)
+def iterate_cards(var_list_cards, mode):
+    total_cards = len(var_list_cards)
 
-    for idx, card_path in enumerate(list_of_cards):
+    for idx, card_path in enumerate(var_list_cards):
         status = None
 
         card_no = idx + 1
         card_counter_feedback_text = "Card ({}) of ({})".format(card_no, total_cards).upper()
 
-        card = l_formatters.path_to_card(card_path)
+        card = l_formatters.filename_to_card(card_path)
 
         l_animators.standard_interval_printer(["", card_counter_feedback_text], speed_interval=0)
         l_boxify.display_card(card)
@@ -380,7 +378,7 @@ def review_and_write_recurring():
 def planner_feedback(card_title, card_step):
 
     formatted_output = f"{card_title}: {card_step}"
-    full_message = f"Added: '{formatted_output} 'to planner."
+    full_message = f"Added: '{formatted_output}.' to planner."
     l_animators.standard_interval_printer([full_message])
     todays_cards.append(formatted_output)
 
@@ -398,7 +396,7 @@ def update_cards():
 
         if l_files.proceed("> "):
             for card in archived_cards:
-                l_formatters.archiver(card)
+                l_formatters.near_focus_to_archive(card)
 
 
     if len(deleted_cards) > 0:
@@ -412,13 +410,13 @@ def update_cards():
 
     if not l_files.exists_planner_file():
         l_animators.animate_text("Creating Planner file for today...")
-        l_files.mk_planner()
+        l_files.make_today_planner()
 
     if len(todays_cards) > 0:
-        l_files.basic_wrtr("\n", l_files.today_outline_fullpath)
-        l_files.basic_wrtr(f"NEAR FOCUS CARDS: {l_files.cur_time_hr}", l_files.today_outline_fullpath)
-        l_files.basic_wrtr("\n", l_files.today_outline_fullpath)
-        l_files.basic_wrtr_list(todays_cards, l_files.today_outline_fullpath)
+        l_files.basic_wrtr("\n", l_files.today_planner_fullpath)
+        l_files.basic_wrtr(f"NEAR FOCUS CARDS: {l_files.curr_time_hr}", l_files.today_planner_fullpath)
+        l_files.basic_wrtr("\n", l_files.today_planner_fullpath)
+        l_files.basic_wrtr_list(todays_cards, l_files.today_planner_fullpath)
 
 
     print()

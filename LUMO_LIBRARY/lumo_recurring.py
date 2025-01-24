@@ -10,8 +10,8 @@ import lumo_animationlibrary as l_animators
 reactivated_cards = []
 
 
-def test_for_reactivation(var_json_card):
-    json_fullpath = l_json_utils.get_json_card_fullpath(var_json_card)
+def test_for_reactivation(json_filename):
+    json_fullpath = l_json_utils.get_json_card_fullpath(json_filename)
 
     with open(json_fullpath) as fin:
         json_data = json.load(fin)
@@ -41,20 +41,20 @@ def get_recurring_cards():
     return reactivated_cards
 
 
-def remove_recurring_data(var_json_card):
-    json_data = l_json_utils.read_and_get_json_data(var_json_card)
+def remove_recurring_data(json_filename):
+    json_data = l_json_utils.read_and_get_json_data(json_filename)
 
     json_data["recurring freq"] = 0
     json_data["recurring freq time unit"] = None
     json_data["last occurrence"] = None
 
-    l_json_utils.write_json(var_json_card, json_data)
+    l_json_utils.write_json(json_filename, json_data)
 
     return json_data
 
 
-def update_recurring_data(var_json_card, var_settings=None, initialized=False):
-    json_fullpath = l_json_utils.get_json_card_fullpath(var_json_card)
+def update_recurring_data(json_filename, var_settings=None, initialized=False):
+    json_fullpath = l_json_utils.get_json_card_fullpath(json_filename)
 
     with open(json_fullpath) as fin:
         json_data = json.load(fin)

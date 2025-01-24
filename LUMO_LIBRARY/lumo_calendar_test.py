@@ -191,7 +191,7 @@ def unschedule_and_remove_localCardId(credentials, card_abspath):
 
 def new_event_and_sync(credentials, card_file, card_abspath):
 
-	card_tuple = l_formatter.path_to_card(card_file)
+	card_tuple = l_formatter.filename_to_card(card_file)
 	card_title = card_tuple[0]
 	card_title_formatted = l_formatter.format_card_title(card_title)
 	card_steps = card_tuple[1]

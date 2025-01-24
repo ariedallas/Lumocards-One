@@ -21,10 +21,12 @@ def test_match(queried):
     unique_words =  re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', queried)
     return unique_words
 
+
 def test_match_digit(queried, search_term):
 
     digit_match = re.findall(fr'{search_term}\d*', queried)
     return digit_match
+
 
 def iterate_and_find(searchterm, folder):
     possible_files = []
@@ -47,20 +49,20 @@ def iterate_and_find(searchterm, folder):
 
 
 def reshow_match(chosen_file):
-    card = l_formatters.path_to_card(chosen_file)
+    card = l_formatters.filename_to_card(chosen_file)
     l_menus.prep_menu(l_menus.cardsearch_main_menu_actions)
     return card, chosen_file
 
 
-def big_zipper_prep(var_searchterm):
+def big_zipper_prep(searchterm):
 
-    file_matches_near = iterate_and_find(var_searchterm, l_files.cards_near_folder)
-    file_matches_middle = iterate_and_find(var_searchterm, l_files.cards_middle_folder)
-    file_matches_dist = iterate_and_find(var_searchterm, l_files.cards_dist_folder)
+    file_matches_near = iterate_and_find(searchterm, l_files.cards_near_folder)
+    file_matches_middle = iterate_and_find(searchterm, l_files.cards_middle_folder)
+    file_matches_dist = iterate_and_find(searchterm, l_files.cards_dist_folder)
 
-    file_matches_recurring = iterate_and_find(var_searchterm, l_files.recurring_cards_folder)
-    file_matches_checklist = iterate_and_find(var_searchterm, l_files.checklist_cards_folder)
-    file_matches_archived = iterate_and_find(var_searchterm, l_files.archived_cards_folder)
+    file_matches_recurring = iterate_and_find(searchterm, l_files.recurring_cards_folder)
+    file_matches_checklist = iterate_and_find(searchterm, l_files.checklist_cards_folder)
+    file_matches_archived = iterate_and_find(searchterm, l_files.archived_cards_folder)
 
     found_matches = (sorted(file_matches_near), sorted(file_matches_middle), sorted(file_matches_dist)
                      , sorted(file_matches_recurring), sorted(file_matches_checklist), sorted(file_matches_archived))
@@ -108,7 +110,7 @@ def big_zipper(var_total_matches):
 
 def select_card_from_found(searchterm):
 
-    found_matches, shortcut_file_matches = big_zipper_prep(var_searchterm=searchterm)
+    found_matches, shortcut_file_matches = big_zipper_prep(searchterm=searchterm)
     total_amt_matches, all_matches_formatted, used_letters  = big_zipper(found_matches)
 
     if total_amt_matches > 24:
@@ -147,7 +149,7 @@ def select_card_from_found(searchterm):
             letter_as_listindex = ord(response.lower()) - 97
 
             chosen_file = shortcut_file_matches[letter_as_listindex]
-            card = l_formatters.path_to_card(chosen_file)
+            card = l_formatters.filename_to_card(chosen_file)
 
             return card, chosen_file
 
@@ -170,9 +172,9 @@ def select_card_from_found(searchterm):
                    "\nYou entered a letter that doesn't match anything.")
 
 
-def cardsearch_main_options(var_card, var_card_path, var_hotkey_dict, var_hotkey_list):
+def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_hotkey_list):
 
-    card_fullpath = l_formatters.get_card_abspath(var_card_path)
+    card_fullpath = l_formatters.get_card_abspath(var_card_filename)
 
     l_formatters.card_header(var_card)
 
@@ -188,16 +190,16 @@ def cardsearch_main_options(var_card, var_card_path, var_hotkey_dict, var_hotkey
 
             if var_hotkey_dict[response.upper()] == l_menus.action_open:
                 subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
-                return "RELOOP", var_card_path
+                return "RELOOP", var_card_filename
 
             elif var_hotkey_dict[response.upper()] == l_menus.action_modify:
 
                 hotkey_list, hotkey_dict = l_menus.prep_card_modify_menu(l_menus.cardsearch_modify_menu_actions.copy(),
-                                                                         var_submenu_cardpath=var_card_path)
+                                                                         card_filename=var_card_filename)
 
-                possible_status, possible_returned_card = l_menus.menu_modifying_card(selected_card=var_card_path,
-                                                                                     var_hotkey_list=hotkey_list,
-                                                                                     var_hotkey_dict=hotkey_dict)
+                possible_status, possible_returned_card = l_menus.menu_modify_card(selected_card=var_card_filename,
+                                                                                   var_hotkey_list=hotkey_list,
+                                                                                   var_hotkey_dict=hotkey_dict)
                 if possible_returned_card:
                     return "RELOOP", possible_returned_card
 
@@ -205,15 +207,15 @@ def cardsearch_main_options(var_card, var_card_path, var_hotkey_dict, var_hotkey
                     return "NEW SEARCH", None
 
                 else:
-                    return "RELOOP", var_card_path
+                    return "RELOOP", var_card_filename
 
 
             elif var_hotkey_dict[response.upper()] == l_menus.action_schedule:
                 l_animators.animate_text("  This feature not fully available")
-                return "RELOOP", var_card_path
+                return "RELOOP", var_card_filename
 
             elif var_hotkey_dict[response.upper()] == l_menus.action_set_recurring:
-                card_title_formatted = l_formatters.format_card_title(var_card_path.replace(".txt", ""))
+                card_title_formatted = l_formatters.format_card_title(var_card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus.prep_newcard_menu(l_menus.recurring_menu,
                                                                        l_menus.letters_filtered,
                                                                        pop_letters=False)
@@ -224,12 +226,12 @@ def cardsearch_main_options(var_card, var_card_path, var_hotkey_dict, var_hotkey
 
                 recurrence_settings = l_menus.menu_recurrence_settings(var_menu=recur_menu_d)
 
-                l_recurring.update_recurring_data(var_card_path, recurrence_settings, initialized=True)
-                l_formatters.card_renamer(curr_name=var_card_path
-                                        , dst_dir=l_files.recurring_cards_folder
-                                        , dst_name=var_card_path)
+                l_recurring.update_recurring_data(var_card_filename, recurrence_settings, initialized=True)
+                l_formatters.card_renamer(curr_name=var_card_filename
+                                          , dst_dir=l_files.recurring_cards_folder
+                                          , dst_name=var_card_filename)
 
-                return "RELOOP", var_card_path
+                return "RELOOP", var_card_filename
 
 
         elif response.upper() in l_menus.hotkey_exit_dict.keys():
@@ -276,6 +278,7 @@ def main():
 
     status = "INITIAL SEARCH"
     response = True
+    return_path = None
 
     while response not in l_files.negative_user_responses:
         print()

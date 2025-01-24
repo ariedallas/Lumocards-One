@@ -177,10 +177,10 @@ def prep_menu(var_menu):
     return full_hotkey_set_dict, full_hotkey_set_list
 
 
-def prep_card_run_menu(actions_set):
+def prep_card_run_menu(actions_list):
     hotkey_dict = {}
 
-    for letter, action in zip(letters_filtered, actions_set):
+    for letter, action in zip(letters_filtered, actions_list):
         hotkey_dict[letter] = action
 
     full_hotkey_set_dict = hotkey_dict
@@ -192,19 +192,19 @@ def prep_card_run_menu(actions_set):
     return full_hotkey_set_dict, full_hotkey_set_list
 
 
-def prep_card_modify_menu(actions_set, var_submenu_cardpath):
-    current_focus = l_formatters.get_card_focus(var_submenu_cardpath)
+def prep_card_modify_menu(actions_list, card_filename):
+    current_focus = l_formatters.get_card_focus(card_filename)
 
     hotkey_dict = {}
 
     if current_focus == "near":
-        actions_set.remove(action_set_near)
+        actions_list.remove(action_set_near)
     elif current_focus == "middle":
-        actions_set.remove(action_set_middle)
+        actions_list.remove(action_set_middle)
     elif current_focus == "distant":
-        actions_set.remove(action_set_dist)
+        actions_list.remove(action_set_dist)
 
-    for letter, action in zip(letters_filtered, actions_set):
+    for letter, action in zip(letters_filtered, actions_list):
         hotkey_dict[letter] = action
 
     full_hotkey_set_dict = hotkey_dict
@@ -242,7 +242,7 @@ def menu_recurrence_settings(var_menu):
         return recurrence_settings
 
 
-def menu_modifying_card(selected_card, var_hotkey_list, var_hotkey_dict):
+def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
     print()
     l_animators.animate_text("MODIFYING CARD")
     print()
@@ -259,19 +259,19 @@ def menu_modifying_card(selected_card, var_hotkey_list, var_hotkey_dict):
         if response.upper() in var_hotkey_dict.keys():
 
             if var_hotkey_dict[response.upper()] == action_set_near:
-                l_recurring.remove_recurring_data(var_json_card=selected_card)
+                l_recurring.remove_recurring_data(json_filename=selected_card)
                 l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_near_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card set to ➝ Near Focus")
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == action_set_middle:
-                l_recurring.remove_recurring_data(var_json_card=selected_card)
+                l_recurring.remove_recurring_data(json_filename=selected_card)
                 l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_middle_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card set to ➝ Middle Focus")
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == action_set_dist:
-                l_recurring.remove_recurring_data(var_json_card=selected_card)
+                l_recurring.remove_recurring_data(json_filename=selected_card)
                 l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_dist_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card set to ➝ Distant Focus")
                 return "CARD REFOCUSED", None
@@ -284,7 +284,7 @@ def menu_modifying_card(selected_card, var_hotkey_list, var_hotkey_dict):
                 return None, retitled_card_path
 
             elif var_hotkey_dict[response.upper()] == action_archive:
-                l_recurring.remove_recurring_data(var_json_card=selected_card)
+                l_recurring.remove_recurring_data(json_filename=selected_card)
                 l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.archived_cards_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card Archived")
                 return None, None

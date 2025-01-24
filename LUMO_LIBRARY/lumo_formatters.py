@@ -81,56 +81,55 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
 
     if l_files.proceed("  Type 'cancel' to stop or press any key to continue > "):
         os.rename(source, dest)
-        print(source, dest)
-        l_json_utils.rename_json_card(var_file_src=curr_name, var_file_dst=dst_name)
-        l_json_utils.flexible_json_updater(var_file=dst_name, loc=dst_dir_name, update_category=category_change)
+        l_json_utils.rename_json_card(src_filename=curr_name, dest_filename=dst_name)
+        l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name, update_category=category_change)
 
 
-def card_deleter(var_card_path):
-    card_fullpath = get_card_abspath(var_card_path)
-    json_fullpath = l_json_utils.get_json_card_fullpath(var_card_path)
+def card_deleter(card_filename):
+    card_fullpath = get_card_abspath(card_filename)
+    json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
 
     send2trash.send2trash(card_fullpath)
     send2trash.send2trash(json_fullpath)
 
 
-def set_card_near_focus(card_path, var_dst_dir):
-    new_path = os.path.join(l_files.cards_near_folder, card_path)
+def set_card_near_focus(card_filename, var_dst_dir):
+    new_path = os.path.join(l_files.cards_near_folder, card_filename)
 
-    card_renamer(curr_name=card_path, dst_dir=var_dst_dir, dst_name=card_path)
+    card_renamer(curr_name=card_filename, dst_dir=var_dst_dir, dst_name=card_filename)
     return new_path
 
 
-def set_card_middle_focus(card_path):
-    new_path = os.path.join(l_files.cards_middle_folder, card_path)
+def set_card_middle_focus(card_filename):
+    new_path = os.path.join(l_files.cards_middle_folder, card_filename)
 
-    card_renamer(card_path, new_path)
+    card_renamer(card_filename, new_path)
     return new_path
 
 
-def set_card_dist_focus(card_path):
-    new_path = os.path.join(l_files.cards_dist_folder, card_path)
+def set_card_dist_focus(card_filename):
+    new_path = os.path.join(l_files.cards_dist_folder, card_filename)
 
-    card_renamer(card_path, new_path)
+    card_renamer(card_filename, new_path)
     return new_path
 
 
-def get_card_focus(path):
+def get_card_focus(card_filename):
     focus = None
 
-    if path in os.listdir(l_files.cards_near_folder):
+    if card_filename in os.listdir(l_files.cards_near_folder):
         focus = "near"
-    elif path in os.listdir(l_files.cards_middle_folder):
+    elif card_filename in os.listdir(l_files.cards_middle_folder):
         focus = "middle"
-    elif path in os.listdir(l_files.cards_dist_folder):
+    elif card_filename in os.listdir(l_files.cards_dist_folder):
         focus = "distant"
 
     return focus
 
 
-def archiver(card_path):
-    source = os.path.join(l_files.cards_near_folder, card_path)
-    dest = os.path.join(l_files.archived_cards_folder, card_path)
+def near_focus_to_archive(card_filename):
+    source = os.path.join(l_files.cards_near_folder, card_filename)
+    dest = os.path.join(l_files.archived_cards_folder, card_filename)
     os.rename(source, dest)
 
 
@@ -141,84 +140,83 @@ def cycler(list_of_steps):
             sys.exit(0)
 
 
-def format_card_title(var):
+def format_card_title(card_filename):
     try:
-        subbed_underscores = var.replace("_", " ")
+        subbed_underscores = card_filename.replace("_", " ")
 
         first, rest = subbed_underscores.split()
-        separated_by_caps = camelbreaks_stitch_two(rest).upper()
+        separated_by_caps = camel_case_separator_b(rest).upper()
 
         result = "{}: {}".format(first, separated_by_caps)
 
     except:
-        var = var.replace("_", " ")
-        result = camelbreaks_stitch(var).upper()
+        subbed_underscores = card_filename.replace("_", " ")
+        result = camel_case_separator_b(subbed_underscores).upper()
 
     return result
 
 
-def add_blank_space(response):
-    if response == "":
+def add_blank_space(usr_input):
+    if usr_input == "":
         return " "
 
     else:
-        return response
+        return usr_input
 
 
-def camelbreaks(var):
+def get_capital_letter_idxs(card_filename):
     result = []
 
-    for x in range(len(var)):
-        if var[x].isupper():
+    for x in range(len(card_filename)):
+        if card_filename[x].isupper():
             result.append(x)
     return result
 
 
+def get_capital_letter_idxs_b(card_filename):
+    result = []
 
-def camelbreaks_stitch(var):
+    for n in range(len(card_filename)):
+        if card_filename[n].isupper():
+            result.append(n)
+
+    result.append(len(card_filename))
+
+    return result
+
+
+def camel_case_separator(card_filename):
     card_name = ""
-    breaks = camelbreaks(var)
+    breaks = get_capital_letter_idxs(card_filename)
     stop = 0
 
     for n in range(len(breaks) - 1):
         start = breaks[n]
         stop = breaks[n+1]
 
-        card_name += "{} ".format(var[start:stop])
+        card_name += "{} ".format(card_filename[start:stop])
 
-    card_name += "{}".format(var[stop:])
+    card_name += "{}".format(card_filename[stop:])
 
     return card_name
 
 
-def camelbreaks_two(var):
-    result = []
-
-    for x in range(len(var)):
-        if var[x].isupper():
-            result.append(x)
-
-    result.append(len(var))
-
-    return result
-
-
-def camelbreaks_stitch_two(var):
-    breaks = camelbreaks_two(var)
+def camel_case_separator_b(card_filename):
+    breaks = get_capital_letter_idxs_b(card_filename)
     total_words = len(breaks) - 1
 
     # add this back at the end
-    first_nums = re.match(r'\d+', var)
+    first_nums = re.match(r'\d+', card_filename)
 
     initial_group = []
 
     for n in range(total_words):
         start, stop = breaks[n], (breaks[n + 1])
-        word = var[start:stop]
+        word = card_filename[start:stop]
         initial_group.append(word)
 
 
-    additions = recursive_digit_split(initial_group)
+    additions = recursive_parser(initial_group)
 
     card_name = " ".join(additions)
 
@@ -230,10 +228,10 @@ def camelbreaks_stitch_two(var):
     return card_name
 
 
-def recursive_digit_split(initial_group):
+def recursive_parser(var_list):
     additions = []
 
-    for word in initial_group:
+    for word in var_list:
         nums = re.search(r'\d+', word)
 
         if nums:
@@ -244,7 +242,7 @@ def recursive_digit_split(initial_group):
             additions.append(m)
 
             if second:
-                additions += recursive_digit_split([second])
+                additions += recursive_parser([second])
 
         else:
             additions.append(word)
@@ -252,32 +250,32 @@ def recursive_digit_split(initial_group):
     return additions
 
 
-def get_card_abspath(path):
+def get_card_abspath(card_filename):
     folder_route = None
 
-    if path in os.listdir(l_files.cards_near_folder):
+    if card_filename in os.listdir(l_files.cards_near_folder):
         folder_route = l_files.cards_near_folder
-    elif path in os.listdir(l_files.cards_middle_folder):
+    elif card_filename in os.listdir(l_files.cards_middle_folder):
         folder_route = l_files.cards_middle_folder
-    elif path in os.listdir(l_files.cards_dist_folder):
+    elif card_filename in os.listdir(l_files.cards_dist_folder):
         folder_route = l_files.cards_dist_folder
-    elif path in os.listdir(l_files.recurring_cards_folder):
+    elif card_filename in os.listdir(l_files.recurring_cards_folder):
         folder_route = l_files.recurring_cards_folder
-    elif path in os.listdir(l_files.archived_cards_folder):
+    elif card_filename in os.listdir(l_files.archived_cards_folder):
         folder_route = l_files.archived_cards_folder
-    elif path in os.listdir(l_files.checklist_cards_folder):
+    elif card_filename in os.listdir(l_files.checklist_cards_folder):
         folder_route = l_files.checklist_cards_folder
 
-    card_fullpath = os.path.join(folder_route, path)
+    card_fullpath = os.path.join(folder_route, card_filename)
     return card_fullpath
 
 
-def path_to_card(path):
-    card_name_a = path.replace(".txt", "")
+def filename_to_card(card_filename):
+    card_name_a = card_filename.replace(".txt", "")
     card_name_b = card_name_a.replace("_", " ")
     card_name_c = card_name_b.strip()
 
-    card_fullpath = get_card_abspath(path)
+    card_fullpath = get_card_abspath(card_filename)
 
     with open(card_fullpath, 'r') as fin:
         card_steps = [l.strip() for l in fin.readlines()]
@@ -286,14 +284,14 @@ def path_to_card(path):
     return card
 
 
-def abspath_to_card(abspath):
-    card_title_unformatted = os.path.basename(abspath)
+def fullpath_to_card(card_fullpath):
+    card_title_unformatted = os.path.basename(card_fullpath)
 
     format_a = card_title_unformatted.replace(".txt", "")
     format_b = format_a.replace("_", " ")
     card_title = format_b.strip()
 
-    with open(abspath, 'r') as fin:
+    with open(card_fullpath, 'r') as fin:
         card_steps = [l.strip() for l in fin.readlines()]
 
     card = (card_title, card_steps)
@@ -317,9 +315,9 @@ def add_multiple_steps_from_card(nums):
     return passed_list
 
 
-def test_for_float(string):
+def test_for_float(text):
     try:
-        float(string)
+        float(text)
         return True
     except:
         return False
@@ -327,3 +325,4 @@ def test_for_float(string):
 
 if __name__ == "__main__":
     print("Hello from main")
+    format_card_title("C_SuperCard")

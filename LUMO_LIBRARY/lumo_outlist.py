@@ -9,11 +9,11 @@ letters = string.ascii_uppercase
 letters_filtered = [l.upper() for l in letters if not (l == 'q') and not (l == 'x')]
 
 main_card_path = os.path.join(l_files.internal_cards_folder, "Outlist_Main.txt")
-main_card = l_formatters.abspath_to_card(main_card_path)
+main_card = l_formatters.fullpath_to_card(main_card_path)
 main_card_title, main_card_steps = main_card[0], main_card[1]
 
 errand_card_path = os.path.join(l_files.internal_cards_folder, "Outlist_Errand.txt")
-errand_card = l_formatters.abspath_to_card(errand_card_path)
+errand_card = l_formatters.fullpath_to_card(errand_card_path)
 errand_card_title, errand_card_steps = errand_card[0], errand_card[1]
 
 checklist_cards = sorted([card for card in os.listdir(l_files.checklist_cards_folder)])
@@ -27,23 +27,23 @@ for path in checklist_cards:
         checklist_cards_filtered.append(path)
 
 
-def display_menu(list_of_cards):
-    fetched_cards = [l_formatters.path_to_card(path) for path in list_of_cards]
+def display_menu(var_list_cards):
+    fetched_cards = [l_formatters.filename_to_card(path) for path in var_list_cards]
     formatted_results = [f"[{idx_lttr}] {l_formatters.format_card_title(card[0])}"
                          for idx_lttr, card in zip(letters_filtered, fetched_cards)]
 
     l_animators.standard_interval_printer(formatted_results, speed_interval=.15)
 
 
-def card_select(list_of_cards):
+def card_select(var_list_cards):
     letter_to_idx = input("\nSelect letter > ")
-    match_letters = letters_filtered[0:len(list_of_cards)]
+    match_letters = letters_filtered[0:len(var_list_cards)]
 
     # change this to a dict lookup
     if letter_to_idx.isalpha() and len(letter_to_idx) == 1 and (letter_to_idx.upper() in match_letters):
         letter_as_listindex = ord(letter_to_idx.lower()) - 97
-        outlist_path = list_of_cards[letter_as_listindex]
-        outlist_card = l_formatters.path_to_card(outlist_path)
+        outlist_path = var_list_cards[letter_as_listindex]
+        outlist_card = l_formatters.filename_to_card(outlist_path)
 
         title = l_formatters.format_card_title(outlist_card[0]).upper()
         list_of_steps = outlist_card[1]

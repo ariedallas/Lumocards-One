@@ -334,7 +334,7 @@ def write_card_and_json(card_filename, folder, add_custom_steps=None):
 
     default_json = l_json_utils.make_dflt_json_dict(card_folder, c_abbr)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
-    l_json_utils.write_json(var_file=json_fullpath, json_data=default_json)
+    l_json_utils.write_json(json_filename=json_fullpath, json_data=default_json)
 
     return formatted_card_fullpath, json_fullpath
 
@@ -348,7 +348,7 @@ def card_creation_loop():
 
     if possible_card_abspath:
         card_path = os.path.basename(possible_card_abspath)
-        card = l_formatters.path_to_card(card_path)
+        card = l_formatters.filename_to_card(card_path)
 
         return card, card_path
 
@@ -361,13 +361,13 @@ def card_menu_loop(result_card, result_path):
     if result_card and result_path:
         hotkey_dict, hotkey_list = l_menus.prep_newcard_menu(l_menus.newcard_main_actions, l_menus.letters_filtered.copy())
         status, return_path = l_search.cardsearch_main_options(var_card=result_card,
-                                                               var_card_path=result_path,
+                                                               var_card_filename=result_path,
                                                                var_hotkey_dict=hotkey_dict,
                                                                var_hotkey_list=hotkey_list)
         while status == "RELOOP":
-            card = l_formatters.path_to_card(return_path)
+            card = l_formatters.filename_to_card(return_path)
             status, return_path = l_search.cardsearch_main_options(var_card=card,
-                                                                   var_card_path=return_path,
+                                                                   var_card_filename=return_path,
                                                                    var_hotkey_dict=hotkey_dict,
                                                                    var_hotkey_list=hotkey_list)
     else:
