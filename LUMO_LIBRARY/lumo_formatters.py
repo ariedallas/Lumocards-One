@@ -20,11 +20,11 @@ def card_header(var_card):
     steps_amt = len(card_steps)
     steps_idx = steps_amt + 1
 
-    formatted_card_tile = format_card_title(card_title)
+    formatted_card_title = format_card_title(card_title)
     card_steps_three = steps_preview(card_steps, steps_amt, steps_idx)
 
     print()
-    l_animators.animate_text(formatted_card_tile.upper())
+    l_animators.animate_text(formatted_card_title.upper())
     print()
     print("  First three items: ", card_steps_three[0], card_steps_three[1], card_steps_three[2])
     print()
@@ -37,7 +37,7 @@ def step_abbreviator(var_step):
 
 def steps_preview(card_steps, steps_amt, steps_idx):
 
-    if steps_amt < 3 and steps_amt > 0:
+    if 0 < steps_amt < 3:
 
         initial = [f" {n} — {step_abbreviator(step)}" for n, step in
                    zip(range(1, steps_idx), card_steps[0:steps_amt])]
@@ -61,7 +61,7 @@ def steps_preview(card_steps, steps_amt, steps_idx):
 
 def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
     curr_name_abspath = get_card_abspath(curr_name)
-    curr_dir_name = pathlib.Path(curr_name_abspath).parent.name
+    curr_dir_name = pathlib.Path(str(curr_name_abspath)).parent.name
 
     if dst_dir == "Same Dir":
         dst_dir = os.path.join(l_files.rootpath, "CARDS", curr_dir_name)
@@ -149,7 +149,8 @@ def format_card_title(card_filename):
 
         result = "{}: {}".format(first, separated_by_caps)
 
-    except:
+    except ValueError:
+        print("exception runs")
         subbed_underscores = card_filename.replace("_", " ")
         result = camel_case_separator_b(subbed_underscores).upper()
 
@@ -319,10 +320,9 @@ def test_for_float(text):
     try:
         float(text)
         return True
-    except:
+    except ValueError:
         return False
 
 
 if __name__ == "__main__":
     print("Hello from main")
-    format_card_title("C_SuperCard")

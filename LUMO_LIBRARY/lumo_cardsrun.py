@@ -78,8 +78,8 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
         route = found_tuple[1]
 
         if route == 'menu':
-
             hotkey_dict, hotkey_list = l_menus.prep_card_run_menu(l_menus.cardsrun_macro_menu_actions)
+# HEY HEY
             status = None
 
             while True:
