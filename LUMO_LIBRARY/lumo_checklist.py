@@ -8,27 +8,18 @@ import lumo_animationlibrary as l_animators
 letters = string.ascii_uppercase
 letters_filtered = [l.upper() for l in letters if not (l == 'q') and not (l == 'x')]
 
-main_card_path = os.path.join(l_files.internal_cards_folder, "Outlist_Main.txt")
+main_card_path = os.path.join(l_files.internal_cards_folder, "Checklist_Main.txt")
 main_card = l_formatters.fullpath_to_card(main_card_path)
 main_card_title, main_card_steps = main_card[0], main_card[1]
 
-errand_card_path = os.path.join(l_files.internal_cards_folder, "Outlist_Errand.txt")
+errand_card_path = os.path.join(l_files.internal_cards_folder, "Checklist_Errand.txt")
 errand_card = l_formatters.fullpath_to_card(errand_card_path)
 errand_card_title, errand_card_steps = errand_card[0], errand_card[1]
 
 checklist_cards = sorted([card for card in os.listdir(l_files.checklist_cards_folder)])
-checklist_cards_filtered = []
-
-for path in checklist_cards:
-
-    if path == main_card_path or path == errand_card_path:
-        continue
-    else:
-        checklist_cards_filtered.append(path)
-
 
 def display_menu(var_list_cards):
-    fetched_cards = [l_formatters.filename_to_card(path) for path in var_list_cards]
+    fetched_cards = [l_formatters.filename_to_card(fn) for fn in var_list_cards]
     formatted_results = [f"[{idx_lttr}] {l_formatters.format_card_title(card[0])}"
                          for idx_lttr, card in zip(letters_filtered, fetched_cards)]
 
@@ -45,10 +36,10 @@ def card_select(var_list_cards):
         outlist_path = var_list_cards[letter_as_listindex]
         outlist_card = l_formatters.filename_to_card(outlist_path)
 
-        title = l_formatters.format_card_title(outlist_card[0]).upper()
-        list_of_steps = outlist_card[1]
+        card_title = l_formatters.format_card_title(outlist_card[0]).upper()
+        card_steps = outlist_card[1]
 
-        return title, list_of_steps
+        return card_title, card_steps
 
     else:
         print("Try again, pls.")
@@ -91,8 +82,8 @@ if __name__ == "__main__":
     l_animators.animate_text("CHECKLISTS")
     print()
 
-    display_menu(checklist_cards_filtered)
-    title, steps = card_select(checklist_cards_filtered)
+    display_menu(checklist_cards)
+    title, steps = card_select(checklist_cards)
     display_selected_checklist(card_title=title, card_steps=steps)
 
     main_checklist_review()

@@ -1,6 +1,5 @@
 import os
 import datetime
-import pprint
 import json
 
 import lumo_filehandler as l_files

@@ -43,22 +43,20 @@ def delete_all_cards():
         delete_cards_from_folder(l_files.json_cards_folder)
 
 
-def delete_cards_from_folder(dir):
+def delete_cards_from_folder(var_dir):
 
-    for card in os.listdir(dir):
+    for card in os.listdir(var_dir):
         print(f"deleted card: {card}")
-        os.remove(f"{dir}/{card}")
+        os.remove(f"{var_dir}/{card}")
 
 
 def near_cards():
-    global n, ltr, filename
     for n, ltr in zip(range(1, 9), category_letters):
         filename = f"{ltr}_NearCard{n}.txt"
         l_newcard.write_card_and_json(filename, l_files.cards_near_folder, add_custom_steps=sample_steps)
 
 
 def middle_cards():
-    global n, ltr, filename
     for n, ltr in zip(range(1, 9), category_letters):
         filename = f"{ltr}_MiddleCard{n}.txt"
         l_newcard.write_card_and_json(filename, l_files.cards_middle_folder, add_custom_steps=sample_steps)
@@ -71,7 +69,6 @@ def distant_cards():
 
 
 def archived_cards():
-    global n, ltr, filename
     for n, ltr in zip(range(1, 4), category_letters):
         filename = f"{ltr}_ArchivedCard{n}.txt"
         l_newcard.write_card_and_json(filename, l_files.archived_cards_folder, add_custom_steps=sample_steps)

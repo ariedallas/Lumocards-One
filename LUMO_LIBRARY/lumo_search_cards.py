@@ -253,7 +253,7 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
 
 
 def steps_preview(card_steps, steps_amt, steps_idx):
-    if steps_amt < 3 and steps_amt > 0:
+    if 3 > steps_amt > 0:
         initial = [f" {n} — {l_formatters.step_abbreviator(step)}" for n, step in
                    zip(range(1, steps_idx), card_steps[0:steps_amt])]
         filler = [f" {n} — {step}" for n, step in zip(range(steps_idx, 4), l_formatters.default_card_steps)]

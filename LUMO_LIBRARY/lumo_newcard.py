@@ -19,7 +19,6 @@ default_text = '\n'.join(('...', '...', '...'))
 
 card_title_already_exists = False
 
-
 def arg_parser():
     global parser
 
@@ -129,24 +128,9 @@ def get_card_name():
 def get_card_from_input():
     cardname = get_cardname_from_input()
     category = get_category_from_input()
-    joined = ("_").join((category, cardname))
+    joined = "_".join((category, cardname))
     result = f"{joined}.txt"
     return result
-
-
-def prep_newcard_menu(menu, pop_letters=False):
-    if pop_letters:
-        full_hotkey_set_dict = {f"{letters_filtered_copy.pop(0)}":f"{match}" for match in menu}
-
-    else:
-        full_hotkey_set_dict = {f"{ltr}":f"{match}" for ltr, match in zip(l_menus.letters_filtered, menu)}
-
-
-    full_hotkey_set_list = [f"  [{letter}] {action}" for letter, action in zip(
-        full_hotkey_set_dict.keys(),
-        full_hotkey_set_dict.values())]
-
-    return full_hotkey_set_dict, full_hotkey_set_list
 
 
 def generate_quick_card(card_filename):
@@ -193,7 +177,7 @@ def add_custom_or_default_steps():
 
 
 def create_card():
-    global letters_filtered_copy
+    # global letters_filtered_copy
     letters_filtered_copy = l_menus.letters_filtered.copy()
 
     card_filename = get_card_name()
@@ -393,3 +377,19 @@ if __name__ == "__main__":
 #
 # def lambda_menu(letter, msg):
 #     return [f"  [{letter}] {msg}"]
+
+
+# def prep_newcard_menu(menu, pop_letters=False):
+#     if pop_letters:
+#         full_hotkey_set_dict = {f"{letters_filtered_copy.pop(0)}":f"{match}" for match in menu}
+#
+#     else:
+#         full_hotkey_set_dict = {f"{ltr}":f"{match}" for ltr, match in zip(l_menus.letters_filtered, menu)}
+#
+#
+#     full_hotkey_set_list = [f"  [{letter}] {action}" for letter, action in zip(
+#         full_hotkey_set_dict.keys(),
+#         full_hotkey_set_dict.values())]
+#
+#     return full_hotkey_set_dict, full_hotkey_set_list
+

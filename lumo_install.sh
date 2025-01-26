@@ -44,6 +44,6 @@ alias newcard="python3 LUMO_LIBRARY/lumo_newcard.py"
 alias planner="open PLANNER"
 alias today="python3 LUMO_LIBRARY/lumo_gettoday.py"
 alias pomodoro="python3 LUMO_LIBRARY/lumo_pomodoro.py"
-alias checklist="python3 LUMO_LIBRARY/lumo_outlist.py"
+alias checklist="python3 LUMO_LIBRARY/lumo_checklist.py"
 
 lumo
