@@ -39,16 +39,15 @@ def cards_intro():
 
 def add_step_via_integers(card_steps, card_title, response_filtered):
     selected_integers = l_formatters.add_multiple_steps_from_card(response_filtered)
-    max = len(card_steps)
-    selected_integers_filtered = [num for num in selected_integers if
-                                  (int(num) <= max and int(num) > 0)]
+    total_cards = len(card_steps)
+    selected_integers_filtered = [num for num in selected_integers if (0 < int(num) <= total_cards)]
     for card_step in selected_integers_filtered:
         idx = int(card_step) - 1
 
         planner_feedback(card_title, card_steps[idx])
 
     for num in selected_integers:
-        if int(num) > max or int(num) <= 0:
+        if 0 <= int(num) > total_cards :
             l_animators.animate_text(f"Skipping number {num}, it shouldn't correspond to a step...")
 
 
@@ -79,30 +78,27 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
 
         if route == 'menu':
             hotkey_dict, hotkey_list = l_menus.prep_card_run_menu(l_menus.cardsrun_macro_menu_actions)
-# HEY HEY
-            status = None
+            status, possible_card_path = cardsrun_macro_menu(card_filename=card_filename,
+                                                             card=card,
+                                                             hkey_dict=hotkey_dict,
+                                                             hkey_list=hotkey_list)
 
-            while True:
+            if status == "RELOOP" and possible_card_path:
+                return "RELOOP"
 
-                if not status:
-                    status, possible_card_path = cardsrun_macro_menu(card_filename=card_filename,
-                                                                     card=card,
-                                                                     hkey_dict=hotkey_dict,
-                                                                     hkey_list=hotkey_list)
-                elif status == "RELOOP" and possible_card_path:
-                    return "RELOOP"
+            elif status == "EXIT MENU":
+                return "RELOOP"
 
-                elif status == "EXIT MENU":
-                    return "RELOOP"
+            elif status == "CARD REFOCUSED":
+                return "RELOOP"
 
-                elif status == "CARD REFOCUSED":
-                    return "RELOOP"
-
-                elif status == "CARD MARKED FOR DELETION":
-                    reviewed_cards.append(card_filename)
-                    deleted_cards.append(card_filename)
-                    l_animators.animate_text(f"Card {card_filename} marked for deletion; returning to Lumocards.")
-                    return "RELOOP"
+            elif status == "CARD MARKED FOR DELETION":
+                reviewed_cards.append(card_filename)
+                deleted_cards.append(card_filename)
+                l_animators.animate_text(f"Card {card_filename} marked for deletion; returning to Lumocards.")
+                return "RELOOP"
+            else:
+                return "RELOOP"
 
 
         elif route == 'edit':
@@ -172,29 +168,26 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
         if route == 'menu':
 
             hotkey_dict, hotkey_list = l_menus.prep_card_run_menu(l_menus.cardsrun_macro_menu_actions)
-            status = None
+            status, possible_card_path = cardsrun_macro_menu(card_filename=card_filename,
+                                                             card=card,
+                                                             hkey_dict=hotkey_dict,
+                                                             hkey_list=hotkey_list)
+            if status == "RELOOP" and possible_card_path:
+                return "RELOOP"
 
-            while True:
+            elif status == "EXIT MENU":
+                return "RELOOP"
 
-                if not status:
-                    status, possible_card_path = cardsrun_macro_menu(card_filename=card_filename,
-                                                                     card=card,
-                                                                     hkey_dict=hotkey_dict,
-                                                                     hkey_list=hotkey_list)
-                elif status == "RELOOP" and possible_card_path:
-                    return "RELOOP"
+            elif status == "CARD REFOCUSED":
+                return "RELOOP"
 
-                elif status == "EXIT MENU":
-                    return "RELOOP"
-
-                elif status == "CARD REFOCUSED":
-                    return "RELOOP"
-
-                elif status == "CARD MARKED FOR DELETION":
-                    reviewed_recurring_cards.append(card_filename)
-                    deleted_cards.append(card_filename)
-                    l_animators.animate_text(f"Card {card_filename} marked for deletion; returning to Lumocards.")
-                    return "RELOOP"
+            elif status == "CARD MARKED FOR DELETION":
+                reviewed_recurring_cards.append(card_filename)
+                deleted_cards.append(card_filename)
+                l_animators.animate_text(f"Card {card_filename} marked for deletion; returning to Lumocards.")
+                return "RELOOP"
+            else:
+                return "RELOOP"
 
 
         elif route == 'edit':
@@ -387,7 +380,6 @@ def update_cards():
     print()
     l_animators.animate_text("ADDING TO PLANNER:")
     l_animators.standard_interval_printer(todays_cards)
-    print()
 
     if len(archived_cards) > 0:
         print()
