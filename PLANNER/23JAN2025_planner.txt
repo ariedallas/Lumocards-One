@@ -1,0 +1,7 @@
+PLANNER: 23 JAN 2025
+
+NEAR FOCUS CARDS: ----------16:15:04----------
+A 4PlantsFor8Parts: ...
+A NearCard1: Step 01
+C NearCard2: custom
+A RecurringCard1: test

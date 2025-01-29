@@ -1,0 +1,16 @@
+{
+  "card location": "CARDS_A_FOCUS_NEAR",
+  "card category abbreviation": "S",
+  "card category": "Self Care",
+  "calender event": null,
+  "calendar repeating event": null,
+  "recurring freq": 0,
+  "recurring freq time unit": null,
+  "last occurrence": null,
+  "card created": "2025-01-21 17:33:28",
+  "tags": [
+    "default tag a",
+    "default tag b",
+    "default tag c"
+  ]
+}
