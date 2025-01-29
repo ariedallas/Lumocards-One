@@ -1,5 +1,7 @@
 import os
 import datetime
+import subprocess
+import sys
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -12,22 +14,24 @@ import lumo_formatters as l_formatter
 import lumo_animationlibrary as animators
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
+creds_file = os.path.join(l_files.credentials_folder, "credentials.json")
+token_file = os.path.join(l_files.credentials_folder, "token.json")
 
 def get_creds():
 	creds = None
 
-	if os.path.exists("Z_CREDENTIALS/token.json"):
-		creds = Credentials.from_authorized_user_file("Z_CREDENTIALS/token.json")
+	if os.path.exists(token_file):
+		creds = Credentials.from_authorized_user_file(token_file)
 
 	if not creds or not creds.valid:
 		if creds and creds.expired and creds.refresh_token:
 			creds.refresh(Request())
 
 		else:
-			flow = InstalledAppFlow.from_client_secrets_file("Z_CREDENTIALS/credentials.json", SCOPES)
+			flow = InstalledAppFlow.from_client_secrets_file(creds_file, SCOPES)
 			creds = flow.run_local_server(port=0)
 
-		with open("Z_CREDENTIALS/token.json", "w") as token:
+		with open(token_file, "w") as token:
 			token.write(creds.to_json())
 
 	return creds
@@ -213,29 +217,49 @@ def new_event_and_sync(credentials, card_file, card_abspath):
 
 			return generated_id
 
+superlist = ['one', 'two', 'three', 'four']
+
+def paginate():
+
+	idx = 0
+
+	while True:
+		user_input = input("  >")
+
+		if user_input == "]":
+			idx += 1
+			subprocess.run('clear', shell=True)
+			print(superlist[idx])
+		elif user_input == "[" and idx > 0:
+			idx -= 1
+			subprocess.run('clear', shell=True)
+			print(superlist[idx])
+		else:
+			subprocess.run('clear', shell=True)
+			print(superlist[idx])
 
 
 
 if __name__ == "__main__":
-	test_card = "L_LumogardenTestCalendarNoId.txt"
+	test_card = "TestCalNoId.txt"
 	test_card_abspath = os.path.join(l_files.cards_near_folder, test_card)
 
-	print()
+	paginate()
 
-
-	returned_creds = get_creds()
-
-
-	animators.animate_text("LIST ONE")
-	list_events(credentials=returned_creds, no_to_list=3)
+	# creds = get_creds()
+	# print(creds)
+	#
+	# list_events(5, creds)
+	# animators.animate_text("LIST ONE")
+	# list_events(credentials=returned_creds, no_to_list=3)
 
 
 	# generated_id = new_event_and_sync(returned_creds, test_card, test_card_abspath)
 
-	unschedule_and_remove_localCardId(credentials=returned_creds, card_abspath=test_card_abspath)
-
-	animators.animate_text("LIST TWO")
-	list_events(credentials=returned_creds, no_to_list=3)
+	# unschedule_and_remove_localCardId(credentials=returned_creds, card_abspath=test_card_abspath)
+	#
+	# animators.animate_text("LIST TWO")
+	# list_events(credentials=returned_creds, no_to_list=3)
 	#
 	# with open(test_card_abspath, "r") as fin:
 	# 	animators.standard_interval_printer(fin.readlines())

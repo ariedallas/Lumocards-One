@@ -37,7 +37,6 @@ lumo_welcome_msg() {
     echo "Welcome to Lumocards, where you decide what cards to put in focus."
 }
 
-alias lumo="activate_venv"
 alias lumocards="python3 LUMO_LIBRARY/lumo_cardsrun.py"
 alias locard="python3 LUMO_LIBRARY/lumo_search_cards.py"
 alias newcard="python3 LUMO_LIBRARY/lumo_newcard.py"
@@ -45,5 +44,3 @@ alias planner="open PLANNER"
 alias today="python3 LUMO_LIBRARY/lumo_gettoday.py"
 alias pomodoro="python3 LUMO_LIBRARY/lumo_pomodoro.py"
 alias checklist="python3 LUMO_LIBRARY/lumo_checklist.py"
-
-lumo

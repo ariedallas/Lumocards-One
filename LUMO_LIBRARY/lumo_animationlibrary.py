@@ -29,7 +29,10 @@ def animate_text_fast(text):
     time.sleep(.5)
 
 
-def standard_interval_printer(text_list: list=['default'], speed_interval: float=.35, animate_letters: float=0):
+def standard_interval_printer(text_list=None, speed_interval: float=.35, animate_letters: float=0):
+    if not text_list:
+        text_list = ['']
+
     for item in text_list:
         if animate_letters > 0:
             animate_text(item, speed=animate_letters)

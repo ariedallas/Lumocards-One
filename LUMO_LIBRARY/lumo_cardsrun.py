@@ -378,8 +378,9 @@ def planner_feedback(card_title, card_step):
 
 def update_cards():
     print()
-    l_animators.animate_text("ADDING TO PLANNER:")
-    l_animators.standard_interval_printer(todays_cards)
+    if todays_cards:
+        l_animators.animate_text("ADDING TO PLANNER:")
+        l_animators.standard_interval_printer(todays_cards)
 
     if len(archived_cards) > 0:
         print()

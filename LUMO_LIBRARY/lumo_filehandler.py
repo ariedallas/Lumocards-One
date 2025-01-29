@@ -24,6 +24,7 @@ support_files_folder = os.path.join(rootpath, "SUPPORT_FILES")
 internal_cards_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_INTERNAL_CARDS")
 json_cards_folder = os.path.join(rootpath, "SUPPORT_FILES/JSON_CARDS")
 temp_folder = os.path.join(rootpath, "SUPPORT_FILES/TEMP")
+credentials_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_CREDENTIALS")
 
 sounds_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_SOUNDS")
 
