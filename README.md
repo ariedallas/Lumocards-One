@@ -1,8 +1,10 @@
 # Lumocards
 
 ---
-Lumocards One is a todo app, project manager, and calendar rolled into a simple text-based application. 
-It's based around the idea of "cards" similar to projects like Trello. 
+Lumocards One is a todo app, project manager, and calendar rolled into a CLI. 
+It's based around the idea of "cards" similar to projects like Trello.
+
+It's currently available for MacOS / Linux, but support for Windows will come with time. 
 ## Getting Started
 
 After downloading / cloning this folder, open it or navigate to it in the terminal. Then, type in the following or paste the line below.
