@@ -1,7 +1,6 @@
 import os
 import datetime
 import subprocess
-import sys
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -217,9 +216,77 @@ def new_event_and_sync(credentials, card_file, card_abspath):
 
 			return generated_id
 
+def percent(percentage, number):
+
+	perc_as_dec = percentage / 100
+	return round(number * perc_as_dec)
+
 superlist = ['one', 'two', 'three', 'four']
 
-def paginate():
+
+class CalendarPageDay:
+	t_size = os.get_terminal_size()
+	width = int(t_size.columns)
+	line = ("-" * round((width * .8)))
+	content_width = ("-" * round((width * .7)))
+
+	def __init__(self, date, events):
+		self.name = "Calendar Page"
+		self.date = date
+		self.events = events
+
+
+	def cal_header(self):
+		print('{0:^{width}}\n'.format(self.date, width=CalendarPageDay.width))
+		print('{0:^{width}}'.format(CalendarPageDay.line, width=CalendarPageDay.width))
+
+	# print('{0:^{width}}'.format(content_width, width=width))
+
+	@staticmethod
+	def get_start_and_end(var_event):
+		start_time, end_time = var_event['start time'], var_event['end time']
+		return start_time, end_time
+
+	@staticmethod
+	def row_style_1(var_sel, var_event, var_start_t, var_end_t):
+		left = "{:>{width}}".format(" ", width=percent(25, CalendarPageDay.width))
+		selector = "{:<{width}}".format(var_sel, width=8)
+		event = "• {:<{width}}".format(var_event, width=50)
+		time = "{} —— {}".format(var_start_t, var_end_t)
+
+		print(left, selector, event, time)
+
+	@staticmethod
+	def row_style_2(var_sel, var_event, var_start_t, var_end_t):
+		selector = "{:<{width}}".format(var_sel, width=10)
+		event = "• {:<{width}}".format(var_event, width=60)
+		time = "{} —— {}".format(var_start_t, var_end_t)
+
+		group = selector + event + time
+		print('{0:^{width}}\n'.format(group, width=CalendarPageDay.width))
+
+	def print_sample_page(self):
+		start, end = CalendarPageDay.get_start_and_end(self.events[0])
+		event_name = self.events[0].get('name')
+
+		subprocess.run(['clear'], shell=True)
+
+		self.cal_header()
+		CalendarPageDay.row_style_2("[A]", event_name, start, end)
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[A]", "something I'll do another time", start, end)
+		CalendarPageDay.row_style_2("[A]", "something I'll do soon", start, end)
+
+
+
+def paginate(calendar):
 
 	idx = 0
 
@@ -228,15 +295,21 @@ def paginate():
 
 		if user_input == "]":
 			idx += 1
-			subprocess.run('clear', shell=True)
-			print(superlist[idx])
+			# subprocess.run('clear', shell=True)
+			calendar.print_sample_page()
+			print(idx)
 		elif user_input == "[" and idx > 0:
 			idx -= 1
-			subprocess.run('clear', shell=True)
-			print(superlist[idx])
+			# subprocess.run('clear', shell=True)
+			calendar.print_sample_page()
+			print(idx)
 		else:
-			subprocess.run('clear', shell=True)
-			print(superlist[idx])
+			# subprocess.run('clear', shell=True)
+			calendar.print_sample_page()
+			print(idx)
+
+
+
 
 
 
@@ -244,7 +317,27 @@ if __name__ == "__main__":
 	test_card = "TestCalNoId.txt"
 	test_card_abspath = os.path.join(l_files.cards_near_folder, test_card)
 
-	paginate()
+
+	sample_page = CalendarPageDay(date="FRIDAY: DECEMBER 14, 2025"
+								 ,events=[{'name': 'Places with Cameron and Phil'
+									  ,'start time': '14:00'
+									  ,'end time': '15:30'}])
+
+	# sample_page.print_sample_page()
+	paginate(sample_page)
+
+
+
+
+	# print("{0:{width}}{:<8}{:<}{}".format(
+	# 	" "
+	# 	,"[A]"
+	# 	,"[B]"
+	# 	,"[C]"
+	# 	, width=30
+	# 	, sample_dt_dict['name']
+	# ))
+
 
 	# creds = get_creds()
 	# print(creds)
