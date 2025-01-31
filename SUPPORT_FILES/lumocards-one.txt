@@ -1,4 +1,10 @@
 --  start work on the calendar / scheduled cards!!!
+	- pass a list of day events to the calendar object
+	- propagate default values to calendar page
+	- test out pagination for different days
+	- collect object from google cal and incorporate into 'event list'
+	- paginate day should support ']', ']]', ']]]' etc.	
+	
 	- use some oop/classes
 	- user can schedule cards
 	- user can view already scheduled events / calendar events
@@ -6,11 +12,33 @@
 	- user can toggle events from scheduled to non-scheduled
 	- calendar mode: d[1], w[2], m[3]
 	- select day from [a], [b], [c]
+
+	- how should I move backward and forward in days? what should be 'loaded'? how/when should loading happen?
+
+
+	SHORTCUTS/FORMATTING:
 	- calendar shortcuts: go to "next week" etc.
 	- calendar shortcuts: go to: dec 25
 	- calendar shortcuts: go to 1/25/2022
 	- calendar shortcuts: to december
-	- calendar shortucts: 
+	- see shortcuts created in LibreOffice:
+	> time? 8-9 
+	> time? 8 1h
+	> time? 8 default
+	> from week mode: 21, 8p-9p, dinner with Jamie (first part=the day, second part=time, third part=event name)
+	> a -> schedule to that day ...
+		> what time? 8:30p-
+	
+	> confirm 8:00 Am – 9:00 Pm or (8:00 Am – 9:00 Pm?)
+
+	EDGE CASES:
+	- leap year 
+	- how do events that start one day and flow into the next work?
+	- how does calendar display conflicting?
+	- what happens in between weeks of two different months? (does it always start on first?)
+	- how does it account for this?
+	
+	
 	
 --  you can refactor newcard so that it uses default args from argparse...
 --  should a card with a lowercase name still show it's title (using format card title?)
