@@ -1,6 +1,10 @@
 import os
 import datetime
 import subprocess
+import calendar
+import sys
+
+# from enum import Enum
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -15,6 +19,27 @@ import lumo_animationlibrary as animators
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 creds_file = os.path.join(l_files.credentials_folder, "credentials.json")
 token_file = os.path.join(l_files.credentials_folder, "token.json")
+
+
+cal = calendar.Calendar()
+curr_year, curr_month, curr_day = l_files.today.year, l_files.today.month, l_files.today.day
+monthdays = [d for d in cal.itermonthdays(year=curr_year, month=curr_month) if d != 0]
+curr_month_max = max(monthdays)
+
+# class Month(Enum):
+# 	JAN = 1
+# 	FEB = 2
+# 	MAR = 3
+# 	APR = 4
+# 	MAY = 5
+# 	JUN = 6
+# 	JUL = 7
+# 	AUG = 8
+# 	SEP = 9
+# 	OCT = 10
+# 	NOV = 11
+# 	DEC = 12
+
 
 def get_creds():
 	creds = None
@@ -36,19 +61,21 @@ def get_creds():
 	return creds
 
 
-def list_events(no_to_list, credentials):
+def list_events(credentials):
 	try:
 		print()
 		animators.animate_text("LIST EVENTS FUNCTION:")
 		service = build("calendar", "v3", credentials=credentials)
 
-		now = datetime.datetime.now().isoformat() + "Z"
-		past = datetime.datetime(2024, 10, 27, 14, 0, 0).isoformat() + "Z"
+		# now = datetime.datetime.now().isoformat() + "Z"
+		month_start = datetime.datetime(year=curr_year, month=curr_month, day=1).isoformat() + "Z"
+		month_end   = datetime.datetime(year=curr_year, month=curr_month, day=curr_month_max).isoformat() + "Z"
+
 
 		event_result = service.events().list(
 			calendarId="primary",
-			timeMin=past,
-			maxResults=no_to_list,
+			timeMin=month_start,
+			timeMax=month_end,
 			singleEvents=True,
 			orderBy="startTime"
 		).execute()
@@ -216,7 +243,7 @@ def new_event_and_sync(credentials, card_file, card_abspath):
 
 			return generated_id
 
-def percent(percentage, number):
+def percenter(percentage, number):
 
 	perc_as_dec = percentage / 100
 	return round(number * perc_as_dec)
@@ -226,9 +253,16 @@ superlist = ['one', 'two', 'three', 'four']
 
 class CalendarPageDay:
 	t_size = os.get_terminal_size()
-	width = int(t_size.columns)
-	line = ("-" * round((width * .8)))
-	content_width = ("-" * round((width * .7)))
+	total_width = int(t_size.columns)
+	content_width = percenter(70, total_width)
+	left_margin = round((total_width - content_width) / 2)
+
+	EVENTS_WIDTH = 86
+	events_line = "-" * EVENTS_WIDTH
+	l_margin = round((total_width - EVENTS_WIDTH) / 2)
+	l_margin_line = "-" * l_margin
+
+	line = ("-" * content_width)
 
 	def __init__(self, date, events):
 		self.name = "Calendar Page"
@@ -237,8 +271,9 @@ class CalendarPageDay:
 
 
 	def cal_header(self):
-		print('{0:^{width}}\n'.format(self.date, width=CalendarPageDay.width))
-		print('{0:^{width}}'.format(CalendarPageDay.line, width=CalendarPageDay.width))
+		print('{0:^{width}}\n'.format(self.date, width=CalendarPageDay.total_width))
+		print('{0:^{width}}'.format(CalendarPageDay.line, width=CalendarPageDay.total_width))
+		print()
 
 	# print('{0:^{width}}'.format(content_width, width=width))
 
@@ -249,7 +284,7 @@ class CalendarPageDay:
 
 	@staticmethod
 	def row_style_1(var_sel, var_event, var_start_t, var_end_t):
-		left = "{:>{width}}".format(" ", width=percent(25, CalendarPageDay.width))
+		left = "{:>{width}}".format(" ", width=percenter(25, CalendarPageDay.total_width))
 		selector = "{:<{width}}".format(var_sel, width=8)
 		event = "• {:<{width}}".format(var_event, width=50)
 		time = "{} —— {}".format(var_start_t, var_end_t)
@@ -263,9 +298,9 @@ class CalendarPageDay:
 		time = "{} —— {}".format(var_start_t, var_end_t)
 
 		group = selector + event + time
-		print('{0:^{width}}\n'.format(group, width=CalendarPageDay.width))
+		print('{0:^{width}}\n'.format(group, width=CalendarPageDay.total_width))
 
-	def print_sample_page(self):
+	def display_day(self):
 		start, end = CalendarPageDay.get_start_and_end(self.events[0])
 		event_name = self.events[0].get('name')
 
@@ -278,6 +313,7 @@ class CalendarPageDay:
 		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
 		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
 		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[A]", event_name, start, end)
 		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
 		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
 		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
@@ -285,76 +321,70 @@ class CalendarPageDay:
 		CalendarPageDay.row_style_2("[A]", "something I'll do soon", start, end)
 
 
-
-def paginate(calendar):
-
+def paginate(list_of_days):
 	idx = 0
+	current_page = list_of_days[idx]
+
 
 	while True:
-		user_input = input("  >")
+		current_page.display_day()
+		# print("{:^{width}}".format(CalendarPageDay.events_line, width=CalendarPageDay.total_width))
+		print(" " * CalendarPageDay.l_margin, idx)
+		print(" " * CalendarPageDay.l_margin, end=' ')
+		user_input = input(">  ")
 
-		if user_input == "]":
+		if user_input == "]" and idx < 2:
 			idx += 1
-			# subprocess.run('clear', shell=True)
-			calendar.print_sample_page()
-			print(idx)
+			current_page = list_of_days[idx]
+
 		elif user_input == "[" and idx > 0:
 			idx -= 1
-			# subprocess.run('clear', shell=True)
-			calendar.print_sample_page()
-			print(idx)
+			current_page = list_of_days[idx]
+
 		else:
-			# subprocess.run('clear', shell=True)
-			calendar.print_sample_page()
-			print(idx)
+			current_page = list_of_days[idx]
 
 
+def get_month_events():
+	creds = get_creds()
 
+	list_events(creds)
 
-
+	return []
 
 if __name__ == "__main__":
 	test_card = "TestCalNoId.txt"
 	test_card_abspath = os.path.join(l_files.cards_near_folder, test_card)
 
-
-	sample_page = CalendarPageDay(date="FRIDAY: DECEMBER 14, 2025"
-								 ,events=[{'name': 'Places with Cameron and Phil'
-									  ,'start time': '14:00'
-									  ,'end time': '15:30'}])
-
-	# sample_page.print_sample_page()
-	paginate(sample_page)
+	curr_month_events = get_month_events()
 
 
 
-
-	# print("{0:{width}}{:<8}{:<}{}".format(
-	# 	" "
-	# 	,"[A]"
-	# 	,"[B]"
-	# 	,"[C]"
-	# 	, width=30
-	# 	, sample_dt_dict['name']
-	# ))
-
-
-	# creds = get_creds()
-	# print(creds)
+	# sample_page = CalendarPageDay(date="FRIDAY: DECEMBER 14, 2025"
+	# 							 ,events=[{'name': 'Places with Cameron and Phil'
+	# 								  ,'start time': '14:00'
+	# 								  ,'end time': '15:30'}])
 	#
-	# list_events(5, creds)
-	# animators.animate_text("LIST ONE")
+	# sample_page_2 = CalendarPageDay(date="FRIDAY: DECEMBER 15, 2025"
+	# 							 ,events=[{'name': 'Blah super blah'
+	# 								  ,'start time': '14:00'
+	# 								  ,'end time': '15:30'}])
+	#
+	# sample_page_3 = CalendarPageDay(date="FRIDAY: DECEMBER 16, 2025"
+	# 							 ,events=[{'name': '... another thing thing'
+	# 								  ,'start time': '21:00'
+	# 								  ,'end time': '23:00'}])
+	#
+	# sample_pages = [sample_page, sample_page_2, sample_page_3]
+
+	# paginate(sample_pages)
+
+# ------------------------------------- END / MISC BELOW -------------------------------------- #
+
+# print("{:{fill}<50}".format("hello", fill="*"))
+# print("{0:{width}}{:<8}{:<}{}".format(
+
+
+	# list_events(5, creds)n
 	# list_events(credentials=returned_creds, no_to_list=3)
-
-
-	# generated_id = new_event_and_sync(returned_creds, test_card, test_card_abspath)
-
-	# unschedule_and_remove_localCardId(credentials=returned_creds, card_abspath=test_card_abspath)
-	#
-	# animators.animate_text("LIST TWO")
-	# list_events(credentials=returned_creds, no_to_list=3)
-	#
-	# with open(test_card_abspath, "r") as fin:
-	# 	animators.standard_interval_printer(fin.readlines())
-
 
