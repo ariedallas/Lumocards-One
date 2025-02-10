@@ -2,9 +2,11 @@ import os
 import datetime
 import subprocess
 import calendar
-import sys
 
 # from enum import Enum
+
+from pprint import pprint as pp
+from dateutil.relativedelta import relativedelta
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -61,10 +63,8 @@ def get_creds():
 	return creds
 
 
-def list_events(credentials):
+def get_google_events(credentials):
 	try:
-		print()
-		animators.animate_text("LIST EVENTS FUNCTION:")
 		service = build("calendar", "v3", credentials=credentials)
 
 		# now = datetime.datetime.now().isoformat() + "Z"
@@ -86,15 +86,25 @@ def list_events(credentials):
 			print("No upcoming events found.")
 			return
 
-		for event in events:
-			start = event["start"]
-			print(event["summary"], start.get("dateTime"))
-
-		print()
-
+		return events
 
 	except HttpError as error:
+		print("Nothing")
 		print("An error has occurred ", error)
+		return None
+
+def get_single_event(credentials, id):
+	try:
+		service = build("calendar", "v3", credentials=credentials)
+
+		event_result = service.events().get(calendarId='primary', eventId=id).execute()
+
+		return event_result
+
+	except HttpError as error:
+		print("Nothing")
+		print("An error has occurred ", error)
+		return None
 
 
 def create_gcal_event(credentials, formatted_card_title, card_steps):
@@ -131,31 +141,31 @@ def create_gcal_event(credentials, formatted_card_title, card_steps):
 		print("Here's the error that has occurred: ", error)
 		return None
 
+
 def update_event(credentials):
-	pass
-	# try:
-	#
-	# 	service = build("calendar", "v3", credentials=credentials)
-	#
-	# 	retrieved_id_from_txt = '4v39giucjk61s9q23koofhfekd'
-	#
-	# 	event = service.events().get(calendarId='primary',
-	# 								 eventId=retrieved_id_from_txt).execute()
-	# 	print()
-	# 	print("FROM UPDATER FUNCTION")
-	# 	print(f"ID {retrieved_id_from_txt} makes ->", event.get("summary"))
-	#
-	# 	event['colorId'] = 1
-	# 	# event['summary'] = 'Desiree + Arie Continue to Collab on Little Ditty'
-	#
-	# 	updated_event = service.events().update(calendarId='primary', eventId=event['id'], body=event).execute()
-	#
-	# 	google_id = event['id']
-	# 	return google_id
-	#
-	#
-	# except HttpError as error:
-	# 	print("An error happened: ", error)
+	try:
+
+		service = build("calendar", "v3", credentials=credentials)
+
+		retrieved_id_from_txt = '4v39giucjk61s9q23koofhfekd'
+
+		event = service.events().get(calendarId='primary',
+									 eventId=retrieved_id_from_txt).execute()
+		print()
+		print("FROM UPDATER FUNCTION")
+		print(f"ID {retrieved_id_from_txt} makes ->", event.get("summary"))
+
+		event['colorId'] = 1
+		# event['summary'] = 'Desiree + Arie Continue to Collab on Little Ditty'
+
+		updated_event = service.events().update(calendarId='primary', eventId=event['id'], body=event).execute()
+
+		google_id = event['id']
+		return google_id
+
+
+	except HttpError as error:
+		print("An error happened: ", error)
 
 
 def get_lines(card_abspath):
@@ -220,6 +230,7 @@ def unschedule_and_remove_localCardId(credentials, card_abspath):
 
 	animators.animate_text("The card is now unscheduled.")
 
+
 def new_event_and_sync(credentials, card_file, card_abspath):
 
 	card_tuple = l_formatter.filename_to_card(card_file)
@@ -243,12 +254,11 @@ def new_event_and_sync(credentials, card_file, card_abspath):
 
 			return generated_id
 
+
 def percenter(percentage, number):
 
 	perc_as_dec = percentage / 100
 	return round(number * perc_as_dec)
-
-superlist = ['one', 'two', 'three', 'four']
 
 
 class CalendarPageDay:
@@ -264,23 +274,23 @@ class CalendarPageDay:
 
 	line = ("-" * content_width)
 
-	def __init__(self, date, events):
+	def __init__(self, header_date, events):
 		self.name = "Calendar Page"
-		self.date = date
+		self.header_date = header_date
 		self.events = events
 
 
 	def cal_header(self):
-		print('{0:^{width}}\n'.format(self.date, width=CalendarPageDay.total_width))
+		print('{0:^{width}}\n'.format(self.header_date, width=CalendarPageDay.total_width))
 		print('{0:^{width}}'.format(CalendarPageDay.line, width=CalendarPageDay.total_width))
 		print()
 
 	# print('{0:^{width}}'.format(content_width, width=width))
 
-	@staticmethod
-	def get_start_and_end(var_event):
-		start_time, end_time = var_event['start time'], var_event['end time']
-		return start_time, end_time
+	# @staticmethod
+	# def get_start_and_end(var_start, var_end):
+	# 	start_time, end_time = var_event['start time'], var_event['end time']
+	# 	return start_time, end_time
 
 	@staticmethod
 	def row_style_1(var_sel, var_event, var_start_t, var_end_t):
@@ -300,11 +310,18 @@ class CalendarPageDay:
 		group = selector + event + time
 		print('{0:^{width}}\n'.format(group, width=CalendarPageDay.total_width))
 
-	def display_day(self):
-		start, end = CalendarPageDay.get_start_and_end(self.events[0])
-		event_name = self.events[0].get('name')
 
-		subprocess.run(['clear'], shell=True)
+	def populate_defaults(self):
+		print(len(self.events))
+
+		events_plus_defaults = []
+
+
+	def display_day(self):
+		start, end = (self.events[0][1], self.events[0][2]) if self.events else ("     ", "     ")
+		event_name = self.events[0][3] if self.events else "--- --- ---"
+
+		# subprocess.run(['clear'], shell=True)
 
 		self.cal_header()
 		CalendarPageDay.row_style_2("[A]", event_name, start, end)
@@ -321,10 +338,18 @@ class CalendarPageDay:
 		CalendarPageDay.row_style_2("[A]", "something I'll do soon", start, end)
 
 
-def paginate(list_of_days):
-	idx = 0
-	current_page = list_of_days[idx]
+def parse_brackets(var_input):
+	if "]" in var_input:
+		return var_input.count("]"), "PAGE RIGHT"
+	elif "[" in var_input:
+		return (var_input.count("[")), "PAGE LEFT"
+	else:
+		return 0, None
 
+
+def paginate(list_of_pages):
+	idx = 0
+	current_page = list_of_pages[idx]
 
 	while True:
 		current_page.display_day()
@@ -333,58 +358,138 @@ def paginate(list_of_days):
 		print(" " * CalendarPageDay.l_margin, end=' ')
 		user_input = input(">  ")
 
-		if user_input == "]" and idx < 2:
-			idx += 1
-			current_page = list_of_days[idx]
+		shift, direction = parse_brackets(user_input)
 
-		elif user_input == "[" and idx > 0:
-			idx -= 1
-			current_page = list_of_days[idx]
+		if direction == "PAGE RIGHT" and idx < 30:
+			idx += shift
+			current_page = list_of_pages[idx]
+
+		elif direction == "PAGE LEFT" and idx > 0:
+			idx -= shift
+			current_page = list_of_pages[idx]
 
 		else:
-			current_page = list_of_days[idx]
+			current_page = list_of_pages[idx]
 
 
-def get_month_events():
+def google_event_to_lumo(event):
+	dt_google_start = (event['start'].get('dateTime'))
+	dt_google_end = (event['end'].get('dateTime'))
+	dt_python_start = datetime.datetime.strptime(dt_google_start, '%Y-%m-%dT%H:%M:%S%z')
+	dt_python_end = datetime.datetime.strptime(dt_google_end, '%Y-%m-%dT%H:%M:%S%z')
+
+	day = dt_python_start.day
+	start_time = dt_python_start.strftime('%H:%M')
+	end_time = dt_python_end.strftime('%H:%M')
+	summary = event['summary']
+
+	return day, start_time, end_time, summary
+
+
+def format_headers_one_month(var_year, var_month):
+	month_headers = []
+	for d in cal.itermonthdates(var_year, var_month):
+
+		date_header = datetime.date.strftime(d, "%A: %B %d, %Y")
+
+		"""this filters out any padded dates that itermonthdates includes 
+		e.g. it may include a few dates from the previous or next month for purposes of displaying a readable block"""
+		if d.month == var_month:
+			month_headers.append(date_header)
+
+	return month_headers
+
+
+def format_headers_three_month(base_year, base_month):
+	past_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="past", months_distance=1)
+	next_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="futr", months_distance=1)
+
+	past_headers = format_headers_one_month(var_year=past_month_dt.year, var_month=past_month_dt.month)
+	curr_headers = format_headers_one_month(var_year=base_year, var_month=base_month)
+	next_headers = format_headers_one_month(var_year=next_month_dt.year, var_month=next_month_dt.month)
+
+	return past_headers, curr_headers, next_headers
+
+
+
+def get_adjacent_month(base_month, base_year, direction, months_distance):
+	if direction == "past":
+		adjacent = datetime.date(day=1, month=base_month, year=base_year) - relativedelta(months=months_distance)
+	elif direction == "futr":
+		adjacent = datetime.date(day=1, month=base_month, year=base_year) + relativedelta(months=months_distance)
+	else:
+		adjacent = datetime.date(day=1, month=base_month, year=base_year)
+
+	return adjacent
+
+
+def get_month_events(var_year, var_month):
 	creds = get_creds()
+	google_month_events = get_google_events(creds)
 
-	list_events(creds)
+	if not google_month_events:
+		dummy_headers = format_headers_one_month(var_year, var_month)
+		dummy_pages = [CalendarPageDay(h, []) for h in dummy_headers]
+		return dummy_pages
 
-	return []
+	converted_events = [google_event_to_lumo(e) for e in google_month_events]
+	month_events = []
+
+	for day in monthdays:
+		"""Adds an empty list if no items are found which acts as a placeholder for that day"""
+		matched_events = [e for e in converted_events if e[0] == day]
+		# [f(x) if condition else g(x) for x in sequence]
+		month_events.append(matched_events)
+
+	return month_events
+
+def get_multiple_month_events(base_year, base_month):
+	past_month_dt = get_adjacent_month(base_month=base_year, base_year=base_year, direction="past", months_distance=1)
+	next_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="futr", months_distance=1)
+
+	past_month_events = get_month_events(var_year=past_month_dt.year, var_month=past_month_dt.month)
+	curr_month_events = get_month_events(var_year=base_year, var_month=base_month)
+	futr_month_events = get_month_events(var_year=next_month_dt.year, var_month=next_month_dt.month)
+
+	return past_month_events, curr_month_events, futr_month_events
+
+def dynamic_events_block(var_year, var_month):
+	past_headers, curr_headers, futr_headers = format_headers_three_month(base_year=var_year, base_month=var_month)
+	past_events, curr_events, futr_events = get_multiple_month_events(base_year=var_year, base_month=var_month)
+
+	past_group = zip_full_date_pages(past_headers, past_events)
+	curr_group = zip_full_date_pages(curr_headers, curr_events)
+	futr_group = zip_full_date_pages(futr_headers, futr_events)
+
+
+def zip_full_date_pages(headers, events):
+	month_pages = []
+	for h, e in zip(headers, events):
+		cal_page = CalendarPageDay(header_date=h, events=e)
+		month_pages.append(cal_page)
+
 
 if __name__ == "__main__":
-	test_card = "TestCalNoId.txt"
-	test_card_abspath = os.path.join(l_files.cards_near_folder, test_card)
+	pass
+	# input = input("<<< pause here >>>")
+	# test_card = "TestCalNoId.txt"
+	# test_card_abspath = os.path.join(l_files.cards_near_folder, test_card)
 
-	curr_month_events = get_month_events()
 
 
+	# ---- DUMMY PAGES ---- #
+	# dummy_headers = format_full_month_dates(2025, 2)
+	# dummy_pages = [CalendarPageDay(h, []) for h in dummy_headers]
 
-	# sample_page = CalendarPageDay(date="FRIDAY: DECEMBER 14, 2025"
-	# 							 ,events=[{'name': 'Places with Cameron and Phil'
-	# 								  ,'start time': '14:00'
-	# 								  ,'end time': '15:30'}])
-	#
-	# sample_page_2 = CalendarPageDay(date="FRIDAY: DECEMBER 15, 2025"
-	# 							 ,events=[{'name': 'Blah super blah'
-	# 								  ,'start time': '14:00'
-	# 								  ,'end time': '15:30'}])
-	#
-	# sample_page_3 = CalendarPageDay(date="FRIDAY: DECEMBER 16, 2025"
-	# 							 ,events=[{'name': '... another thing thing'
-	# 								  ,'start time': '21:00'
-	# 								  ,'end time': '23:00'}])
-	#
-	# sample_pages = [sample_page, sample_page_2, sample_page_3]
+	# paginate(month_pages)
 
-	# paginate(sample_pages)
+	# creds = get_creds()
+	# google_month_events = get_google_events(creds, 4)
+
+	# single = get_single_event(creds, '7d0b2shbq8jc50gqu9uhit7o5v')
+	# print(single)
 
 # ------------------------------------- END / MISC BELOW -------------------------------------- #
 
 # print("{:{fill}<50}".format("hello", fill="*"))
 # print("{0:{width}}{:<8}{:<}{}".format(
-
-
-	# list_events(5, creds)n
-	# list_events(credentials=returned_creds, no_to_list=3)
-
