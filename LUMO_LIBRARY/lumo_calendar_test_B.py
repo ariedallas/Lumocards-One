@@ -2,6 +2,7 @@ import os
 import datetime
 import subprocess
 import calendar
+import time
 
 # from enum import Enum
 
@@ -92,6 +93,7 @@ def get_google_events(credentials):
 		print("Nothing")
 		print("An error has occurred ", error)
 		return None
+
 
 def get_single_event(credentials, id):
 	try:
@@ -261,83 +263,6 @@ def percenter(percentage, number):
 	return round(number * perc_as_dec)
 
 
-class CalendarPageDay:
-	t_size = os.get_terminal_size()
-	total_width = int(t_size.columns)
-	content_width = percenter(70, total_width)
-	left_margin = round((total_width - content_width) / 2)
-
-	EVENTS_WIDTH = 86
-	events_line = "-" * EVENTS_WIDTH
-	l_margin = round((total_width - EVENTS_WIDTH) / 2)
-	l_margin_line = "-" * l_margin
-
-	line = ("-" * content_width)
-
-	def __init__(self, header_date, events):
-		self.name = "Calendar Page"
-		self.header_date = header_date
-		self.events = events
-
-
-	def cal_header(self):
-		print('{0:^{width}}\n'.format(self.header_date, width=CalendarPageDay.total_width))
-		print('{0:^{width}}'.format(CalendarPageDay.line, width=CalendarPageDay.total_width))
-		print()
-
-	# print('{0:^{width}}'.format(content_width, width=width))
-
-	# @staticmethod
-	# def get_start_and_end(var_start, var_end):
-	# 	start_time, end_time = var_event['start time'], var_event['end time']
-	# 	return start_time, end_time
-
-	@staticmethod
-	def row_style_1(var_sel, var_event, var_start_t, var_end_t):
-		left = "{:>{width}}".format(" ", width=percenter(25, CalendarPageDay.total_width))
-		selector = "{:<{width}}".format(var_sel, width=8)
-		event = "• {:<{width}}".format(var_event, width=50)
-		time = "{} —— {}".format(var_start_t, var_end_t)
-
-		print(left, selector, event, time)
-
-	@staticmethod
-	def row_style_2(var_sel, var_event, var_start_t, var_end_t):
-		selector = "{:<{width}}".format(var_sel, width=10)
-		event = "• {:<{width}}".format(var_event, width=60)
-		time = "{} —— {}".format(var_start_t, var_end_t)
-
-		group = selector + event + time
-		print('{0:^{width}}\n'.format(group, width=CalendarPageDay.total_width))
-
-
-	def populate_defaults(self):
-		print(len(self.events))
-
-		events_plus_defaults = []
-
-
-	def display_day(self):
-		start, end = (self.events[0][1], self.events[0][2]) if self.events else ("     ", "     ")
-		event_name = self.events[0][3] if self.events else "--- --- ---"
-
-		# subprocess.run(['clear'], shell=True)
-
-		self.cal_header()
-		CalendarPageDay.row_style_2("[A]", event_name, start, end)
-		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
-		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
-		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
-		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
-		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
-		CalendarPageDay.row_style_2("[A]", event_name, start, end)
-		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
-		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
-		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
-		CalendarPageDay.row_style_2("[A]", "something I'll do another time", start, end)
-		CalendarPageDay.row_style_2("[A]", "something I'll do soon", start, end)
-
-
 def parse_brackets(var_input):
 	if "]" in var_input:
 		return var_input.count("]"), "PAGE RIGHT"
@@ -345,31 +270,6 @@ def parse_brackets(var_input):
 		return (var_input.count("[")), "PAGE LEFT"
 	else:
 		return 0, None
-
-
-def paginate(list_of_pages):
-	idx = 0
-	current_page = list_of_pages[idx]
-
-	while True:
-		current_page.display_day()
-		# print("{:^{width}}".format(CalendarPageDay.events_line, width=CalendarPageDay.total_width))
-		print(" " * CalendarPageDay.l_margin, idx)
-		print(" " * CalendarPageDay.l_margin, end=' ')
-		user_input = input(">  ")
-
-		shift, direction = parse_brackets(user_input)
-
-		if direction == "PAGE RIGHT" and idx < 30:
-			idx += shift
-			current_page = list_of_pages[idx]
-
-		elif direction == "PAGE LEFT" and idx > 0:
-			idx -= shift
-			current_page = list_of_pages[idx]
-
-		else:
-			current_page = list_of_pages[idx]
 
 
 def google_event_to_lumo(event):
@@ -411,7 +311,6 @@ def format_headers_three_month(base_year, base_month):
 	return past_headers, curr_headers, next_headers
 
 
-
 def get_adjacent_month(base_month, base_year, direction, months_distance):
 	if direction == "past":
 		adjacent = datetime.date(day=1, month=base_month, year=base_year) - relativedelta(months=months_distance)
@@ -427,15 +326,16 @@ def get_month_events(var_year, var_month):
 	creds = get_creds()
 	google_month_events = get_google_events(creds)
 
-	if not google_month_events:
-		dummy_headers = format_headers_one_month(var_year, var_month)
-		dummy_pages = [CalendarPageDay(h, []) for h in dummy_headers]
-		return dummy_pages
+	# if not google_month_events:
+	# 	dummy_headers = format_headers_one_month(var_year, var_month)
+	# 	dummy_pages = [CalendarPageDay(h, []) for h in dummy_headers]
+	# 	return dummy_pages
 
 	converted_events = [google_event_to_lumo(e) for e in google_month_events]
 	month_events = []
 
-	for day in monthdays:
+	days_in_month = calendar.monthrange(var_year, var_month)[1]
+	for day in range(days_in_month):
 		"""Adds an empty list if no items are found which acts as a placeholder for that day"""
 		matched_events = [e for e in converted_events if e[0] == day]
 		# [f(x) if condition else g(x) for x in sequence]
@@ -443,8 +343,9 @@ def get_month_events(var_year, var_month):
 
 	return month_events
 
+
 def get_multiple_month_events(base_year, base_month):
-	past_month_dt = get_adjacent_month(base_month=base_year, base_year=base_year, direction="past", months_distance=1)
+	past_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="past", months_distance=1)
 	next_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="futr", months_distance=1)
 
 	past_month_events = get_month_events(var_year=past_month_dt.year, var_month=past_month_dt.month)
@@ -452,6 +353,7 @@ def get_multiple_month_events(base_year, base_month):
 	futr_month_events = get_month_events(var_year=next_month_dt.year, var_month=next_month_dt.month)
 
 	return past_month_events, curr_month_events, futr_month_events
+
 
 def dynamic_events_block(var_year, var_month):
 	past_headers, curr_headers, futr_headers = format_headers_three_month(base_year=var_year, base_month=var_month)
@@ -461,6 +363,8 @@ def dynamic_events_block(var_year, var_month):
 	curr_group = zip_full_date_pages(curr_headers, curr_events)
 	futr_group = zip_full_date_pages(futr_headers, futr_events)
 
+	return past_group,  curr_group,  futr_group
+
 
 def zip_full_date_pages(headers, events):
 	month_pages = []
@@ -468,9 +372,122 @@ def zip_full_date_pages(headers, events):
 		cal_page = CalendarPageDay(header_date=h, events=e)
 		month_pages.append(cal_page)
 
+	return month_pages
+
+
+class CalendarPageDay:
+	t_size = os.get_terminal_size()
+	total_width = int(t_size.columns)
+	content_width = percenter(70, total_width)
+	left_margin = round((total_width - content_width) / 2)
+
+	EVENTS_WIDTH = 86
+	events_line = "-" * EVENTS_WIDTH
+	l_margin = round((total_width - EVENTS_WIDTH) / 2)
+	l_margin_line = "-" * l_margin
+
+	line = ("-" * content_width)
+
+	def __init__(self, header_date, events):
+		self.name = "Calendar Page"
+		self.header_date = header_date
+		self.events = events
+
+
+	def cal_header(self):
+		print('{0:^{width}}\n'.format(self.header_date, width=CalendarPageDay.total_width))
+		print('{0:^{width}}'.format(CalendarPageDay.line, width=CalendarPageDay.total_width))
+		print()
+
+
+	@staticmethod
+	def row_style_1(var_sel, var_event, var_start_t, var_end_t):
+		left = "{:>{width}}".format(" ", width=percenter(25, CalendarPageDay.total_width))
+		selector = "{:<{width}}".format(var_sel, width=8)
+		event = "• {:<{width}}".format(var_event, width=50)
+		time = "{} —— {}".format(var_start_t, var_end_t)
+
+		print(left, selector, event, time)
+
+	@staticmethod
+	def row_style_2(var_sel, var_event, var_start_t, var_end_t):
+		selector = "{:<{width}}".format(var_sel, width=10)
+		event = "• {:<{width}}".format(var_event, width=60)
+		time = "{} —— {}".format(var_start_t, var_end_t)
+
+		group = selector + event + time
+		print('{0:^{width}}\n'.format(group, width=CalendarPageDay.total_width))
+
+
+	def populate_defaults(self):
+		print(len(self.events))
+
+		events_plus_defaults = []
+
+
+	def display_day(self):
+		start, end = (self.events[0][1], self.events[0][2]) if self.events else ("     ", "     ")
+		event_name = self.events[0][3] if self.events else "--- --- ---"
+
+		subprocess.run(['clear'], shell=True)
+
+		self.cal_header()
+		CalendarPageDay.row_style_2("[A]", event_name, start, end)
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[A]", event_name, start, end)
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[-]", "--- --- ---", "     ", "     ")
+		CalendarPageDay.row_style_2("[A]", "something I'll do another time", start, end)
+		CalendarPageDay.row_style_2("[A]", "something I'll do soon", start, end)
+
+
+class CalendarInterface:
+	def __init__(self):
+		p_group, c_group, f_group = dynamic_events_block(curr_year, curr_month)
+		self.events_block = p_group + c_group + f_group
+
+	def paginate(self):
+		idx = self._get_idx_for_today()
+		pause = input("<<< pause >>>")
+
+		current_page = self.events_block[idx]
+
+		while True:
+			current_page.display_day()
+			print(" " * CalendarPageDay.l_margin, idx)
+			print(" " * CalendarPageDay.l_margin, end=' ')
+			user_input = input(">  ")
+
+			shift, direction = parse_brackets(user_input)
+
+			if direction == "PAGE RIGHT" and idx < len(self.events_block):
+				idx += shift
+				current_page = self.events_block[idx]
+
+			elif direction == "PAGE LEFT" and idx > 0:
+				idx -= shift
+				current_page = self.events_block[idx]
+
+			else:
+				current_page = self.events_block[idx]
+
+	def _get_idx_for_today(self):
+		past_month = get_adjacent_month(base_month=curr_month, base_year=curr_year, direction="past", months_distance=1)
+		past_months_amt = calendar.monthrange(past_month.year, past_month.month)[1]
+		return (past_months_amt + curr_day) - 1
+
+	def get_new_block(self):
+		pass
 
 if __name__ == "__main__":
-	pass
+	calendar_obj = CalendarInterface()
+	calendar_obj.paginate()
+
 	# input = input("<<< pause here >>>")
 	# test_card = "TestCalNoId.txt"
 	# test_card_abspath = os.path.join(l_files.cards_near_folder, test_card)
@@ -493,3 +510,4 @@ if __name__ == "__main__":
 
 # print("{:{fill}<50}".format("hello", fill="*"))
 # print("{0:{width}}{:<8}{:<}{}".format(
+# print("{:^{width}}".format(CalendarPageDay.events_line, width=CalendarPageDay.total_width))
