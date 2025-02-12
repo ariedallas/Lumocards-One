@@ -2,6 +2,7 @@ import os
 import datetime
 import subprocess
 import calendar
+import sys
 import time
 
 # from enum import Enum
@@ -27,7 +28,7 @@ token_file = os.path.join(l_files.credentials_folder, "token.json")
 cal = calendar.Calendar()
 curr_year, curr_month, curr_day = l_files.today.year, l_files.today.month, l_files.today.day
 monthdays = [d for d in cal.itermonthdays(year=curr_year, month=curr_month) if d != 0]
-curr_month_max = max(monthdays)
+curr_month_max = calendar.monthrange(year=curr_year, month=curr_month)[1]
 
 # class Month(Enum):
 # 	JAN = 1
@@ -302,7 +303,7 @@ def format_headers_one_month(var_year, var_month):
 
 def format_headers_three_month(base_year, base_month):
 	past_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="past", months_distance=1)
-	next_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="futr", months_distance=1)
+	next_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="next", months_distance=1)
 
 	past_headers = format_headers_one_month(var_year=past_month_dt.year, var_month=past_month_dt.month)
 	curr_headers = format_headers_one_month(var_year=base_year, var_month=base_month)
@@ -314,7 +315,7 @@ def format_headers_three_month(base_year, base_month):
 def get_adjacent_month(base_month, base_year, direction, months_distance):
 	if direction == "past":
 		adjacent = datetime.date(day=1, month=base_month, year=base_year) - relativedelta(months=months_distance)
-	elif direction == "futr":
+	elif direction == "next":
 		adjacent = datetime.date(day=1, month=base_month, year=base_year) + relativedelta(months=months_distance)
 	else:
 		adjacent = datetime.date(day=1, month=base_month, year=base_year)
@@ -336,7 +337,8 @@ def get_month_events(var_year, var_month):
 
 	days_in_month = calendar.monthrange(var_year, var_month)[1]
 	for day in range(days_in_month):
-		"""Adds an empty list if no items are found which acts as a placeholder for that day"""
+		"""Transform whatever events are found from Google into a full list where every day has a placeholder
+		Adds an empty list if no items are found."""
 		matched_events = [e for e in converted_events if e[0] == day]
 		# [f(x) if condition else g(x) for x in sequence]
 		month_events.append(matched_events)
@@ -344,9 +346,17 @@ def get_month_events(var_year, var_month):
 	return month_events
 
 
+def get_month_full_pages(var_year, var_month):
+	headers = format_headers_one_month(var_year=var_year, var_month=var_month)
+	events = get_month_events(var_year=var_year, var_month=var_month)
+	full_pages = zip_full_date_pages(headers=headers, events=events)
+
+	return full_pages
+
+
 def get_multiple_month_events(base_year, base_month):
 	past_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="past", months_distance=1)
-	next_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="futr", months_distance=1)
+	next_month_dt = get_adjacent_month(base_month=base_month, base_year=base_year, direction="next", months_distance=1)
 
 	past_month_events = get_month_events(var_year=past_month_dt.year, var_month=past_month_dt.month)
 	curr_month_events = get_month_events(var_year=base_year, var_month=base_month)
@@ -382,7 +392,7 @@ class CalendarPageDay:
 	left_margin = round((total_width - content_width) / 2)
 
 	EVENTS_WIDTH = 86
-	events_line = "-" * EVENTS_WIDTH
+	EVENTS_LINE = "-" * EVENTS_WIDTH
 	l_margin = round((total_width - EVENTS_WIDTH) / 2)
 	l_margin_line = "-" * l_margin
 
@@ -447,13 +457,20 @@ class CalendarPageDay:
 
 
 class CalendarInterface:
+
 	def __init__(self):
-		p_group, c_group, f_group = dynamic_events_block(curr_year, curr_month)
-		self.events_block = p_group + c_group + f_group
+		past_month = get_adjacent_month(curr_month, curr_year, "past", 1)
+		next_month = get_adjacent_month(curr_month, curr_year, "next", 1)
+
+		self.month_left_events = get_month_full_pages(past_month.year, past_month.month)
+		self.month_center_events = get_month_full_pages(curr_year, curr_month)
+		self.month_right_events = get_month_full_pages(next_month.year, next_month.month)
+
+		self.events_block = self.get_combined_block()
 
 	def paginate(self):
 		idx = self._get_idx_for_today()
-		pause = input("<<< pause >>>")
+		# pause = input("<<< pause >>>")
 
 		current_page = self.events_block[idx]
 
@@ -461,18 +478,37 @@ class CalendarInterface:
 			current_page.display_day()
 			print(" " * CalendarPageDay.l_margin, idx)
 			print(" " * CalendarPageDay.l_margin, end=' ')
+
 			user_input = input(">  ")
 
 			shift, direction = parse_brackets(user_input)
+			shift = shift if shift < 25 else 25
 
-			if direction == "PAGE RIGHT" and idx < len(self.events_block):
-				idx += shift
-				current_page = self.events_block[idx]
+			if direction == "PAGE RIGHT":
+				look_ahead_idx = idx + shift
 
-			elif direction == "PAGE LEFT" and idx > 0:
-				idx -= shift
-				current_page = self.events_block[idx]
+				if look_ahead_idx < len(self.events_block) - 3:
+					idx += shift
+					current_page = self.events_block[idx]
+				else:
+					# Means the idx is nearing the right end of the 'buffered' events_block and needs to be updated
+					# Function grabs the next month, 'right', relative to the current month in focus
+					big_shift = self.roll_forward()
+					idx -= big_shift
+					current_page = self.events_block[idx]
 
+			elif direction == "PAGE LEFT":
+				look_ahead_idx = idx - shift
+
+				if look_ahead_idx > 3:
+					idx -= shift
+					current_page = self.events_block[idx]
+				else:
+					# Means the idx is nearing the left end of the 'buffered' events block and needs to be updated
+					# Functions grabs the previous month, 'left', relative to the current date in focus
+					big_shift = self.roll_backward()
+					idx += big_shift
+					current_page = self.events_block[idx]
 			else:
 				current_page = self.events_block[idx]
 
@@ -481,12 +517,52 @@ class CalendarInterface:
 		past_months_amt = calendar.monthrange(past_month.year, past_month.month)[1]
 		return (past_months_amt + curr_day) - 1
 
+	def get_combined_block(self):
+		return self.month_left_events + self.month_center_events + self.month_right_events
+
+	def roll_forward(self):
+		month_right_name = self.month_right_events[0].header_date
+		dt = datetime.datetime.strptime(month_right_name, "%A: %B %d, %Y")
+		new_month_right_name = dt + relativedelta(months=1)
+
+		idx_shift = len(self.month_left_events) - 1
+
+		self.month_left_events = self.month_center_events.copy()
+		self.month_center_events = self.month_right_events.copy()
+		self.month_right_events = get_month_full_pages(new_month_right_name.year
+													   ,new_month_right_name.month )
+
+		self.events_block = self.get_combined_block()
+
+		return idx_shift
+
+	def roll_backward(self):
+		month_left_name = self.month_left_events[0].header_date
+		dt = datetime.datetime.strptime(month_left_name, "%A: %B %d, %Y")
+		new_month_left_name = dt - relativedelta(months=1)
+
+		self.month_right_events = self.month_center_events.copy()
+		self.month_center_events = self.month_left_events.copy()
+		self.month_left_events = get_month_full_pages(new_month_left_name.year, new_month_left_name.month)
+
+		idx_shift = len(self.month_left_events) - 1
+
+		# [print(l.header_date) for l in self.month_left_events]
+		# time.sleep(5)
+
+		self.events_block = self.get_combined_block()
+
+		return idx_shift
+
 	def get_new_block(self):
 		pass
 
 if __name__ == "__main__":
-	calendar_obj = CalendarInterface()
-	calendar_obj.paginate()
+	hello = get_month_events(2025, 1)
+	[print(l) for l in hello]
+
+	# calendar_obj = CalendarInterface()
+	# calendar_obj.paginate()
 
 	# input = input("<<< pause here >>>")
 	# test_card = "TestCalNoId.txt"
