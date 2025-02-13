@@ -558,11 +558,11 @@ class CalendarInterface:
 		pass
 
 if __name__ == "__main__":
-	hello = get_month_events(2025, 1)
-	[print(l) for l in hello]
+	# hello = get_month_events(2025, 1)
+	# [print(l) for l in hello]
 
-	# calendar_obj = CalendarInterface()
-	# calendar_obj.paginate()
+	calendar_obj = CalendarInterface()
+	calendar_obj.paginate()
 
 	# input = input("<<< pause here >>>")
 	# test_card = "TestCalNoId.txt"
