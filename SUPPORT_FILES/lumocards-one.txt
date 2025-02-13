@@ -1,9 +1,37 @@
---  start work on the calendar / scheduled cards!!!
-	- pass a list of day events to the calendar object
+NEXT:
+	- if no bracket, then just redisplay
+	- week view
+	- try a design pattern
+
+OUTLINE BIG:
+	> CODE READING 
+	> WEEK VIEW 
+	> SYNC CALENDAR
+	> SCHEDULING
+	> NEW USER
+
+EMAILS:
+	Casey / Corey Mentorship program
+	Double Quotes to single
+	Make a branch of Lumo that goes deeper into OOP
+	When you type 'back' on Near Cards it shows the previous card that has moved
+	Try coding in Micro one day
+	Put some of my money in a local bank
+	Pip install to target
+	CLIG.dev
+	
+
+SCHEDULE / CALENDAR!!!
+	- algorithm for selecting what calendar data to load... paging through 3 months, then loaded the next few months
 	- propagate default values to calendar page
-	- test out pagination for different days
+	- mess
+
+	- should selecting an event on the chosen day show a new screen? I think so, but we can do it both ways to see...
+	
+	- it should be able to retrieve a years worth of events from google, then it can just check for differences to see if events have updated between the calendars...
+	- offline calendar API?
 	- collect object from google cal and incorporate into 'event list'
-	- paginate day should support ']', ']]', ']]]' etc.	
+
 	
 	- use some oop/classes
 	- user can schedule cards
@@ -13,8 +41,14 @@
 	- calendar mode: d[1], w[2], m[3]
 	- select day from [a], [b], [c]
 
+	- is there an issue with the Google API for 'primary' calendars?
+	- if a card is repeating event in GCal or LumoCal, it should have one instance as a .txt file
+
 	- how should I move backward and forward in days? what should be 'loaded'? how/when should loading happen?
 
+	- how should I handle cases where there is no internet? what is the 'offline' mode
+
+**  put tape on my keyboard for better finding of l ctrl and alt.
 
 	SHORTCUTS/FORMATTING:
 	- calendar shortcuts: go to "next week" etc.
@@ -28,8 +62,19 @@
 	> from week mode: 21, 8p-9p, dinner with Jamie (first part=the day, second part=time, third part=event name)
 	> a -> schedule to that day ...
 		> what time? 8:30p-
+			> confirm 8:00 Am – 9:00 Pm or (8:00 Am – 9:00 Pm?)
+
+	- how would a user make a quick scheduled card like: newcard r dinner with sam, tue @ 8a (blank would be default length of one hour)
+	- how would a user make a quick scheduled card like: newcard r dinner with sam, 12/01/2020 @ 8a-9a
+	- how would a user make a quick scheduled card like: newcard r dinner with sam, aug 01 @ 8a +2
 	
-	> confirm 8:00 Am – 9:00 Pm or (8:00 Am – 9:00 Pm?)
+	- standard menu should be one item at a time (try one format at a time for testing)
+		-event name? dinner with Sam
+		-event start? 8a | 8am | 8:30a | 8 am | 20:00 | 20:31 
+		-event end? ( blank=defaul +1 ) | +1=do the math | 9a | etc. 
+		-etc...
+
+	
 
 	EDGE CASES:
 	- leap year 
@@ -37,33 +82,44 @@
 	- how does calendar display conflicting?
 	- what happens in between weeks of two different months? (does it always start on first?)
 	- how does it account for this?
+
+
+-- GENEREAL
+	--  you can refactor newcard so that it uses default args from argparse...
+	--  at some point you should use types in your functions
+	--  enum vs. str as input to a function
+	--  should a card with a lowercase name still show it's title (using format card title?)
+	--  should there be an option to make a newcard after making a newcard?
+	--  should the 'macro menu' have an option to be able to menu jump to recurring cards? (I think so...)
+	--  difference of 'case' vs. 'elif/if'
+	--  see if you can have someone look at your code?
+	--  look into python generator?? for pomodoro?
+
+
+	--  can lumocards have a version where it shows in paren() the location of the found card when it's previewing the card from the 1...2...3... menu?
+	--  spend a few hours one morning going through the playsound python package
+	--  is it possible to use part of ffmpeg, ffplay, pyaudio?
+
+	--  can lumo aliases be renamed to "lumo cardsrun" and "lumo newcard" etc?
+	**  make micro have the function to shift+space move over one char
+	**  find out how to 'tab through options' in oh my bash (maybe watch a tutorial on this)
+	**  find out how to filter by portion of the word rather than starting
+	**  modify lumo_install.sh so that it checks whether or not 'lumo_runtime' is activated...
+
+--  INSTALLATION NEW USERS??? (continued)
+	- requires python
+	- user downloads a tar or compressed folder
+	- then script installs a vitual environment +
+		- pip installs the package to the virtual environment
+		- then exports the environment script to /usr/bin
+		- then .toml file creates and entry point for the 'Lumo' program that can load all the different lumo fucntions
+		- then show a demo video
+		- show what settings are available
 	
-	
-	
---  you can refactor newcard so that it uses default args from argparse...
---  should a card with a lowercase name still show it's title (using format card title?)
---  should there be an option to make a newcard after making a newcard?
---  should the 'macro menu' have an option to be able to menu jump to recurring cards? (I think so...)
---  difference of 'case' vs. 'elif/if'
---  see if you can have someone look at your code?
---  look into python generator?? for pomodoro?
-
-
---  can lumocards have a version where it shows in paren() the location of the found card when it's previewing the card from the 1...2...3... menu?
---  spend a few hours one morning going through the playsound python package
---  is it possible to use part of ffmpeg, ffplay, pyaudio?
-
---  can lumo aliases be renamed to "lumo cardsrun" and "lumo newcard" etc?
-**  make micro have the function to shift+space move over one char
-**  find out how to 'tab through options' in oh my bash (maybe watch a tutorial on this)
-**  find out how to filter by portion of the word rather than starting
-**  modify lumo_install.sh so that it checks whether or not 'lumo_runtime' is activated...
-
---  installation and intro for new users ??? (continued)
-	-learn about the design patterns from forrest knight
 	-make a toml file, export function to script
 	-see micro, how does it do it? (look at my email examples)
 	-should it be installable from pip?
+	-pip install to target?
 	-the installation should be one call to install.sh etc. (cross platform)
 	-the installation should ideally then allow users to call "lumo" from any location in the terminal
 	-maybe the project then is in /usr/bin?
@@ -80,6 +136,8 @@
 		- this file is also linked to settings.json
 		- note: the user cannot then manually rename the credentials file without issue!
 		- I feel like this is still not a robust implementation
+	-how will the app handle updates for users?
+		-say for a bug or if the json needs to change?
 	-how would people set this up for google api?
 	-should it auto load 'micro?' is this possible???
 	-should it be able to configure a text editor based on 'settings?'
