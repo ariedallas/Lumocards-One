@@ -31,6 +31,7 @@ sounds_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_SOUNDS")
 
 # ---TIME--- #
 today = datetime.datetime.today()
+now = datetime.datetime.now().isoformat() + "Z"
 today_frmttd = today.strftime("%d%b%Y")
 today_frmttd_spaces = today.strftime("%d %b %Y")
 today_frmttd_log = today.strftime("%d %m %Y")
