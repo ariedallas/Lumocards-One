@@ -24,7 +24,6 @@ SCOPES = ["https://www.googleapis.com/auth/calendar"]
 creds_file = os.path.join(l_files.credentials_folder, "credentials.json")
 token_file = os.path.join(l_files.credentials_folder, "token.json")
 
-
 cal = calendar.Calendar()
 curr_year, curr_month, curr_day = l_files.today.year, l_files.today.month, l_files.today.day
 monthdays = [d for d in cal.itermonthdays(year=curr_year, month=curr_month) if d != 0]
