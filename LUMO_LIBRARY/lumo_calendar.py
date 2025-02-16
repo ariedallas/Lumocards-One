@@ -29,20 +29,8 @@ curr_year, curr_month, curr_day = l_files.today.year, l_files.today.month, l_fil
 monthdays = [d for d in cal.itermonthdays(year=curr_year, month=curr_month) if d != 0]
 curr_month_max = calendar.monthrange(year=curr_year, month=curr_month)[1]
 
-# class Month(Enum):
-# 	JAN = 1
-# 	FEB = 2
-# 	MAR = 3
-# 	APR = 4
-# 	MAY = 5
-# 	JUN = 6
-# 	JUL = 7
-# 	AUG = 8
-# 	SEP = 9
-# 	OCT = 10
-# 	NOV = 11
-# 	DEC = 12
-
+print(calendar.week(3, 2))
+sys.exit(0)
 
 def get_creds():
     creds = None
