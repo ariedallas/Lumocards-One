@@ -3,29 +3,12 @@ import datetime
 import os
 import subprocess
 
+from lumo_calendar import DayBlock
 
 def percenter(percentage, number):
 
     perc_as_dec = percentage / 100
     return round(number * perc_as_dec)
-
-class DayBlock:
-    def __init__(self, day, dayname, events):
-        self.day = day
-        self.dayname = dayname
-        self.events = events
-
-        self.event_1 = events[0]
-        self.event_2 = events[1]
-        self.event_3 = events[2]
-
-    @classmethod
-    def from_date(cls, var_datetime, events):
-        day = var_datetime.day
-        day_int = var_datetime.weekday()
-        dayname = calendar.Day(day_int).name
-
-        return DayBlock(day, dayname, events)
 
 
 class CalendarPageWeek:
@@ -199,14 +182,7 @@ class CalendarPageWeek:
         ])
 
         self.cal_header()
-        # CalendarPageWeek.row_style_days((2, 30))
-        # CalendarPageWeek.row_style_daynames(("MONDAY--JAN", "THURSDAY"))
-        # CalendarPageWeek.line_break()
-        # CalendarPageWeek.row_style_event(("Places with Cameron and Phil", "14:00 - 15:00")
-        #                                  , ("Places with Cameron and Phil", "14:00 - 15:00"))
-        # CalendarPageWeek.line_break()
-        # CalendarPageWeek.row_style_addnl_events((2, 6))
-        # CalendarPageWeek.line_break()
+
 
         editor_block = CalendarPageWeek.make_editor_block()
         day_block_7 = CalendarPageWeek.make_day_block(today_block)
@@ -219,7 +195,6 @@ class CalendarPageWeek:
         print("                                                         ", end='')
         usr = input(">")
 
-
     def cal_header(self):
         print()
         print('{0:^{width}}'.format(self.header_date, width=CalendarPageWeek.total_width))
@@ -229,3 +204,13 @@ class CalendarPageWeek:
 if __name__ == "__main__":
     week_viewer = CalendarPageWeek("DECEMBER", [])
     week_viewer.display_week()
+
+# ---- ETC / UNUSED ---- #
+# CalendarPageWeek.row_style_days((2, 30))
+# CalendarPageWeek.row_style_daynames(("MONDAY--JAN", "THURSDAY"))
+# CalendarPageWeek.line_break()
+# CalendarPageWeek.row_style_event(("Places with Cameron and Phil", "14:00 - 15:00")
+#                                  , ("Places with Cameron and Phil", "14:00 - 15:00"))
+# CalendarPageWeek.line_break()
+# CalendarPageWeek.row_style_addnl_events((2, 6))
+# CalendarPageWeek.line_break()
