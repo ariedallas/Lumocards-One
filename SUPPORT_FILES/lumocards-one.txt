@@ -1,7 +1,9 @@
 NEXT:
-	- if no bracket, then just redisplay
-	- week view
+	- continue refactor, see docstring on ln: 504
+	- week view, implement how a months worth of days would get parsed
+	
 	- try a design pattern
+	- try a simple decorator
 
 OUTLINE BIG:
 	> CODE READING 
@@ -22,31 +24,38 @@ EMAILS:
 	
 
 SCHEDULE / CALENDAR!!!
-	- algorithm for selecting what calendar data to load... paging through 3 months, then loaded the next few months
 	- propagate default values to calendar page
-	- mess
 
-	- should selecting an event on the chosen day show a new screen? I think so, but we can do it both ways to see...
+	- should selecting an event on the chosen day show a new screen?
+		- I think so, but we can do it both ways to see...
 	
 	- it should be able to retrieve a years worth of events from google, then it can just check for differences to see if events have updated between the calendars...
 	- offline calendar API?
 	- collect object from google cal and incorporate into 'event list'
 
 	
-	- use some oop/classes
 	- user can schedule cards
 	- user can view already scheduled events / calendar events
-	- user can select which events become cards
 	- user can toggle events from scheduled to non-scheduled
 	- calendar mode: d[1], w[2], m[3]
 	- select day from [a], [b], [c]
 
 	- is there an issue with the Google API for 'primary' calendars?
+	- all the shit with repeating events...!
 	- if a card is repeating event in GCal or LumoCal, it should have one instance as a .txt file
+	- how is the calendar aware in different contexts?
+	- deleting a card from google deletes the card in Lumo
+	- deleting a card from Lumo deletes the card in Google
+	- all this for recurring cards
 
 	- how should I move backward and forward in days? what should be 'loaded'? how/when should loading happen?
 
 	- how should I handle cases where there is no internet? what is the 'offline' mode
+		-flagging data for upload
+		-upload / sync manager 
+	- can you have more than one calendar added?
+	- how to make token / credentials persistent?
+		-automatically delete the token and re-apply credentials?
 
 **  put tape on my keyboard for better finding of l ctrl and alt.
 
@@ -77,14 +86,14 @@ SCHEDULE / CALENDAR!!!
 	
 
 	EDGE CASES:
-	- leap year 
+	- 
 	- how do events that start one day and flow into the next work?
 	- how does calendar display conflicting?
 	- what happens in between weeks of two different months? (does it always start on first?)
 	- how does it account for this?
 
 
--- GENEREAL
+-- LUMO (ALL)
 	--  you can refactor newcard so that it uses default args from argparse...
 	--  at some point you should use types in your functions
 	--  enum vs. str as input to a function
