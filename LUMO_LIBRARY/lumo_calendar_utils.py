@@ -244,6 +244,31 @@ def new_event_and_sync(credentials, card_file, card_abspath):
             return generated_id
 
 
+def times_formatter(start, end, format):
+    if format == "military":
+        start = f" {start} "
+        end = f" {end} "
+    else:
+        # format is standard
+        start = start if len(start) == 7 else f" {start}"
+        end = end if len(end) == 7 else f" {end}"
+
+    formatted = f"{start} - {end}"
+    return formatted
+
+
+def military_to_standard(military_time):
+    standard_converted = datetime.datetime.strptime(military_time, '%H:%M')
+    standard_time_formatted = standard_converted.strftime('%I:%M%p')
+    return standard_time_formatted.title()
+
+
+def standard_to_military(standard_time):
+    military_converted = datetime.datetime.strptime(standard_time, '%I:%M%p')
+    military_formatted = military_converted.strftime('%H:%M')
+    print(military_formatted)
+
+
 def percenter(percentage, number):
 
     perc_as_dec = percentage / 100
@@ -375,9 +400,9 @@ class DayBlock:
         self.date = date
         self.events = events
 
-        self.event_1 = DayBlock.list_safe_idx_get(self.events, 0, "--- --- ---")
-        self.event_2 = DayBlock.list_safe_idx_get(self.events, 1, "--- --- ---")
-        self.event_3 = DayBlock.list_safe_idx_get(self.events, 2, "--- --- ---")
+        # self.event_1 = DayBlock.list_safe_idx_get(self.events, 0, "--- --- ---")
+        # self.event_2 = DayBlock.list_safe_idx_get(self.events, 1, "--- --- ---")
+        # self.event_3 = DayBlock.list_safe_idx_get(self.events, 2, "--- --- ---")
 
     @classmethod
     def from_date(cls, var_datetime, events):
@@ -389,11 +414,11 @@ class DayBlock:
         return DayBlock(day, dayname, date, events)
 
     @staticmethod
-    def list_safe_idx_get(var_list, idx, default_value=None):
+    def list_safe_get_item(var_list, idx):
         if len(var_list) >= (idx + 1):
             return var_list[idx]
         else:
-            return default_value
+            return [None, None, '     ', '     ', '--- --- ---']
 
 
 class CalendarPageDay:
@@ -456,17 +481,47 @@ class CalendarPageDay:
 class CalendarPageWeek:
     t_size = os.get_terminal_size()
     total_width = int(t_size.columns)
-    content_width = percenter(80, total_width)
-    line = ("-" * content_width)
 
     COL_SPACER = "        "
     COL_WIDTH = 60
 
+    content_width = (2 * COL_WIDTH) + len(COL_SPACER)
+    line = ("-" * content_width)
+    l_margin = round((total_width - content_width) / 2) + 15
 
-    def __init__(self, header_date, events):
-        self.header_date = header_date
-        self.events = events
 
+    def __init__(self, week_of_day_blocks):
+        self.day_blocks = week_of_day_blocks
+        self.header_date = CalendarPageWeek.get_header_date(week_of_day_blocks)
+
+    @staticmethod
+    def get_header_date(var_week_block):
+        bucket_1 = []
+        bucket_2 = []
+
+        first, last = var_week_block[0], var_week_block[-1]
+
+        if first.date.month == last.date.month:
+            month_int = first.date.month
+
+        else:
+            for day_block in var_week_block:
+                if day_block.date.month == first.date.month:
+                    bucket_1.append(day_block.date.month)
+                else:
+                    bucket_2.append(day_block.date.month)
+
+            larger_bucket = bucket_1 if len(bucket_1) > len(bucket_2) else bucket_2
+            month_int = larger_bucket[0]
+
+        header_month = (calendar.Month(month_int).name)
+        return header_month
+
+    def cal_header(self):
+        print()
+        # print('{0:^{width}}'.format(CalendarPageDay.line, width=CalendarPageWeek.total_width))
+        print('{0:^{width}}'.format(self.header_date, width=CalendarPageWeek.total_width))
+        print()
 
     @staticmethod
     def row_style_days(dates):
@@ -493,7 +548,7 @@ class CalendarPageWeek:
 
     @staticmethod
     def row_style_event(event_1, event_2):
-        summary_width = CalendarPageWeek.COL_WIDTH - 14
+        summary_width = CalendarPageWeek.COL_WIDTH - 17
 
         summary_1, time_1 = event_1
         summary_2, time_2 = event_2
@@ -546,11 +601,13 @@ class CalendarPageWeek:
 
     @staticmethod
     def half_row_style_event(event):
-        summary_width = CalendarPageWeek.COL_WIDTH - 15
+        summary_width = CalendarPageWeek.COL_WIDTH - 17
 
-        summary, time = event
+        _, _, start, end, summary = event
+        # times = times_formatter(start, end)
+        times = times_formatter(start, end, format="military")
 
-        return "{0:<{width}}".format(summary, width=summary_width) + time
+        return "{0:<{width}}".format(summary, width=summary_width) + times
 
     @staticmethod
     def half_row_style_line_break():
@@ -567,7 +624,7 @@ class CalendarPageWeek:
     @staticmethod
     def make_editor_block():
         header = CalendarPageWeek.half_row_style_editor_header()
-        summary = CalendarPageWeek.half_row_style_event(("Dinner with John", "8:00Pm - 9:00Pm"))
+        summary = CalendarPageWeek.half_row_style_event([None, None, "20:00", "21:00", "Dinner with John"])
         br = CalendarPageWeek.half_row_style_line_break()
         menu_1 = CalendarPageWeek.half_row_style_menu("[A]  Complete card with no additional options")
         menu_2 = CalendarPageWeek.half_row_style_menu("[B]  Set recurring features")
@@ -582,21 +639,24 @@ class CalendarPageWeek:
                 ,br
                 ,menu_4
                 ]
-
     @staticmethod
-    def make_day_block(day_block):
+    def format_day_block(day_block):
+        event_1 = DayBlock.list_safe_get_item(day_block.events, 0)
+        event_2 = DayBlock.list_safe_get_item(day_block.events, 1)
+        event_3 = DayBlock.list_safe_get_item(day_block.events, 2)
+
         day = CalendarPageWeek.half_row_style_day(day_block.day)
         dayname = CalendarPageWeek.half_row_style_dayname(day_block.dayname)
         br = CalendarPageWeek.half_row_style_line_break()
-        event_1 = CalendarPageWeek.half_row_style_event(day_block.event_1)
-        event_2 = CalendarPageWeek.half_row_style_event(day_block.event_2)
-        event_3 = CalendarPageWeek.half_row_style_event(day_block.event_3)
+        event_1_row = CalendarPageWeek.half_row_style_event(event_1)
+        event_2_row = CalendarPageWeek.half_row_style_event(event_2)
+        event_3_row = CalendarPageWeek.half_row_style_event(event_3)
         addl_events = CalendarPageWeek.half_row_style_addnl_events(3)
 
         return [ day
                 ,dayname
                 ,br
-                ,event_1, event_2, event_3
+                ,event_1_row, event_2_row, event_3_row
                 ,br
                 ,addl_events
                 ,br]
@@ -610,31 +670,23 @@ class CalendarPageWeek:
     def display_week(self):
         # subprocess.run(['clear'], shell=True)
 
-        dt_today = datetime.date.today()
-        today_block = DayBlock.from_date(var_datetime=dt_today, events=[
-              ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
-            , ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
-            , ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
-        ])
-
         self.cal_header()
 
-
         editor_block = CalendarPageWeek.make_editor_block()
-        day_block_7 = CalendarPageWeek.make_day_block(today_block)
+        day_block_1 = CalendarPageWeek.format_day_block(self.day_blocks[0])
+        day_block_2 = CalendarPageWeek.format_day_block(self.day_blocks[1])
+        day_block_3 = CalendarPageWeek.format_day_block(self.day_blocks[2])
+        day_block_4 = CalendarPageWeek.format_day_block(self.day_blocks[3])
+        day_block_5 = CalendarPageWeek.format_day_block(self.day_blocks[4])
+        day_block_6 = CalendarPageWeek.format_day_block(self.day_blocks[5])
+        day_block_7 = CalendarPageWeek.format_day_block(self.day_blocks[6])
 
-        CalendarPageWeek.block_zipper(day_block_7, day_block_7)
-        CalendarPageWeek.block_zipper(day_block_7, day_block_7)
-        CalendarPageWeek.block_zipper(day_block_7, day_block_7)
+        CalendarPageWeek.block_zipper(day_block_1, day_block_4)
+        CalendarPageWeek.block_zipper(day_block_2, day_block_5)
+        CalendarPageWeek.block_zipper(day_block_3, day_block_6)
         CalendarPageWeek.block_zipper(editor_block, day_block_7)
         CalendarPageWeek.line_break()
-        print("                                                         ", end='')
-        usr = input(">")
 
-    def cal_header(self):
-        print()
-        print('{0:^{width}}'.format(self.header_date, width=CalendarPageWeek.total_width))
-        print()
 
 if __name__ == "__main__":
     print("Hello from main")
@@ -644,3 +696,9 @@ if __name__ == "__main__":
 # print("{:{fill}<50}".format("hello", fill="*"))
 # print("{0:{width}}{:<8}{:<}{}".format(
 # print("{:^{width}}".format(CalendarPageDay.events_line, width=CalendarPageDay.total_width))
+
+# today_block = DayBlock.from_date(var_datetime=dt_today, events=[
+#       ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
+#     , ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
+#     , ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
+# ])
