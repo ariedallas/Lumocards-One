@@ -1,12 +1,12 @@
 NEXT:
-	- continue refactor, see docstring on ln: 504
 	- week view, implement how a months worth of days would get parsed
-	
+	- probably an event should become an object at some point... (currently it's a list)
+	- python public vs. private methods?	
 	- try a design pattern
-	- try a simple decorator
 
 OUTLINE BIG:
 	> CODE READING 
+	> REFACTOR to TYPES
 	> WEEK VIEW 
 	> SYNC CALENDAR
 	> SCHEDULING

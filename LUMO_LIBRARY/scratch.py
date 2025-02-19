@@ -65,8 +65,10 @@ def separate_by_weeks(dayblocks):
 # sep = separate_by_weeks(dayblocks)
 
 li = list(range(13))
-print(li)
+li_2 = list(range(16))
+print("Hello")
+print(max(li, li_2))
 
-base = li[:-4]
-print(base)
+
+print(not [])
 
