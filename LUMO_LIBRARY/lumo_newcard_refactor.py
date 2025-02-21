@@ -130,14 +130,6 @@ def input_to_filename():
     return result
 
 
-# def generate_quick_card(card_filename):
-#     formatted_card_fullpath = os.path.join(l_files.cards_near_folder, card_filename)
-#     with open(formatted_card_fullpath, "a+") as newcard:
-#         newcard.write(default_text)
-#
-#     return formatted_card_fullpath
-
-
 def check_for_dupes(card_filename):
 
     card_exists = False
@@ -148,11 +140,13 @@ def check_for_dupes(card_filename):
         card_exists = True
     elif card_filename in os.listdir(l_files.cards_dist_folder):
         card_exists = True
+    elif card_filename in os.listdir(l_files.cards_calendar_folder):
+        card_exists = True
+    elif card_filename in os.listdir(l_files.checklist_cards_folder):
+        card_exists = True
     elif card_filename in os.listdir(l_files.recurring_cards_folder):
         card_exists = True
     elif card_filename in os.listdir(l_files.archived_cards_folder):
-        card_exists = True
-    elif card_filename in os.listdir(l_files.checklist_cards_folder):
         card_exists = True
 
     return card_exists
@@ -385,6 +379,42 @@ def main():
     result_card, result_path = card_creation_loop()
     card_menu_loop(result_card, result_path)
 
+# ---- LUMO CALENDAR FUNCTIONS ---- #
+def check_for_calendar_cards(card_filename):
+    for card in os.listdir(l_files.cards_middle_folder):
+        if card[2:] == card_filename:
+            return False
+    return True
+
+
+def string_to_filename(var_str):
+    split_string = str.split(var_str)
+    cardname_as_list = [w.title() for w in split_string]
+    cardname = "".join(cardname_as_list)
+
+    cardname_txt = f"{cardname}.txt"
+    return cardname_txt
+
+
+def write_calendar_card_and_json(card_filename, folder, google_calendar_data, add_custom_steps=None):
+    formatted_card_fullpath = os.path.join(folder, card_filename)
+    card_folder = pathlib.Path(folder).name
+    c_abbr = card_filename[0]
+
+    if add_custom_steps:
+        with open(formatted_card_fullpath, "w+") as newcard:
+            for line in add_custom_steps:
+                newcard.write(line)
+
+    else:
+        with open(formatted_card_fullpath, "w+") as newcard:
+            newcard.write(default_text)
+
+    default_json = l_json_utils.make_dflt_json_dict(card_folder, c_abbr, google_calendar_data)
+    json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
+    l_json_utils.write_json(json_filename=json_fullpath, json_data=default_json)
+
+    return formatted_card_fullpath, json_fullpath
 
 if __name__ == "__main__":
     main()

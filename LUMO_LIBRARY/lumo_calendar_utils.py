@@ -1,14 +1,11 @@
-import math
 import os
 import datetime
 import subprocess
 import calendar
-import sys
-import time
-
-# from enum import Enum
 
 from pprint import pprint as pp
+
+import dateutil.tz
 from dateutil.relativedelta import relativedelta
 
 from google.auth.transport.requests import Request
@@ -18,18 +15,21 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 import lumo_filehandler as l_files
-import lumo_formatters as l_formatter
+import lumo_formatters as l_formatters
+import lumo_newcard_refactor as l_newcard
 import lumo_animationlibrary as animators
+import lumo_json_utilities as l_json_utils
 
-SCOPES = ["https://www.googleapis.com/auth/calendar"]
-creds_file = os.path.join(l_files.credentials_folder, "credentials.json")
-token_file = os.path.join(l_files.credentials_folder, "token.json")
+SCOPES = ['https://www.googleapis.com/auth/calendar']
+creds_file = os.path.join(l_files.credentials_folder, 'credentials.json')
+token_file = os.path.join(l_files.credentials_folder, 'token.json')
 
 cal = calendar.Calendar()
 curr_year, curr_month, curr_day = l_files.today.year, l_files.today.month, l_files.today.day
 monthdays = [d for d in cal.itermonthdays(year=curr_year, month=curr_month) if d != 0]
 curr_month_max = calendar.monthrange(year=curr_year, month=curr_month)[1]
 today_date = datetime.date.today()
+tz_local = dateutil.tz.gettz('America/Los_Angeles')
 
 
 def get_creds():
@@ -46,103 +46,78 @@ def get_creds():
             flow = InstalledAppFlow.from_client_secrets_file(creds_file, SCOPES)
             creds = flow.run_local_server(port=0)
 
-        with open(token_file, "w") as token:
+        with open(token_file, 'w') as token:
             token.write(creds.to_json())
 
     return creds
 
 
+def get_google_event_by_id(credentials, id):
+    try:
+        service = build('calendar', 'v3', credentials=credentials)
+
+
+        event_result = (service.events().get(
+              calendarId='primary'
+            , eventId=id)
+                        .execute())
+
+        return event_result
+
+    except HttpError as error:
+        print('Nothing')
+        print('An error has occurred ', error)
+        return None
+
+
 def get_google_events(credentials, time_min, time_max):
     try:
-        service = build("calendar", "v3", credentials=credentials)
+        service = build('calendar', 'v3', credentials=credentials)
 
-        start = datetime.datetime(year=time_min.year, month=time_min.month, day=time_min.day).isoformat() + "Z"
-        end   = datetime.datetime(year=time_max.year, month=time_max.month, day=time_max.day).isoformat() + "Z"
+        start = datetime.datetime(year=time_min.year, month=time_min.month, day=time_min.day).isoformat() + 'Z'
+        end   = datetime.datetime(year=time_max.year, month=time_max.month, day=time_max.day).isoformat() + 'Z'
 
 
         event_result = service.events().list(
-            calendarId="primary",
+            calendarId='primary',
             timeMin=start,
             timeMax=end,
             singleEvents=True,
-            orderBy="startTime"
+            orderBy='startTime'
         ).execute()
 
-        events = event_result.get("items", [])
+        events = event_result.get('items', [])
 
         if not events:
-            print("No upcoming events found.")
+            print('No upcoming events found.')
             return
 
         return events
 
     except HttpError as error:
-        print("Nothing")
-        print("An error has occurred ", error)
+        print('Nothing')
+        print('An error has occurred ', error)
         return None
 
 
-def get_single_event(credentials, id):
-    try:
-        service = build("calendar", "v3", credentials=credentials)
+def get_google_events_for_times(credentials, time_min, time_max):
+    google_month_events = get_google_events(credentials=credentials, time_min=time_min, time_max=time_max)
 
-        event_result = service.events().get(calendarId='primary', eventId=id).execute()
-
-        return event_result
-
-    except HttpError as error:
-        print("Nothing")
-        print("An error has occurred ", error)
-        return None
-
-
-def create_gcal_event(credentials, formatted_card_title, card_steps):
-
-    try:
-        service_2 = build("calendar", "v3", credentials=credentials)
-
-        now = datetime.datetime.now().isoformat() + "Z"
-        card_steps_as_str = "\n".join(card_steps[:3])
-
-        my_event = {
-            'summary': formatted_card_title
-            , 'location': '...'
-            , 'description': card_steps_as_str
-            , 'start': {
-                'dateTime': f'{now}'
-                , 'timeZone': 'America/Los_Angeles'
-            }
-            , 'end': {
-                'dateTime': f'{now}'
-                , 'timeZone': 'America/Los_Angeles'
-            }
-            , 'colorId': 7
-        }
-
-        run_event = service_2.events().insert(calendarId='primary', body=my_event).execute()
-
-        generated_id = run_event.get('id')
-        # animators.animate_text(f"Created Google Calendar Event with ID: {generated_id}")
-        return generated_id
-
-
-    except HttpError as error:
-        print("Here's the error that has occurred: ", error)
-        return None
+    return google_month_events
 
 
 def update_event(credentials):
     try:
 
-        service = build("calendar", "v3", credentials=credentials)
+        service = build('calendar', 'v3', credentials=credentials)
 
         retrieved_id_from_txt = '4v39giucjk61s9q23koofhfekd'
 
         event = service.events().get(calendarId='primary',
                                      eventId=retrieved_id_from_txt).execute()
         print()
-        print("FROM UPDATER FUNCTION")
-        print(f"ID {retrieved_id_from_txt} makes ->", event.get("summary"))
+        print('FROM UPDATER FUNCTION')
+        print(f'ID {retrieved_id_from_txt} makes ->', event.get('summary'))
 
         event['colorId'] = 1
         # event['summary'] = 'Desiree + Arie Continue to Collab on Little Ditty'
@@ -154,106 +129,41 @@ def update_event(credentials):
 
 
     except HttpError as error:
-        print("An error happened: ", error)
+        print('An error happened: ', error)
 
 
-def get_lines(card_abspath):
-
-    with open(card_abspath, "r") as fin:
-        lines = fin.readlines()
-        filtered_out_calendarId = filter_for_id(lines)
-
-    return filtered_out_calendarId
-
-
-def filter_for_id(var_lines):
-    id_line = None
-    filtered_lines = []
-
-    for line in var_lines:
-        if '[GOOGLE API EVENT ID]' in line:
-            id_line = line
-        else:
-            filtered_lines.append(line)
-
-    if id_line:
-
-        google_event_id = id_line.split(",")[1]
-        return filtered_lines, google_event_id
-
-    else:
-        return var_lines, None
-
-
-def append_id(id_to_txt, card_abspath):
-    prefix_and_id = f"\n\n[GOOGLE API EVENT ID],{id_to_txt}"
-
-    with open(card_abspath, "a") as fin:
-        fin.writelines(prefix_and_id)
-
-
-def delete_event_from_gcal(credentials, some_id):
-    some_id = str(some_id)
-
+def delete_event_from_google(credentials, var_id):
     try:
-        service = build("calendar", "v3", credentials=credentials)
-        service.events().delete(calendarId='primary', eventId=some_id).execute()
+        service = build('calendar', 'v3', credentials=credentials)
+        service.events().delete(calendarId='primary', eventId=var_id).execute()
 
     except HttpError as error:
-        print("This event was already deleted.")
+        print('This event was (likely) already deleted.')
         print(error)
 
 
-def unschedule_and_remove_localcard_id(credentials, card_abspath):
-    card_tuple = get_lines(card_abspath)
-    cards_steps_isolated = card_tuple[0]
-    card_event_id = card_tuple[1]
+def delete_calendar_card(credentials, card_filename):
+    json_data = l_json_utils.read_and_get_json_data(card_filename)
+    calendar_card_id = json_data['google calendar data']['id']
 
-    delete_event_from_gcal(credentials, card_event_id)
-    animators.animate_text("The card was deleted from the external (Google) calendar.")
+    delete_event_from_google(credentials, calendar_card_id)
 
-    with open(card_abspath, "w") as fin:
-        for line in cards_steps_isolated:
-            print(line.strip())
-            fin.writelines(line)
+    l_formatters.card_deleter(card_filename)
 
-    animators.animate_text("The card is now unscheduled.")
-
-
-def new_event_and_sync(credentials, card_file, card_abspath):
-
-    card_tuple = l_formatter.filename_to_card(card_file)
-    card_title = card_tuple[0]
-    card_title_formatted = l_formatter.format_card_title(card_title)
-    card_steps = card_tuple[1]
-
-    steps, possible_google_id = get_lines(card_abspath)
-
-    if possible_google_id: # AND MAKE SURE TO ACTUALLY ACCESS THE CARD TO TEST IT EXISTS IN BOTH PLACES
-        animators.animate_text(f"This card is already scheduled, with the ID: {possible_google_id}")
-
-        return possible_google_id
-
-    elif not possible_google_id:
-        animators.animate_text("This card is not currently scheduled. Creating Google Calendar Event.")
-        generated_id = create_gcal_event(credentials, card_title_formatted, card_steps)
-
-        if generated_id:
-            append_id(generated_id, card_abspath)
-
-            return generated_id
+    animators.animate_text('The card was deleted from the external (Google) calendar.')
+    animators.animate_text('This Lumo card is deleted.')
 
 
 def times_formatter(start, end, format):
-    if format == "military":
-        start = f" {start} "
-        end = f" {end} "
+    if format == 'military':
+        start = f' {start} '
+        end = f' {end} '
     else:
         # format is standard
-        start = start if len(start) == 7 else f" {start}"
-        end = end if len(end) == 7 else f" {end}"
+        start = start if len(start) == 7 else f' {start}'
+        end = end if len(end) == 7 else f' {end}'
 
-    formatted = f"{start} - {end}"
+    formatted = f'{start} - {end}'
     return formatted
 
 
@@ -280,10 +190,10 @@ def is_odd(num):
 
 
 def parse_brackets(var_input):
-    if "]" in var_input:
-        return var_input.count("]"), "PAGE RIGHT"
-    elif "[" in var_input:
-        return (var_input.count("[")), "PAGE LEFT"
+    if ']' in var_input:
+        return var_input.count(']'), 'PAGE RIGHT'
+    elif '[' in var_input:
+        return (var_input.count('[')), 'PAGE LEFT'
     else:
         return 0, None
 
@@ -329,7 +239,7 @@ def fill_time_window_dates(window_start, window_end):
     return time_window
 
 
-def google_event_to_lumo(event):
+def google_event_to_local(event):
     dt_google_start = (event['start'].get('dateTime'))
     dt_google_end = (event['end'].get('dateTime'))
     dt_python_start = datetime.datetime.strptime(dt_google_start, '%Y-%m-%dT%H:%M:%S%z')
@@ -344,29 +254,33 @@ def google_event_to_lumo(event):
     return date, day, start_time, end_time, summary
 
 
-def format_headers_one_month(var_year, var_month):
-    month_headers = []
-    for d in cal.itermonthdates(var_year, var_month):
-
-        date_header = datetime.date.strftime(d, "%A: %B %d, %Y")
-
-        """this filters out any padded dates that itermonthdates includes 
-        e.g. it may include a few dates from the previous or next month for purposes of displaying a readable block"""
-        if d.month == var_month:
-            month_headers.append(date_header)
-
-    return month_headers
-
-
 def get_adjacent_month(base_month, base_year, direction, months_distance):
-    if direction == "past":
+    if direction == 'past':
         adjacent = datetime.date(day=1, month=base_month, year=base_year) - relativedelta(months=months_distance)
-    elif direction == "next":
+    elif direction == 'next':
         adjacent = datetime.date(day=1, month=base_month, year=base_year) + relativedelta(months=months_distance)
     else:
         adjacent = datetime.date(day=1, month=base_month, year=base_year)
 
     return adjacent
+
+
+def get_local_calendar_cards(window_start, window_end):
+    calendar_cards_found = []
+    dt_window_start = datetime.datetime(window_start.year, window_start.month, window_start.day, tzinfo=tz_local)
+    dt_window_end = datetime.datetime(window_end.year, window_end.month, window_end.day, tzinfo=tz_local)
+
+    for card in os.listdir(l_files.cards_calendar_folder):
+        json_data = l_json_utils.read_and_get_json_data(card)
+        dt_google_start = json_data['google calendar data']['start']['dateTime']
+        dt_python_start = datetime.datetime.strptime(dt_google_start, '%Y-%m-%dT%H:%M:%S%z')
+        within_window = dt_window_start <= dt_python_start <= dt_window_end
+        calendar_cards_found.append(card) if within_window else None
+
+    return calendar_cards_found
+
+
+    # start time > specified start and start time < specified end
 
 
 def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
@@ -379,16 +293,16 @@ def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
 
     google_month_events = get_google_events(creds, time_min=window_start, time_max=window_end)
 
-    converted_events = [google_event_to_lumo(e) for e in google_month_events]
+    converted_events = [google_event_to_local(e) for e in google_month_events]
     expanded_events = []
 
     window = fill_time_window_dates(window_start, window_end)
     for date in window:
-        """Transform whatever events are found from Google into a full list where every day has a placeholder
+       """Transform whatever events are found from Google into a full list where every day has a placeholder
         Adds an empty list if no Google events exist for date."""
-        matched_events = [e for e in converted_events if e[0] == date]
-        day_block = DayBlock.from_date(date, matched_events)
-        expanded_events.append(day_block)
+       matched_events = [e for e in converted_events if e[0] == date]
+       day_block = DayBlock.from_date(date, matched_events)
+       expanded_events.append(day_block)
 
     return expanded_events
 
@@ -440,7 +354,7 @@ class CalendarPageDay:
 
     @staticmethod
     def format_date_for_header(var_date):
-        formatted = datetime.date.strftime(var_date, "%A: %B %d, %Y")
+        formatted = datetime.date.strftime(var_date, '%A: %B %d, %Y')
         return formatted
 
     def row_cal_header(self):
@@ -450,39 +364,39 @@ class CalendarPageDay:
 
     @staticmethod
     def _row_style_2(var_sel, var_event, var_start_t, var_end_t):
-        selector = "{:<{width}}".format(var_sel, width=10)
-        event = "• {:<{width}}".format(var_event, width=60)
-        time = "{} —— {}".format(var_start_t, var_end_t)
+        selector = '{:<{width}}'.format(var_sel, width=10)
+        event = '• {:<{width}}'.format(var_event, width=60)
+        time = '{} —— {}'.format(var_start_t, var_end_t)
 
         group = selector + event + time
         print('{0:^{width}}\n'.format(group, width=CalendarPageDay.total_width))
 
     def display_day(self):
-        start, end = (self.events[0][2], self.events[0][3]) if self.events else ("     ", "     ")
-        summary = self.events[0][4] if self.events else "--- --- ---"
+        start, end = (self.events[0][2], self.events[0][3]) if self.events else ('     ', '     ')
+        summary = self.events[0][4] if self.events else '--- --- ---'
 
         subprocess.run(['clear'], shell=True)
 
         self.row_cal_header()
-        CalendarPageDay._row_style_2("[A]", summary, start, end)
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[A]", summary, start, end)
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[A]", "something I'll do another time", start, end)
-        CalendarPageDay._row_style_2("[A]", "something I'll do soon", start, end)
+        CalendarPageDay._row_style_2('[A]', summary, start, end)
+        CalendarPageDay._row_style_2('[-]', '--- --- ---', '     ', '     ')
+        CalendarPageDay._row_style_2('[-]', '--- --- ---', '     ', '     ')
+        CalendarPageDay._row_style_2('[-]', '--- --- ---', '     ', '     ')
+        CalendarPageDay._row_style_2('[-]', '--- --- ---', '     ', '     ')
+        CalendarPageDay._row_style_2('[-]', '--- --- ---', '     ', '     ')
+        CalendarPageDay._row_style_2('[A]', summary, start, end)
+        CalendarPageDay._row_style_2('[-]', '--- --- ---', '     ', '     ')
+        CalendarPageDay._row_style_2('[-]', '--- --- ---', '     ', '     ')
+        CalendarPageDay._row_style_2('[-]', '--- --- ---', '     ', '     ')
+        CalendarPageDay._row_style_2('[A]', 'something I\'ll do another time', start, end)
+        CalendarPageDay._row_style_2('[A]', 'something I\'ll do soon', start, end)
 
 
 class CalendarPageWeek:
     t_size = os.get_terminal_size()
     total_width = int(t_size.columns)
 
-    COL_SPACER = "        "
+    COL_SPACER = '        '
     COL_WIDTH = 60
 
     content_width = (2 * COL_WIDTH) + len(COL_SPACER)
@@ -526,21 +440,21 @@ class CalendarPageWeek:
     @staticmethod
     def row_style_days(dates):
         dt_1, dt_2 = dates
-        dt_1_frmt = "{:02d}".format(dt_1)
-        dt_2_frmt = "{:02d}".format(dt_2)
+        dt_1_frmt = '{:02d}'.format(dt_1)
+        dt_2_frmt = '{:02d}'.format(dt_2)
 
 
-        print("{0:-<{width}}".format(dt_1_frmt, width=CalendarPageWeek.COL_WIDTH)
+        print('{0:-<{width}}'.format(dt_1_frmt, width=CalendarPageWeek.COL_WIDTH)
               , CalendarPageWeek.COL_SPACER
-              , "{0:-<{width}}".format(dt_2_frmt, width=CalendarPageWeek.COL_WIDTH))
+              , '{0:-<{width}}'.format(dt_2_frmt, width=CalendarPageWeek.COL_WIDTH))
 
     @staticmethod
     def row_style_daynames(daynames):
         dayname_1, dayname_2 = daynames
 
-        print("{0:-<{width}}".format(dayname_1, width=CalendarPageWeek.COL_WIDTH)
+        print('{0:-<{width}}'.format(dayname_1, width=CalendarPageWeek.COL_WIDTH)
               , CalendarPageWeek.COL_SPACER
-              , "{0:-<{width}}".format(dayname_2, width=CalendarPageWeek.COL_WIDTH))
+              , '{0:-<{width}}'.format(dayname_2, width=CalendarPageWeek.COL_WIDTH))
 
     @staticmethod
     def line_break():
@@ -554,49 +468,49 @@ class CalendarPageWeek:
         summary_2, time_2 = event_2
 
 
-        print("{0:-<{width}}".format(summary_1, width=summary_width), time_1
+        print('{0:-<{width}}'.format(summary_1, width=summary_width), time_1
               , CalendarPageWeek.COL_SPACER
-              ,"{0:-<{width}}".format(summary_2, width=summary_width), time_2)
+              ,'{0:-<{width}}'.format(summary_2, width=summary_width), time_2)
 
-        print("{0:-<{width}}".format(summary_1, width=summary_width), time_1
+        print('{0:-<{width}}'.format(summary_1, width=summary_width), time_1
               , CalendarPageWeek.COL_SPACER
-              ,"{0:-<{width}}".format(summary_2, width=summary_width), time_2)
+              ,'{0:-<{width}}'.format(summary_2, width=summary_width), time_2)
 
-        print("{0:-<{width}}".format(summary_1, width=summary_width), time_1
+        print('{0:-<{width}}'.format(summary_1, width=summary_width), time_1
               , CalendarPageWeek.COL_SPACER
-              ,"{0:-<{width}}".format(summary_2, width=summary_width), time_2)
+              ,'{0:-<{width}}'.format(summary_2, width=summary_width), time_2)
 
     @staticmethod
     def row_style_addnl_events(addnl_events_indicators):
         num_1, num_2 = addnl_events_indicators
 
-        formatted_text_1 = "+ {} more events".format(num_1)
-        formatted_text_2 = "+ {} more events".format(num_2)
+        formatted_text_1 = '+ {} more events'.format(num_1)
+        formatted_text_2 = '+ {} more events'.format(num_2)
 
-        print("{0:>{width}}".format(formatted_text_1, width=CalendarPageWeek.COL_WIDTH)
+        print('{0:>{width}}'.format(formatted_text_1, width=CalendarPageWeek.COL_WIDTH)
               , CalendarPageWeek.COL_SPACER
-              , "{0:>{width}}".format(formatted_text_2, width=CalendarPageWeek.COL_WIDTH))
+              , '{0:>{width}}'.format(formatted_text_2, width=CalendarPageWeek.COL_WIDTH))
 
     @staticmethod
     def half_row_style_day(day):
-        day_frmt = "{:02d}".format(day)
+        day_frmt = '{:02d}'.format(day)
 
-        return "{0:<{width}}".format(day_frmt, width=CalendarPageWeek.COL_WIDTH)
+        return '{0:<{width}}'.format(day_frmt, width=CalendarPageWeek.COL_WIDTH)
 
     @staticmethod
     def half_row_style_dayname(dayname):
-        return "{0:-<{width}}".format(dayname, width=CalendarPageWeek.COL_WIDTH)
+        return '{0:-<{width}}'.format(dayname, width=CalendarPageWeek.COL_WIDTH)
 
     @staticmethod
     def half_row_style_addnl_events(num):
-        formatted_text = "+ {} more events".format(num)
+        formatted_text = '+ {} more events'.format(num)
 
-        return "{0:>{width}}".format(formatted_text, width=CalendarPageWeek.COL_WIDTH)
+        return '{0:>{width}}'.format(formatted_text, width=CalendarPageWeek.COL_WIDTH)
 
     @staticmethod
     def half_row_style_editor_header():
-        editor_header = "EDITING--02-DEC-2025"
-        editor_header_formatted = "{0:-^{width}}".format(editor_header, width=CalendarPageWeek.COL_WIDTH)
+        editor_header = 'EDITING--02-DEC-2025'
+        editor_header_formatted = '{0:-^{width}}'.format(editor_header, width=CalendarPageWeek.COL_WIDTH)
         return editor_header_formatted
 
     @staticmethod
@@ -605,31 +519,31 @@ class CalendarPageWeek:
 
         _, _, start, end, summary = event
         # times = times_formatter(start, end)
-        times = times_formatter(start, end, format="military")
+        times = times_formatter(start, end, format='military')
 
-        return "{0:<{width}}".format(summary, width=summary_width) + times
+        return '{0:<{width}}'.format(summary, width=summary_width) + times
 
     @staticmethod
     def half_row_style_line_break():
-        return "{0:<{width}}".format("", width=CalendarPageWeek.COL_WIDTH)
+        return '{0:<{width}}'.format('', width=CalendarPageWeek.COL_WIDTH)
 
     @staticmethod
     def half_row_style_line():
-        return "{0:-<{width}}".format("", width=CalendarPageWeek.COL_WIDTH)
+        return '{0:-<{width}}'.format('', width=CalendarPageWeek.COL_WIDTH)
 
     @staticmethod
     def half_row_style_menu(menu_item):
-        return "  {0:<{width}}".format(menu_item, width=CalendarPageWeek.COL_WIDTH - 2)
+        return '  {0:<{width}}'.format(menu_item, width=CalendarPageWeek.COL_WIDTH - 2)
 
     @staticmethod
     def make_editor_block():
         header = CalendarPageWeek.half_row_style_editor_header()
-        summary = CalendarPageWeek.half_row_style_event([None, None, "20:00", "21:00", "Dinner with John"])
+        summary = CalendarPageWeek.half_row_style_event([None, None, '20:00', '21:00', 'Dinner with John'])
         br = CalendarPageWeek.half_row_style_line_break()
-        menu_1 = CalendarPageWeek.half_row_style_menu("[A]  Complete card with no additional options")
-        menu_2 = CalendarPageWeek.half_row_style_menu("[B]  Set recurring features")
-        menu_3 = CalendarPageWeek.half_row_style_menu("[C]  Go back")
-        menu_4 = CalendarPageWeek.half_row_style_menu("[X]  Exit")
+        menu_1 = CalendarPageWeek.half_row_style_menu('[A]  Complete card with no additional options')
+        menu_2 = CalendarPageWeek.half_row_style_menu('[B]  Set recurring features')
+        menu_3 = CalendarPageWeek.half_row_style_menu('[C]  Go back')
+        menu_4 = CalendarPageWeek.half_row_style_menu('[X]  Exit')
 
         return [ br
                 ,header
@@ -665,7 +579,7 @@ class CalendarPageWeek:
     def block_zipper(block_1, block_2):
         for l1, l2 in zip(block_1, block_2):
             line = l1 + CalendarPageWeek.COL_SPACER + l2
-            print("{0:^{width}}".format(line, width=CalendarPageWeek.total_width))
+            print('{0:^{width}}'.format(line, width=CalendarPageWeek.total_width))
 
     def display_week(self):
         # subprocess.run(['clear'], shell=True)
@@ -688,17 +602,120 @@ class CalendarPageWeek:
         CalendarPageWeek.line_break()
 
 
-if __name__ == "__main__":
-    print("Hello from main")
+
+
+
+if __name__ == '__main__':
+    print('Hello from main')
+    creds = get_creds()
+
+    start, end = get_time_window_2(today_date, 8)
+    get_local_calendar_cards(start, end)
+
+    # delete_calendar_card(creds, 'A_SingleEvent.txt')
+
+    def get_new_single_cards_from_google():
+        start, end = get_time_window_2(today_date, 2)
+        events = get_google_events(creds, start, end)
+
+        single_events = [e for e in events if not e.get('recurringEventId')]
+        cards_to_create = []
+
+        for e in single_events[:5]:
+            test = l_newcard.string_to_filename(e.get('summary'))
+            if l_newcard.check_for_calendar_cards(test):
+                cards_to_create.append((test, e))
+
+        return cards_to_create
+
+
+    def sync_deleted_from_google():
+        pass
+
+
+    def create_new_local_card_w_sync(credentials, card_file, card_abspath):
+        pass
+
+
+    def create_google_event(credentials, formatted_card_title, card_steps):
+
+        try:
+            service_2 = build('calendar', 'v3', credentials=credentials)
+
+            now = datetime.datetime.now().isoformat() + 'Z'
+            card_steps_as_str = '\n'.join(card_steps[:3])
+
+            my_event = {
+                'summary': formatted_card_title
+                , 'location': '...'
+                , 'description': card_steps_as_str
+                , 'start': {
+                    'dateTime': f'{now}'
+                    , 'timeZone': 'America/Los_Angeles'
+                }
+                , 'end': {
+                    'dateTime': f'{now}'
+                    , 'timeZone': 'America/Los_Angeles'
+                }
+                , 'colorId': 7
+            }
+
+            run_event = service_2.events().insert(calendarId='primary', body=my_event).execute()
+
+            generated_id = run_event.get('id')
+            # animators.animate_text(f'Created Google Calendar Event with ID: {generated_id}')
+            return generated_id
+
+
+        except HttpError as error:
+            print('Here\'s the error that has occurred: ', error)
+            return None
+
+
+    def make_local_card_from_google():
+        cards_to_create = get_new_single_cards_from_google()
+        pp(cards_to_create)
+        title, google_data = cards_to_create[2]
+        # pp(google_data)
+
+        details = google_data['description'] if google_data.get('description') else '...\n...\n...\n'
+        details_as_list = [f'{d}\n' for d in details.split('\n')]
+        title = f'A_{title}'
+
+        l_newcard.write_calendar_card_and_json(title, l_files.cards_calendar_folder, google_data, details_as_list)
+
+    make_local_card_from_google()
+
+    # def instances():
+    #     page_token = None
+    #     service = build('calendar', 'v3', credentials=creds)
+    #
+    #     while True:
+    #         events = service.events().instances(calendarId='primary', eventId='21fpfp3buf3qpp04qbpbjgpffb',
+    #                                             pageToken=page_token).execute()
+    #         for event in events['items'][:10]:
+    #             print(event['summary'], event['id'])
+    #         pause = input("<<< pause >>>")
+    #         page_token = events.get('nextPageToken')
+    #         if not page_token:
+    #             break
+
+    # instances()
+
+# print('21fpfp3buf3qpp04qbpbjgpffb_20250220T000000Z' == '21fpfp3buf3qpp04qbpbjgpffb_20250220T000000Z')
+# print('21fpfp3buf3qpp04qbpbjgpffb_20250220T000000Z' == '21fpfp3buf3qpp04qbpbjgpffb_20250222T000000Z')
 
 # ------------------------------------- END / MISC BELOW -------------------------------------- #
 
-# print("{:{fill}<50}".format("hello", fill="*"))
-# print("{0:{width}}{:<8}{:<}{}".format(
-# print("{:^{width}}".format(CalendarPageDay.events_line, width=CalendarPageDay.total_width))
+# print('{:{fill}<50}'.format('hello', fill='*'))
+# print('{0:{width}}{:<8}{:<}{}'.format(
+# print('{:^{width}}'.format(CalendarPageDay.events_line, width=CalendarPageDay.total_width))
 
 # today_block = DayBlock.from_date(var_datetime=dt_today, events=[
-#       ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
-#     , ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
-#     , ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
+#       ('Dinner and places with Phil', '7:00Pm - 9:30Pm')
+#     , ('Dinner and places with Phil', '7:00Pm - 9:30Pm')
+#     , ('Dinner and places with Phil', '7:00Pm - 9:30Pm')
 # ])
+
+# 2025-02-20T04:52:49.886Z
+# 2025-02-20T04:52:49.886Z

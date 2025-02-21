@@ -13,9 +13,7 @@ OUTLINE BIG:
 	> NEW USER
 
 EMAILS:
-	Casey / Corey Mentorship program
 	Double Quotes to single
-	Make a branch of Lumo that goes deeper into OOP
 	When you type 'back' on Near Cards it shows the previous card that has moved
 	Try coding in Micro one day
 	Put some of my money in a local bank
@@ -33,7 +31,7 @@ SCHEDULE / CALENDAR!!!
 	- offline calendar API?
 	- collect object from google cal and incorporate into 'event list'
 
-	
+	- custom formatting for military vs. regular and for 7:00Pm - 12:00Am to be centered vs. 7:00Pm - 8:00Pm	
 	- user can schedule cards
 	- user can view already scheduled events / calendar events
 	- user can toggle events from scheduled to non-scheduled
@@ -41,12 +39,13 @@ SCHEDULE / CALENDAR!!!
 	- select day from [a], [b], [c]
 
 	- is there an issue with the Google API for 'primary' calendars?
+	
 	- all the shit with repeating events...!
 	- if a card is repeating event in GCal or LumoCal, it should have one instance as a .txt file
-	- how is the calendar aware in different contexts?
+	- all this for recurring cards
+	
 	- deleting a card from google deletes the card in Lumo
 	- deleting a card from Lumo deletes the card in Google
-	- all this for recurring cards
 
 	- how should I move backward and forward in days? what should be 'loaded'? how/when should loading happen?
 
@@ -62,9 +61,12 @@ SCHEDULE / CALENDAR!!!
 	SHORTCUTS/FORMATTING:
 	- calendar shortcuts: go to "next week" etc.
 	- calendar shortcuts: go to: dec 25
+	- go to: 2025
+	- go to: dec
+	- go to: dec 2026
 	- calendar shortcuts: go to 1/25/2022
 	- calendar shortcuts: to december
-	- see shortcuts created in LibreOffice:
+
 	> time? 8-9 
 	> time? 8 1h
 	> time? 8 default

@@ -52,15 +52,13 @@ def get_category_from_json_settings(var_ltr):
     return selected_category
 
 
-def make_dflt_json_dict(location, category_letter):
+def make_dflt_json_dict(location, category_letter, google_calendar_data=None):
     category = get_category_from_json_settings(category_letter)
 
     dict_for_json = {
             "card location": location,
             "card category abbreviation": category_letter.upper(),
             "card category": category,
-            "calender event": None,
-            "calendar repeating event": None,
             "recurring freq": 0,
             "recurring freq time unit": None,
             "last occurrence": None,
@@ -68,7 +66,8 @@ def make_dflt_json_dict(location, category_letter):
             "tags":
                 [ "default tag a"
                 , "default tag b"
-                , "default tag c"]
+                , "default tag c"],
+            "google calender data": google_calendar_data
         }
 
     return dict_for_json

@@ -174,5 +174,5 @@ class CalendarInterface:
 
 if __name__ == '__main__':
     calendar_interface = CalendarInterface()
-    calendar_interface.paginate_days()
-    # calendar_interface.paginate_weeks()
+    # calendar_interface.paginate_days()
+    calendar_interface.paginate_weeks()

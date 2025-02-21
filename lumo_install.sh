@@ -39,7 +39,7 @@ lumo_welcome_msg() {
 
 alias lumocards="python3 LUMO_LIBRARY/lumo_cardsrun.py"
 alias locard="python3 LUMO_LIBRARY/lumo_search_cards.py"
-alias newcard="python3 LUMO_LIBRARY/lumo_newcard.py"
+alias newcard="python3 LUMO_LIBRARY/lumo_newcard_refactor.py"
 alias planner="open PLANNER"
 alias today="python3 LUMO_LIBRARY/lumo_gettoday.py"
 alias pomodoro="python3 LUMO_LIBRARY/lumo_pomodoro.py"

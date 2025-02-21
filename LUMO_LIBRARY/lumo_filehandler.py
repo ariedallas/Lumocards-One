@@ -15,10 +15,11 @@ desktop = f"{home}/Desktop"
 cards_near_folder = os.path.join(rootpath, "CARDS/CARDS_A_FOCUS_NEAR")
 cards_middle_folder = os.path.join(rootpath, "CARDS/CARDS_B_FOCUS_MIDDLE")
 cards_dist_folder = os.path.join(rootpath, "CARDS/CARDS_C_FOCUS_DISTANT")
+cards_calendar_folder = os.path.join(rootpath, "CARDS/CARDS_D_CALENDAR")
 
-archived_cards_folder = os.path.join(rootpath, "CARDS/CARDS_D_ARCHIVED")
 checklist_cards_folder = os.path.join(rootpath, "CARDS/CARDS_E_CHECKLISTS")
 recurring_cards_folder = os.path.join(rootpath, "CARDS/CARDS_F_RECURRING")
+archived_cards_folder = os.path.join(rootpath, "CARDS/CARDS_G_ARCHIVED")
 
 support_files_folder = os.path.join(rootpath, "SUPPORT_FILES")
 internal_cards_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_INTERNAL_CARDS")
@@ -35,7 +36,6 @@ now = datetime.datetime.now().isoformat() + "Z"
 today_frmttd = today.strftime("%d%b%Y")
 today_frmttd_spaces = today.strftime("%d %b %Y")
 today_frmttd_log = today.strftime("%d %m %Y")
-today_frmttd_csv = today.strftime("%d %B %Y")
 today_dayof_year = today.strftime("%j")
 local_time = time.localtime(time.time())
 local_hour = local_time[3]

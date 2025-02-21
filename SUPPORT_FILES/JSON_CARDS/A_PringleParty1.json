@@ -1,0 +1,46 @@
+{
+  "card location": "CARDS_D_CALENDAR",
+  "card category abbreviation": "A",
+  "card category": "Audio",
+  "recurring freq": 0,
+  "recurring freq time unit": null,
+  "last occurrence": null,
+  "card created": "2025-02-20 23:43:40",
+  "tags": [
+    "default tag a",
+    "default tag b",
+    "default tag c"
+  ],
+  "google calender data": {
+    "kind": "calendar#event",
+    "etag": "\"3480247258772000\"",
+    "id": "7mlo27qm04plcmhue7bro3fq5l",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=N21sbzI3cW0wNHBsY21odWU3YnJvM2ZxNWwgdWlzY2Uuc3R1ZGlvQG0",
+    "created": "2025-02-21T07:40:29.000Z",
+    "updated": "2025-02-21T07:40:29.386Z",
+    "summary": "Pringle Party 1",
+    "creator": {
+      "email": "uisce.studio@gmail.com",
+      "self": true
+    },
+    "organizer": {
+      "email": "uisce.studio@gmail.com",
+      "self": true
+    },
+    "start": {
+      "dateTime": "2025-02-20T17:00:00-08:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-02-20T17:20:00-08:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "iCalUID": "7mlo27qm04plcmhue7bro3fq5l@google.com",
+    "sequence": 0,
+    "reminders": {
+      "useDefault": true
+    },
+    "eventType": "default"
+  }
+}

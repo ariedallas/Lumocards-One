@@ -1,0 +1,47 @@
+{
+  "card location": "CARDS_D_CALENDAR",
+  "card category abbreviation": "A",
+  "card category": "Audio",
+  "recurring freq": 0,
+  "recurring freq time unit": null,
+  "last occurrence": null,
+  "card created": "2025-02-20 21:54:41",
+  "tags": [
+    "default tag a",
+    "default tag b",
+    "default tag c"
+  ],
+  "google calendar data": {
+    "kind": "calendar#event",
+    "etag": "\"3480071696534000\"",
+    "id": "6n3jqgpcqc70t8m16pnod5guoo",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=Nm4zanFncGNxYzcwdDhtMTZwbm9kNWd1b28gdWlzY2Uuc3R1ZGlvQG0",
+    "created": "2025-02-20T06:45:05.000Z",
+    "updated": "2025-02-20T07:17:28.267Z",
+    "summary": "Another single event",
+    "description": "Some items 1\nsome items 2\nsome items 3",
+    "creator": {
+      "email": "uisce.studio@gmail.com",
+      "self": true
+    },
+    "organizer": {
+      "email": "uisce.studio@gmail.com",
+      "self": true
+    },
+    "start": {
+      "dateTime": "2025-02-20T12:00:00-08:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "end": {
+      "dateTime": "2025-02-20T13:00:00-08:00",
+      "timeZone": "America/Los_Angeles"
+    },
+    "iCalUID": "6n3jqgpcqc70t8m16pnod5guoo@google.com",
+    "sequence": 0,
+    "reminders": {
+      "useDefault": true
+    },
+    "eventType": "default"
+  }
+}

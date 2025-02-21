@@ -260,12 +260,14 @@ def get_card_abspath(card_filename):
         folder_route = l_files.cards_middle_folder
     elif card_filename in os.listdir(l_files.cards_dist_folder):
         folder_route = l_files.cards_dist_folder
+    elif card_filename in os.listdir(l_files.cards_calendar_folder):
+        folder_route = l_files.cards_calendar_folder
+    elif card_filename in os.listdir(l_files.checklist_cards_folder):
+        folder_route = l_files.checklist_cards_folder
     elif card_filename in os.listdir(l_files.recurring_cards_folder):
         folder_route = l_files.recurring_cards_folder
     elif card_filename in os.listdir(l_files.archived_cards_folder):
         folder_route = l_files.archived_cards_folder
-    elif card_filename in os.listdir(l_files.checklist_cards_folder):
-        folder_route = l_files.checklist_cards_folder
 
     card_fullpath = os.path.join(folder_route, card_filename)
     return card_fullpath
