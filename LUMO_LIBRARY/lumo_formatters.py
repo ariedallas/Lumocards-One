@@ -207,7 +207,7 @@ def camel_case_separator_b(card_filename):
     total_words = len(breaks) - 1
 
     # add this back at the end
-    first_nums = re.match(r'\d+', card_filename)
+    first_nums = re.match(r"\d+", card_filename)
 
     initial_group = []
 
@@ -233,7 +233,7 @@ def recursive_parser(var_list):
     additions = []
 
     for word in var_list:
-        nums = re.search(r'\d+', word)
+        nums = re.search(r"\d+", word)
 
         if nums:
             m = nums.group()
@@ -280,7 +280,7 @@ def filename_to_card(card_filename):
 
     card_fullpath = get_card_abspath(card_filename)
 
-    with open(card_fullpath, 'r') as fin:
+    with open(card_fullpath, "r") as fin:
         card_steps = [l.strip() for l in fin.readlines()]
 
     card = (card_name_c, card_steps)
@@ -294,7 +294,7 @@ def fullpath_to_card(card_fullpath):
     format_b = format_a.replace("_", " ")
     card_title = format_b.strip()
 
-    with open(card_fullpath, 'r') as fin:
+    with open(card_fullpath, "r") as fin:
         card_steps = [l.strip() for l in fin.readlines()]
 
     card = (card_title, card_steps)
@@ -303,7 +303,7 @@ def fullpath_to_card(card_fullpath):
 
 def add_multiple_steps_from_card(nums):
     if "," in nums:
-        new_nums = nums.split(',')
+        new_nums = nums.split(",")
         new_list = [n.strip() for n in new_nums]
 
     elif " " in nums:

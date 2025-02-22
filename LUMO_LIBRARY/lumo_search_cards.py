@@ -13,18 +13,18 @@ import lumo_recurring as l_recurring
 # import lumo_json_utilities as l_json_utils
 
 letters = string.ascii_lowercase
-letters_filtered = [l.upper() for l in letters if not (l == 'q') and not (l == 'x')]
+letters_filtered = [l.upper() for l in letters if not (l == "q") and not (l == "x")]
 settings = l_files.get_json_settings()
 
 def test_match(queried):
 
-    unique_words =  re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', queried)
+    unique_words =  re.findall(r"[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))", queried)
     return unique_words
 
 
 def test_match_digit(queried, search_term):
 
-    digit_match = re.findall(fr'{search_term}\d*', queried)
+    digit_match = re.findall(fr"{search_term}\d*", queried)
     return digit_match
 
 
@@ -114,11 +114,11 @@ def select_card_from_found(searchterm):
     total_amt_matches, all_matches_formatted, used_letters  = big_zipper(found_matches)
 
     if total_amt_matches > 24:
-        print(f"More than 24 possible matches for term '{searchterm}'... try something more specific.")
+        print(f"More than 24 possible matches for term \'{searchterm}\'... try something more specific.")
         return None, None
 
     if total_amt_matches == 0:
-        print(f"No matches found for your term '{searchterm}'... ")
+        print(f"No matches found for your term \'{searchterm}\'... ")
         return None, None
 
     if len(all_matches_formatted[5]) > 1:
@@ -153,10 +153,10 @@ def select_card_from_found(searchterm):
 
             return card, chosen_file
 
-        elif response.lower() == 'x':
+        elif response.lower() == "x":
             return None, None
 
-        elif response.lower() == 'q':
+        elif response.lower() == "q":
             print("Quit")
             print()
             sys.exit(0)
@@ -189,7 +189,7 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
         if response.upper() in var_hotkey_dict.keys():
 
             if var_hotkey_dict[response.upper()] == l_menus.action_open:
-                subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
+                subprocess.run([f"{settings.get("text editor")} {card_fullpath}"], shell=True)
                 return "RELOOP", var_card_filename
 
             elif var_hotkey_dict[response.upper()] == l_menus.action_modify:
@@ -242,7 +242,7 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
             l_animators.animate_text("Quit Lumocards: Search")
             sys.exit(0)
 
-        elif response.lower() == 'quit':
+        elif response.lower() == "quit":
             print()
             l_animators.animate_text("Quit Lumocards: Search")
             sys.exit(0)
@@ -269,9 +269,9 @@ def steps_preview(card_steps, steps_amt, steps_idx):
 def main():
     command_line_arg_parser = argparse.ArgumentParser()
     command_line_arg_parser.add_argument(
-        'match_term'
-        , action='store'
-        , metavar='Match Term'
+        "match_term"
+        , action="store"
+        , metavar="Match Term"
         , help="This is what regex uses to search for...i.e. 'potatoes' ")
 
     options = command_line_arg_parser.parse_args()
@@ -333,7 +333,7 @@ if __name__ == "__main__":
 #
 #     retitled_card_path = l_newcard.get_card_from_input()
 #
-#     l_animators.animate_text(f"Card will been renamed from '{var_card_path}' ➝ '{retitled_card_path}'")
+#     l_animators.animate_text(f"Card will been renamed from "{var_card_path}" ➝ "{retitled_card_path}"")
 #
 #     if l_files.proceed("> "):
 #         l_animators.animate_text("Card renamed")

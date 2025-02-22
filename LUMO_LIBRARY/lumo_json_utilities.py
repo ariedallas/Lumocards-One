@@ -42,11 +42,11 @@ def write_json(json_filename, json_data):
 
 
 def get_category_from_json_settings(var_ltr):
-    settings_fullpath = os.path.join(l_files.rootpath, 'SUPPORT_FILES/settings.json')
+    settings_fullpath = os.path.join(l_files.rootpath, "SUPPORT_FILES/settings.json")
     with open(settings_fullpath) as fin:
         data = json.load(fin)
 
-    card_settings = data['card categories']
+    card_settings = data["card categories"]
     selected_category = card_settings[var_ltr.upper()][1]
 
     return selected_category
@@ -62,7 +62,7 @@ def make_dflt_json_dict(location, category_letter, google_calendar_data=None):
             "recurring freq": 0,
             "recurring freq time unit": None,
             "last occurrence": None,
-            "card created": datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S'),
+            "card created": datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
             "tags":
                 [ "default tag a"
                 , "default tag b"
@@ -78,7 +78,7 @@ def flexible_json_updater(json_filename, location=None, update_category=False):
     if location:
         json_data = read_and_get_json_data(json_filename)
 
-        json_data['card location'] = location
+        json_data["card location"] = location
         write_json(json_filename, json_data)
 
     if update_category:
@@ -86,8 +86,8 @@ def flexible_json_updater(json_filename, location=None, update_category=False):
 
         c_abbr = json_filename[0]
         new_category = get_category_from_json_settings(c_abbr)
-        json_data['card category abbreviation'] = c_abbr
-        json_data['card category'] = new_category
+        json_data["card category abbreviation"] = c_abbr
+        json_data["card category"] = new_category
         write_json(json_filename, json_data)
 
 

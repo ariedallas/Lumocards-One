@@ -15,26 +15,26 @@ import lumo_menus as l_menus
 settings = l_files.get_json_settings()
 
 all_card_categories = l_files.get_lumocards_categories()
-default_text = '\n'.join(('...', '...', '...'))
+default_text = "\n".join(("...", "...", "..."))
 
 
 parser = ArgumentParser(add_help=False)
-parser.add_argument('-o', '--output', action='store_true',
+parser.add_argument("-o", "--output", action="store_true",
                     help="shows output")
 parser.add_argument(
-    'category'
-    , action='store'
-    , metavar='Optional card category?'
+    "category"
+    , action="store"
+    , metavar="Optional card category?"
     , help="Use an abbreviating letter"
 )
 parser.add_argument(
-    # '-o'
-    # , '--card_name'
-    'cardname'
-    , action='store'
+    # "-o"
+    # , "--card_name"
+    "cardname"
+    , action="store"
     , nargs="+"
-    , metavar='Optional card name?'
-    , default='unnamed'
+    , metavar="Optional card name?"
+    , default="unnamed"
     , help="…?")
 
 
@@ -49,7 +49,7 @@ def test_for_args():
 def get_cardname_from_input():
     print()
     cardname = input("NEW CARD NAME:  ").title()
-    result = cardname.replace(' ', '')
+    result = cardname.replace(" ", "")
     return result
 
 
@@ -76,7 +76,7 @@ def category_check(card_category):
         l_animators.animate_text("You entered something other than one letter.", speed=.025)
         print()
         l_animators.animate_text("The system defaults the category to [Rr]_MAKE.", speed=.025)
-        return 'R'
+        return "R"
 
     else:
         return card_category.upper()
@@ -158,7 +158,7 @@ def add_custom_or_default_steps():
         with open(scratchpad_file, "w") as fin:
             fin.write("")
 
-        subprocess.run([f'{settings.get("text editor")} {scratchpad_file}'], shell=True)
+        subprocess.run([f"{settings.get("text editor")} {scratchpad_file}"], shell=True)
 
         with open(scratchpad_file, "r") as fin:
             steps = [l for l in fin.readlines()]
