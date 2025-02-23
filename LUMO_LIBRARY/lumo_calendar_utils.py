@@ -14,11 +14,11 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-import lumo_filehandler as l_files
-import lumo_formatters as l_formatters
-import lumo_newcard_refactor as l_newcard
-import lumo_animationlibrary as animators
-import lumo_json_utilities as l_json_utils
+import LUMO_LIBRARY.lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_newcard_refactor as l_newcard
+import LUMO_LIBRARY.lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_json_utilities as l_json_utils
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 creds_file = os.path.join(l_files.credentials_folder, "credentials.json")
@@ -150,8 +150,8 @@ def delete_calendar_card(credentials, card_filename):
 
     l_formatters.card_deleter(card_filename)
 
-    animators.animate_text("The card was deleted from the external (Google) calendar.")
-    animators.animate_text("This Lumo card is deleted.")
+    l_animators.animate_text("The card was deleted from the external (Google) calendar.")
+    l_animators.animate_text("This Lumo card is deleted.")
 
 
 def times_formatter(start, end, format):

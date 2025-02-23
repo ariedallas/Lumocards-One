@@ -1,8 +1,8 @@
 import os
 
-import lumo_filehandler as l_files
-import lumo_newcard as l_newcard
-import lumo_recurring as l_recurring
+import LUMO_LIBRARY.lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_newcard as l_newcard
+import LUMO_LIBRARY.lumo_recurring as l_recurring
 
 category_letters = l_files.get_lumocards_categories()
 sample_steps = ["Step 01\n", "Step 02\n", "Step 03\n"]

@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-import lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_filehandler as l_files
 
 settings = l_files.get_json_settings()
 

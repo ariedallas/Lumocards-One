@@ -1,4 +1,4 @@
-import lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_formatters as l_formatters
 
 
 def display_card(var_card, display_qty=6, length=50, height=10):

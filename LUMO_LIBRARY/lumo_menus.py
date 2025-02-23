@@ -1,10 +1,10 @@
 import string
 
-import lumo_filehandler as l_files
-import lumo_formatters as l_formatters
-import lumo_animationlibrary as l_animators
-import lumo_recurring as l_recurring
-import lumo_newcard as l_newcard
+import LUMO_LIBRARY.lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_recurring as l_recurring
+import LUMO_LIBRARY.lumo_newcard_refactor as l_newcard
 
 letters = string.ascii_lowercase
 letters_filtered = [l.upper() for l in letters if not (l == 'q') and not (l == 'x')]

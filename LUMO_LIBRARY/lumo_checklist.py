@@ -1,9 +1,9 @@
 import string
 import os
 
-import lumo_filehandler as l_files
-import lumo_formatters as l_formatters
-import lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 
 letters = string.ascii_uppercase
 letters_filtered = [l.upper() for l in letters if not (l == 'q') and not (l == 'x')]

@@ -5,10 +5,9 @@ from argparse import ArgumentParser
 
 import lumo_filehandler as l_files
 
-sys.path.append(l_files.temp_folder)
-import scratch_2
-import scratch_3
-import scratch_4
+import SUPPORT_FILES.TEMP.scratch_2 as scratch_2
+import SUPPORT_FILES.TEMP.scratch_3 as scratch_3
+import SUPPORT_FILES.TEMP.scratch_4 as scratch_4
 
 parser = ArgumentParser(add_help=False)
 

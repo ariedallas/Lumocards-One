@@ -5,11 +5,11 @@ import string
 import subprocess
 import sys
 
-import lumo_filehandler as l_files
-import lumo_animationlibrary as l_animators
-import lumo_formatters as l_formatters
-import lumo_menus as l_menus
-import lumo_recurring as l_recurring
+import LUMO_LIBRARY.lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_menus as l_menus
+import LUMO_LIBRARY.lumo_recurring as l_recurring
 # import lumo_json_utilities as l_json_utils
 
 letters = string.ascii_lowercase

@@ -1,8 +1,13 @@
 NEXT:
-	- week view, implement how a months worth of days would get parsed
+	- update json_dicts for existing cards (include 'google calendar info') --> in branch 'calendar_sync_basic'
+	- json dict updater for all existing...
+	- pip install -e / real python video
+	- basic .toml file
+	- make sure the word calendar / schedule are used in a way that makes sense...
+		- mostly calendar unless you need schedule
+	- make a function where if you delete a card.txt file, it will then check to delete the json file as well
+	- move entire project to single quotes (in branch MAIN)
 	- probably an event should become an object at some point... (currently it's a list)
-	- python public vs. private methods?	
-	- try a design pattern
 
 OUTLINE BIG:
 	> CODE READING 
@@ -11,18 +16,33 @@ OUTLINE BIG:
 	> SYNC CALENDAR
 	> SCHEDULING
 	> NEW USER
+	> DESIGN PATTERNS
 
 EMAILS:
 	Double Quotes to single
-	When you type 'back' on Near Cards it shows the previous card that has moved
-	Try coding in Micro one day
 	Put some of my money in a local bank
-	Pip install to target
 	CLIG.dev
+
+RESOURCES:
+	*CLIG.dev
+	*Try coding in Micro one day
 	
 
 SCHEDULE / CALENDAR!!!
+	- the difference between deleting a lumo calendar card, and unscheduling it, which would:
+		- take the card off Google calendar, and put it back into middle focus, etc. 
+
+	- create from Google events:
+		- test from sync  non-existing Lumo cards that are google events
+		- turn summary into card name (how to handle google events with same name? / what if the name later changes? / what if it changes in Lumo?)
+		- ask user for card category or default
+		- write the card
+		- write json data
+		- write google json data to sub-section of Lumo json data
+		- print summary
+
 	- propagate default values to calendar page
+	- Lumo keeps and updates one year of cards...otherwise it retrieves cards that are online
 
 	- should selecting an event on the chosen day show a new screen?
 		- I think so, but we can do it both ways to see...
@@ -39,7 +59,27 @@ SCHEDULE / CALENDAR!!!
 	- select day from [a], [b], [c]
 
 	- is there an issue with the Google API for 'primary' calendars?
-	
+
+	- SYNC BASICS:
+		- get all google events for a year
+		- get lumo cards that are scheduled
+		- compare updated times...
+		- sync events in Lumo
+		- changes to events in Lumo should sync automatically by default
+
+
+	- SYNC REPEATING EVENTS:
+		- a menu in both day view and week view to update a recurring card
+		- when offline; repeating cards should be represented by one 'master' card with a RRULE
+			- if all events change recurring rules change
+			- if future events change, this creates a second 'new' card with a similar name and it's own RRULE set
+			- if an individual event changes, this is stored as an exception with 'google calendar exceptions' json section of lumo card
+				- maybe there should be another indicator on the lumo json data that is 'has single modded events' with Boolean
+			- deleting a single event?? should just be an exception
+			- deleting this + following should just be a change to the RRULE
+			- delete all is just deleting the card
+
+		- Lumo should be able to mimic all the event updates that Google Cal can do
 	- all the shit with repeating events...!
 	- if a card is repeating event in GCal or LumoCal, it should have one instance as a .txt file
 	- all this for recurring cards
@@ -55,6 +95,13 @@ SCHEDULE / CALENDAR!!!
 	- can you have more than one calendar added?
 	- how to make token / credentials persistent?
 		-automatically delete the token and re-apply credentials?
+
+	- Any change to a scheduled card either syncs or is staged for sync via 'flag' system
+
+	- Note: in Google Calendar, modified single events will show an updated time unique to that event
+	- Note: in Google Calendar, if a recurring instance is modified, it will no longer appear in get.instances() by google
+
+	- Timezones!!!! Fuck!!! Hard, but important???
 
 **  put tape on my keyboard for better finding of l ctrl and alt.
 
@@ -84,11 +131,10 @@ SCHEDULE / CALENDAR!!!
 		-event start? 8a | 8am | 8:30a | 8 am | 20:00 | 20:31 
 		-event end? ( blank=defaul +1 ) | +1=do the math | 9a | etc. 
 		-etc...
-
+	- what to ask people about each event when scheduling??? Should it be the full Google Menu?
 	
 
 	EDGE CASES:
-	- 
 	- how do events that start one day and flow into the next work?
 	- how does calendar display conflicting?
 	- what happens in between weeks of two different months? (does it always start on first?)
@@ -96,6 +142,9 @@ SCHEDULE / CALENDAR!!!
 
 
 -- LUMO (ALL)
+	--  at some point, make sure that the menus give you decent pathways for setting calendar events (make sure refactor works with added folder CARDS_D_CALENDAR)
+    --  When you type 'back' on Near Cards it shows the previous card that has moved
+
 	--  you can refactor newcard so that it uses default args from argparse...
 	--  at some point you should use types in your functions
 	--  enum vs. str as input to a function
@@ -118,6 +167,7 @@ SCHEDULE / CALENDAR!!!
 	**  modify lumo_install.sh so that it checks whether or not 'lumo_runtime' is activated...
 
 --  INSTALLATION NEW USERS??? (continued)
+	- pip install -e ??? / the python video from Real Python
 	- requires python
 	- user downloads a tar or compressed folder
 	- then script installs a vitual environment +
@@ -264,23 +314,3 @@ SCHEDULE / CALENDAR!!!
 --- feature for formatting text output of lumocards
 
 ---- feature for visually impaired, how does lumocards work as a fully sound designed app?
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

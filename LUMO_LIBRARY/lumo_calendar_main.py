@@ -1,8 +1,9 @@
 import math
+import sys
 
 from dateutil.relativedelta import relativedelta
 
-from lumo_calendar_utils import (CalendarPageDay, CalendarPageWeek
+from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay, CalendarPageWeek
                                 ,get_day_blocks
                                 ,get_time_window_2
                                 ,parse_brackets
@@ -10,7 +11,6 @@ from lumo_calendar_utils import (CalendarPageDay, CalendarPageWeek
                                 ,today_date
                                 ,curr_year
                                 ,curr_month)
-
 
 class CalendarInterface:
 
@@ -109,7 +109,6 @@ class CalendarInterface:
                 print(" " * CalendarPageWeek.l_margin, end=" ")
                 print("Use one or more brackets '[' or ']' to navigate.")
                 curr_week_block = self.week_blocks_window[idx]
-
 
     def _get_idx_for_today(self):
         total_weeks = len(self.week_blocks_window)

@@ -2,9 +2,9 @@ import os
 import datetime
 import json
 
-import lumo_filehandler as l_files
-import lumo_json_utilities as l_json_utils
-import lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_json_utilities as l_json_utils
+import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 
 reactivated_cards = []
 

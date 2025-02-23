@@ -3,8 +3,8 @@ import os
 import json
 import pathlib
 
-import lumo_filehandler as l_files
-import lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_formatters as l_formatters
 
 
 def get_json_card_fullpath(json_filename):

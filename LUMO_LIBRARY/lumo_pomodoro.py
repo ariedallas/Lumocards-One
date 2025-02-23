@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from time import sleep
 from subprocess import run
 
-import lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_filehandler as l_files
 
 selected_sound = os.path.join(l_files.sounds_folder, "block.mp3")
 
