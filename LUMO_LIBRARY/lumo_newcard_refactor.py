@@ -60,11 +60,10 @@ def get_category_from_input():
 
 def category_check(card_category):
     if card_category.upper() not in all_card_categories:
-        l_animators.animate_text("Category letter currently doesn't exist", speed=.025)
-        l_animators.animate_text("- or -", speed=.025)
-        l_animators.animate_text("You entered something other than one letter.", speed=.025)
-        print()
-        l_animators.animate_text("The system defaults the category to [Rr]_MAKE.", speed=.025)
+        l_animators.standard_interval_printer(["", "That category letter currently doesn't exist"], speed_interval=.5)
+        l_animators.standard_interval_printer(["- or -"], speed_interval=.5)
+        l_animators.standard_interval_printer(["You entered something other than one letter.", ""], speed_interval=.5)
+        l_animators.standard_interval_printer(["The system defaults the category to [Rr]_MAKE."], speed_interval=.5)
         return "R"
 
     else:
@@ -398,14 +397,17 @@ def write_calendar_card_and_json(card_filename, folder, google_calendar_data, ad
 
     return formatted_card_fullpath, json_fullpath
 
+def program_header():
+    print()
+    print("NEW CARD")
+    print()
+    for k, v in settings.get('card categories').items():
+        print(f"[{k}]  {v[1]}")
 
 def main(card_category=None, card_title=None, from_lumo_menu=False):
     from_local_args = test_for_local_args()
     locally_run = (__name__ == "__main__")
-
-    print()
-    for s in settings.get('card categories').items():
-        print(s)
+    program_header()
 
     if from_lumo_menu and card_category and card_title:
         possible_card_filename = validate_from_lumo_parser(card_category, card_title)
@@ -444,7 +446,7 @@ if __name__ == "__main__":
 #         full_hotkey_set_dict = {f"{ltr}":f"{match}" for ltr, match in zip(l_menus.letters_filtered, menu)}
 #
 #
-#     full_hotkey_set_list = [f"  [{letter}] {action}" for letter, action in zip(
+#     full_hotkey_set_lst = [f"  [{letter}] {action}" for letter, action in zip(
 #         full_hotkey_set_dict.keys(),
 #         full_hotkey_set_dict.values())]
 #

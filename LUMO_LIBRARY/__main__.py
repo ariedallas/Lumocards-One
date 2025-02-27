@@ -4,8 +4,10 @@ import time
 
 from LUMO_LIBRARY import (
     lumo_animationlibrary as l_animators,
+    lumo_journal as l_journal,
     lumo_newcard_refactor as l_newcard,
-    lumo_search_cards as l_search
+    lumo_search_cards as l_search,
+    lumo_settings as l_settings
 )
 
 
@@ -32,6 +34,11 @@ def get_argument_parser():
         "home"
         , help="Defaults to main menu when you type 'lumo' by itself"
         , description="Defaults to main meny when you type 'lumo' by itself"
+    )
+    sub_parser.add_parser(
+        "journal"
+        , help="Opens a text editor to write in"
+        , description="Creates a journal file with today's date and saves it to a 'JOURNAL' folder"
     )
     newcard = sub_parser.add_parser(
         "newcard"
@@ -60,6 +67,12 @@ def get_argument_parser():
         , description=""
     )
     search.add_argument("search_term", nargs="?")
+
+    settings = sub_parser.add_parser(
+        "settings"
+        , help="Open the lumo settings"
+        , description="Interactive settings program to adjust program features"
+    )
 
     sub_parser.add_parser(
         "timer"
@@ -93,6 +106,7 @@ def load_dots():
 def load_transition():
     clear()
     load_dots()
+    print()
 
 def display_home(var_dict):
     clear()
@@ -112,7 +126,7 @@ def display_submenu(var_dict):
     menu_equalize = len(HOME_MENU) - len(SUB_MENU)
 
     print()
-    print("LUMOCARDS ::MORE:: ")git 
+    print("LUMOCARDS ::MORE:: ")
     print("\n")
 
     for k, v in var_dict.items():
@@ -204,16 +218,15 @@ def router(user_input, unknown):
         root_loop(parser.parse_args(["home"]), [])
 
     elif choice in ["d", "journal"]:
-        print("journal")
-        time.sleep(2)
+        l_journal.main()
         root_loop(parser.parse_args(["home"]), [])
 
     elif choice in ["e", "more"]:
         submenu_loop()
 
     elif choice in ["f", "settings"]:
-        print("settings")
-        time.sleep(2)
+        load_transition()
+        l_settings.main()
         root_loop(parser.parse_args(["home"]), [])
 
     elif choice in ["timer", "pomodoro"]:
@@ -242,11 +255,11 @@ def sub_router(option):
         # lumo_pomodoro.main()
         time.sleep(2)
         print("timer")
-        root_loop(parser.parse_args(["home"]))
+        root_loop(parser.parse_args(["home"]), [])
 
     elif option.lower() in ["b", "search", "search cards"]:
         l_search.main()
-        root_loop(parser.parse_args(["home"]))
+        root_loop(parser.parse_args(["home"]), [])
 
     elif option.lower() in ["x", "exit", "back"]:
         return "EXIT"

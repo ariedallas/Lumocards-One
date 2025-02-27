@@ -1,22 +1,44 @@
-NEXT:
-	- update json_dicts for existing cards (include 'google calendar info') --> in branch 'calendar_sync_basic'
-	- json dict updater for all existing...
+:::::NEXT:::::
+	- setup basic routes
+		- pass a status message back to root loop that it's coming
+		- do stuff for submenu_loop
+		- make a fake settings.py
+		- make a fake journal.py
+
+		
+:::::NEXT LVL 2:::::
+	
+	- integrate all routes
+		- setup relevant sub parser arguments
+		- do necessary refactors for integrating
+		- quit transitions for all sub programs
+
+	- figure out quit error when you loop through multiple programs
+		
 	- pip install -e my project
 		- create argparser basics
 		- setup .toml file etc.
 		- ref 'IMPORTS'
 		- setup entry point script
 		- clone to 'ARIE'
-	- basic .toml file
+		- basic .toml file
+		-commit
+
+	- reintegrate Arie's version with Lumocards-One
+
+	**  put tape on my keyboard for better finding of l ctrl and alt.
+			
+	- json dict updater for all existing...	
+		- update json_dicts for existing cards (include 'google calendar info') --> in branch 'calendar_sync_basic'
 	- make sure the word calendar / schedule are used in a way that makes sense...
 		- mostly calendar unless you need schedule
 	- make a function where if you delete a card.txt file, it will then check to delete the json file as well
-	- move entire project to single quotes (in branch MAIN)
+		- clean up fucntion
 	- probably an event should become an object at some point... (currently it's a list)
 
-OUTLINE BIG:
+
+:::::OUTLINE BIG:::::
 	> CODE READING 
-	> REFACTOR to TYPES
 	> CALENDAR :: SYNC :: RECURRING :: MENUS :: SHCEDULING ::
 	> PACKAGING
 		- NEW USERS
@@ -27,58 +49,29 @@ OUTLINE BIG:
 		- DESIGN PATTERNS
 		- HITCHHIKER'S GUIDE TO PYTHON
 
-EMAILS:
-	Hitchhikers Guide to my EDU list
-	Double Quotes to single
-	Put some of my money in a local bank
-	CLIG.dev
-
-RESOURCES:
-	*CLIG.dev
-	*Try coding in Micro one day
-	
-
-SCHEDULE / CALENDAR!!!
-	- the difference between deleting a lumo calendar card, and unscheduling it, which would:
-		- take the card off Google calendar, and put it back into middle focus, etc. 
-
-	- create from Google events:
-		- test from sync  non-existing Lumo cards that are google events
+:::::SCHEDULE / CALENDAR:::::
+	- CREATION:
+		- user can schedule cards
 		- turn summary into card name (how to handle google events with same name? / what if the name later changes? / what if it changes in Lumo?)
 		- ask user for card category or default
 		- write the card
 		- write json data
 		- write google json data to sub-section of Lumo json data
 		- print summary
+		- Timezones!!!! Fuck!!! Hard, but important???
 
-	- propagate default values to calendar page
-	- Lumo keeps and updates one year of cards...otherwise it retrieves cards that are online
+		- propagate default values to calendar page
 
-	- should selecting an event on the chosen day show a new screen?
-		- I think so, but we can do it both ways to see...
-	
-	- it should be able to retrieve a years worth of events from google, then it can just check for differences to see if events have updated between the calendars...
-	- offline calendar API?
-	- collect object from google cal and incorporate into 'event list'
+		- the difference between deleting a lumo calendar card, and unscheduling it, which would:
+			- take the card off Google calendar, and put it back into middle focus, etc. 
 
-	- custom formatting for military vs. regular and for 7:00Pm - 12:00Am to be centered vs. 7:00Pm - 8:00Pm	
-	- user can schedule cards
-	- user can view already scheduled events / calendar events
-	- user can toggle events from scheduled to non-scheduled
-	- calendar mode: d[1], w[2], m[3]
-	- select day from [a], [b], [c]
+		- Lumo keeps and updates one year of cards...otherwise it retrieves cards that are online
 
-	- is there an issue with the Google API for 'primary' calendars?
+		- should selecting an event  on the chosen day show a new screen when editing?
+			- I think so, but we can do it both ways to see...
 
-	- SYNC BASICS:
-		- get all google events for a year
-		- get lumo cards that are scheduled
-		- compare updated times...
-		- sync events in Lumo
-		- changes to events in Lumo should sync automatically by default
-
-
-	- SYNC REPEATING EVENTS:
+	- REPEATING EVENTS:
+		
 		- a menu in both day view and week view to update a recurring card
 		- when offline; repeating cards should be represented by one 'master' card with a RRULE
 			- if all events change recurring rules change
@@ -88,162 +81,192 @@ SCHEDULE / CALENDAR!!!
 			- deleting a single event?? should just be an exception
 			- deleting this + following should just be a change to the RRULE
 			- delete all is just deleting the card
-
+		- all the shit with repeating events...!
+		- if a card is repeating event in GCal or LumoCal, it should have one instance as a .txt file
 		- Lumo should be able to mimic all the event updates that Google Cal can do
-	- all the shit with repeating events...!
-	- if a card is repeating event in GCal or LumoCal, it should have one instance as a .txt file
-	- all this for recurring cards
+			- repeat last day of the month, vs. repeat on a given day
 	
-	- deleting a card from google deletes the card in Lumo
-	- deleting a card from Lumo deletes the card in Google
 
-	- how should I move backward and forward in days? what should be 'loaded'? how/when should loading happen?
+	- SETTINGS:
+		 custom formatting for military vs. regular and for 7:00Pm - 12:00Am to be centered vs. 7:00Pm - 8:00Pm	
 
-	- how should I handle cases where there is no internet? what is the 'offline' mode
-		-flagging data for upload
+	- MENUS / NAVIGATION / SHORTCUTS
+		- calendar mode: d[1], w[2], m[3]
+		- select day from [a], [b], [c] or [1] [2] (the number of the day)
+		- how should I move backward and forward in days? what should be 'loaded'? how/when should loading happen?
+		- calendar shortcuts: go to "next week" etc.
+		- calendar shortcuts: go to: dec 25
+		- go to: 2025
+		- go to: dec
+		- go to: dec 2026
+		- calendar shortcuts: go to 1/25/2022
+		- calendar shortcuts: to december
+
+		> time? 8-9 
+		> time? 8 1h
+		> time? 8 default
+		> from week mode: 21, 8p-9p, dinner with Jamie (first part=the day, second part=time, third part=event name)
+		> a -> schedule to that day ...
+			> what time? 8:30p-
+				> confirm 8:00 Am – 9:00 Pm or (8:00 Am – 9:00 Pm?)
+
+		- how would a user make a quick scheduled card like: newcard r dinner with sam, tue @ 8a (blank would be default length of one hour)
+		- how would a user make a quick scheduled card like: newcard r dinner with sam, 12/01/2020 @ 8a-9a
+		- how would a user make a quick scheduled card like: newcard r dinner with sam, aug 01 @ 8a +2
+		
+		- standard menu should be one item at a time (try one format at a time for testing)
+			-event name? dinner with Sam
+			-event start? 8a | 8am | 8:30a | 8 am | 20:00 | 20:31 
+			-event end? ( blank=defaul +1 ) | +1=do the math | 9a | etc. 
+			-etc...
+		- what to ask people about each event when scheduling??? Should it be the full Google Menu?
+
+	- API:
+		- is there an issue with the Google API for 'primary' calendars?
+		- offline calendar API? (can this be made so that if Google calendar is gone, then there's something else?)
+		- can you have more than one calendar added?
+		- how to make token / credentials persistent?
+		- Note: in Google Calendar, modified single events will show an updated time unique to that event
+		- Note: in Google Calendar, if a recurring instance is modified, it will no longer appear in get.instances() by google
+		--  make use of icalendar in a refactor?:      
+		      -  https://icalendar.readthedocs.io/en/latest/about.html
+
+	- SYNC BASICS:
+		- deleting a card from google deletes the card in Lumo
+		- deleting a card from Lumo deletes the card in Google
+
+		- how should I handle cases where there is no internet? what is the 'offline' mode
+		- flagging cards for update when updating them offline
+			- how would I handle 'merge conflicts' i.e. you edit the event when it's offline, and edit google
 		-upload / sync manager 
-	- can you have more than one calendar added?
-	- how to make token / credentials persistent?
-		-automatically delete the token and re-apply credentials?
+		- Any change to a scheduled card either syncs or is staged for sync via 'flag' system
 
-	- Any change to a scheduled card either syncs or is staged for sync via 'flag' system
 
-	- Note: in Google Calendar, modified single events will show an updated time unique to that event
-	- Note: in Google Calendar, if a recurring instance is modified, it will no longer appear in get.instances() by google
+		- test from sync  non-existing Lumo cards that are google events
+		- get all google events for a year
+		- get lumo cards that are scheduled
+		- compare updated times...
+		- sync events in Lumo
+		- changes to events in Lumo should sync automatically by default
+		- it should be able to retrieve a years worth of events from google, then it can just check for differences to see if events have updated between the calendars...
+		- user can toggle events from scheduled to non-scheduled
 
-	- Timezones!!!! Fuck!!! Hard, but important???
+	FUNCTIONALITY / FEATURES:
+		--  at some point accomodate .ics files?
 
-**  put tape on my keyboard for better finding of l ctrl and alt.
+	TESTING / EDGE CASES:
+		- how the fuck do I test this thoroughly?
+		- how do events that start one day and flow into the next work?
+		- how does calendar display conflicting?
+		- what happens in between weeks of two different months? (does it always start on first?)
+			- how does it account for this?
 
-	SHORTCUTS/FORMATTING:
-	- calendar shortcuts: go to "next week" etc.
-	- calendar shortcuts: go to: dec 25
-	- go to: 2025
-	- go to: dec
-	- go to: dec 2026
-	- calendar shortcuts: go to 1/25/2022
-	- calendar shortcuts: to december
+:::::LUMO:::::
+	REFACTORS:
+		--  try using a @decorator to do loading transitions
+		--  consider checking out your use of circular dependencies!!
+		--  at some point you should use types in your functions
+		--  enum vs. str as input to a function
+		--  see if you can have someone look at your code?
+		--  difference of 'case' vs. 'elif/if'
+		--  look into python generator?? for pomodoro?
+		
+	ANIMATIONS:
+		- get coherent and consistent system / rules
+		- when you xsition back from a sub program to main menu, do ... loader transition
 
-	> time? 8-9 
-	> time? 8 1h
-	> time? 8 default
-	> from week mode: 21, 8p-9p, dinner with Jamie (first part=the day, second part=time, third part=event name)
-	> a -> schedule to that day ...
-		> what time? 8:30p-
-			> confirm 8:00 Am – 9:00 Pm or (8:00 Am – 9:00 Pm?)
+	LUMO HOME MENU:
+		- support parsing actions like typing 'Lumo newcard A mycard' or 'Lumo search blah'
+		- if they type in 'lumo' ignore it and just parse the rest
+		- have flexible defaults for errors in parsing
 
-	- how would a user make a quick scheduled card like: newcard r dinner with sam, tue @ 8a (blank would be default length of one hour)
-	- how would a user make a quick scheduled card like: newcard r dinner with sam, 12/01/2020 @ 8a-9a
-	- how would a user make a quick scheduled card like: newcard r dinner with sam, aug 01 @ 8a +2
+		- search 'exit' vs. 'quit'
+
+	MENUS:
+		--  at some point, make sure that the menus give you decent pathways for setting calendar events (make sure refactor works with added folder CARDS_D_CALENDAR)
+
+	CARDSRUN:
+	    --  When you type 'back' on Near Cards / Cardsrun / Planner it shows the previous card that has moved
+		--  should the 'macro menu' have an option to be able to menu jump to recurring cards? (I think so...)
+		--  figure out how to format text inside boxes to be left aligned
+		--  'BACK' fucntion vs. 'UNDO'
+
+	SEARCH:
+		--  can search support multiple terms?
+		--  cards should show their location in the menus! i.e. 
+			  P PAINTING (NEAR, SCHEDULED)
+			  (RECURRING CARD, EVERY 2 DAYS)
+			  (CHECKLIST CARD)
+			  (MIDDLE FOCUS CARD)
+			  (MIDDLE FOCUS CARD, SCHEDULED)
+		--  can lumocards have a version where it shows in paren() the location of the found card when it's previewing the card from the 1...2...3... menu?
+		--  issue with how after you 'show full' card if you try to edit it, it won't work?
+		
+
+	NEWCARD:
+		--  should there be an option to make a newcard after making a newcard?
+		--  is it possible that the format could be cardname then optional card category
+			- could it support leaving off the category so that it prompts user depending on context to add one or not?
+
+	LUMO MENUS:
+		- dict comprehensions / print formatting from dicts
+		- what about an option for delete menu for multiple cards?
+
+	SOUNDS:
+		--  cross platform???
+		--  spend a few hours one morning going through the playsound python package
+		--  is it possible to use part of ffmpeg, ffplay, pyaudio?
 	
-	- standard menu should be one item at a time (try one format at a time for testing)
-		-event name? dinner with Sam
-		-event start? 8a | 8am | 8:30a | 8 am | 20:00 | 20:31 
-		-event end? ( blank=defaul +1 ) | +1=do the math | 9a | etc. 
-		-etc...
-	- what to ask people about each event when scheduling??? Should it be the full Google Menu?
+	 INSTALLATION NEW USERS
+		- demo video
+		- homebrew?
+		- see all the ways the micro can be installed
+		-intro to explain settings
+		-explain to users what kinds of cards there are and how they work
+		-introduction feature to have user set up caterogires, one at a time
+		-intro to set user birthday
+		-what if the user wants to change the names of categories? 
+		
+		- pip install -e ??? / the python video from Real Python
+		- requires python
+		- user downloads a tar or compressed folder
+		- then script installs a vitual environment +
+			- pip installs the package to the virtual environment
+			- then exports the environment script to /usr/bin
+			- then .toml file creates and entry point for the 'Lumo' program that can load all the different lumo fucntions
+			- then show a demo video
+			- show what settings are available
 	
+		-should it be installable from pip?
 
-	EDGE CASES:
-	- how do events that start one day and flow into the next work?
-	- how does calendar display conflicting?
-	- what happens in between weeks of two different months? (does it always start on first?)
-	- how does it account for this?
+		-how should 'Z_CREDENTIALS' work when uninitilized?
 
-
--- LUMO (ALL)
-	--  consider checking out your use of circular dependencies!!
-	--  at some point, make sure that the menus give you decent pathways for setting calendar events (make sure refactor works with added folder CARDS_D_CALENDAR)
-    --  When you type 'back' on Near Cards it shows the previous card that has moved
-
-	--  you can refactor newcard so that it uses default args from argparse...
-	--  at some point you should use types in your functions
-	--  enum vs. str as input to a function
-	--  should a card with a lowercase name still show it's title (using format card title?)
-	--  should there be an option to make a newcard after making a newcard?
-	--  should the 'macro menu' have an option to be able to menu jump to recurring cards? (I think so...)
-	--  difference of 'case' vs. 'elif/if'
-	--  see if you can have someone look at your code?
-	--  look into python generator?? for pomodoro?
-
-
-	--  can lumocards have a version where it shows in paren() the location of the found card when it's previewing the card from the 1...2...3... menu?
-	--  spend a few hours one morning going through the playsound python package
-	--  is it possible to use part of ffmpeg, ffplay, pyaudio?
-
-	--  can lumo aliases be renamed to "lumo cardsrun" and "lumo newcard" etc?
-	**  make micro have the function to shift+space move over one char
-	**  find out how to 'tab through options' in oh my bash (maybe watch a tutorial on this)
-	**  find out how to filter by portion of the word rather than starting
-	**  modify lumo_install.sh so that it checks whether or not 'lumo_runtime' is activated...
-
---  INSTALLATION NEW USERS??? (continued)
-	- pip install -e ??? / the python video from Real Python
-	- requires python
-	- user downloads a tar or compressed folder
-	- then script installs a vitual environment +
-		- pip installs the package to the virtual environment
-		- then exports the environment script to /usr/bin
-		- then .toml file creates and entry point for the 'Lumo' program that can load all the different lumo fucntions
-		- then show a demo video
-		- show what settings are available
-	
-	-make a toml file, export function to script
-	-see micro, how does it do it? (look at my email examples)
-	-should it be installable from pip?
-	-pip install to target?
-	-the installation should be one call to install.sh etc. (cross platform)
-	-the installation should ideally then allow users to call "lumo" from any location in the terminal
-	-maybe the project then is in /usr/bin?
-	-otherwise it adds the project folder to the path and cds the user there?
-		- I want people to be able to put the LUMO folder anywhere, but be able to call the program from
-		the command line anywhere, but it's basically just scripts...
-	-it just needs to be an easy to use program otherwise why bother?
-
-	-what is __init__.py and should I be using this?
-	-explain to users what kinds of cards there are and how they work
-	-what happens when you make the API public/external for people?
-	-how should 'Z_CREDENTIALS' work when uninitilized?
 		-ok when they first setup lumo and add credentials it makes a file in Z_CREDENTIALS called 'creds.json'
 		- this file is also linked to settings.json
 		- note: the user cannot then manually rename the credentials file without issue!
 		- I feel like this is still not a robust implementation
-	-how will the app handle updates for users?
-		-say for a bug or if the json needs to change?
-	-how would people set this up for google api?
-	-should it auto load 'micro?' is this possible???
-	-should it be able to configure a text editor based on 'settings?'
-	-should there be an interface to work with settings?
-	-settings feature for updating the names of categories
-	-intro to explain settings
-	-introduction feature to have user set up caterogires, one at a time
-	-intro to set user birthday
-	-what if the user wants to change the names of categories? 
+
+		-how will the app handle updates for users?
+			-say for a bug or if the json needs to change?
+
+		-how would people set this up for google api?
+
+		-can it ship with 'micro'? it auto load 'micro?' is this possible???
+
+	SETTINGS:
+		-should it be able to configure a text editor based on 'settings?'
+		-should there be an interface to work with settings?
+		-settings feature for updating the names of categories
 	-lumo_install.sh should be able to set up a calendar credentials, or guide people
 	-export something like usr/bin/lumo
 
---  make a function called clean up which ensures that all cards are matched with json card, and if not gives options...
---  cards should show their location in the menus! i.e. 
-	  P PAINTING (NEAR, SCHEDULED)
-	  (RECURRING CARD, EVERY 2 DAYS)
-	  (CHECKLIST CARD)
-	  (MIDDLE FOCUS CARD)
-	  (MIDDLE FOCUS CARD, SCHEDULED)
 
 
-**  does an MIT license require payment if I charge for my app that uses a package?
+	PAYMENT:
+		- if I ask for payment, do I owe other people for what I've used?
+		- does an MIT license require payment if I charge for my app that uses a package?
+		- do I have the right license?
 	  
---  find a mentor, or get feedback on some way to make your education better; you don't know what you don't know
-
-
-**  learn about testing
-
-
---  you should be able to 'cancel' out of recurring card menu
---  continue refactor for menus!
-		-consolidate
-		-dict comprehensions / print formatting from dicts
---  figure out how to format text inside boxes to be left aligned
 --  rewrite the alphabetizer_2.py file to work again
 --  ensure that minimum for recurring cards settings = 2 days
 
@@ -281,7 +304,6 @@ SCHEDULE / CALENDAR!!!
 	  -can a near focus card be in google calendar as repeating event?
 
 
---  'BACK' fucntion vs. 'UNDO'
 --  have cards retain their order when relooping 'get_remaining_cards'
 --  Make 'back' work
 --  Make all hotkey word shortcuts work
@@ -294,6 +316,7 @@ SCHEDULE / CALENDAR!!!
 --  implement 'r+' mode when modifying cards, and 'w+' when creating?
 --  should paths be relative?
 
+--  what if you want to use the timer while you are using other programs??
 --  the logic of the functions in cards run feels like it could be clearer with how many statuses are being passed around
 
 --  should you be able to type 'q' in any menu to quit for example when searching for a term in 'locard' typing 'q' will act as search. Should 'q' be added to negative use responses?
@@ -307,21 +330,17 @@ SCHEDULE / CALENDAR!!!
 --  where else should you be able to type 'help'?
 --  feature to schedule viewing middle focus cards per set amount of time
 
---  issue with how after you 'show full' card if you try to edit it, it won't work?
 --  feature: non destructive step completion; 
-
-
----  feature: separate a step from a list into its own card
----  fuzzy hotkey matching?
----  archive steps in place feature to look at non-active, 
 ---  "Lumo Night" → is when yu rurecap card "Lumo Night" is when you edit cards to 
----  install from folder, or make standalone app
----  feature to be able to toggle completed steps from being 'active' or 'in focus' and completed for now.
 ---  basics of lumogarden implement scroll from lumocards3 
----  settings for Lumo
 
---- lumogarden outlines fill in information
---- design the ticking clock in blender, or affinity designer
---- feature for formatting text output of lumocards
+DISTANT:
+	---  support the mouse
+	---  feature: separate a step from a list into its own card
+	---  fuzzy hotkey matching?
+	---  archive steps in place feature to look at non-active, i.e. checkboxes, don't delete steps 
+	---  install from folder, or make standalone app
+	---  feature to be able to toggle completed steps from being 'active' or 'in focus' and completed for now.
+	---  feature for visually impaired, how does lumocards work as a fully sound designed app?
 
----- feature for visually impaired, how does lumocards work as a fully sound designed app?
+

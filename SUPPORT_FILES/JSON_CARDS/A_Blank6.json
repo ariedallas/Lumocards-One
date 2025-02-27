@@ -1,10 +1,10 @@
 {
-  "card location": "CARDS_A_FOCUS_NEAR",
+  "card location": "CARDS_F_RECURRING",
   "card category abbreviation": "A",
   "card category": "Audio",
-  "recurring freq": 0,
-  "recurring freq time unit": null,
-  "last occurrence": null,
+  "recurring freq": 2.0,
+  "recurring freq time unit": "Day",
+  "last occurrence": "Feb 24 2025, Monday",
   "card created": "2025-02-26 11:06:03",
   "tags": [
     "default tag a",

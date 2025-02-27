@@ -1,0 +1,15 @@
+{
+  "card location": "CARDS_A_FOCUS_NEAR",
+  "card category abbreviation": "A",
+  "card category": "Audio",
+  "recurring freq": 0,
+  "recurring freq time unit": null,
+  "last occurrence": null,
+  "card created": "2025-02-26 23:30:29",
+  "tags": [
+    "default tag a",
+    "default tag b",
+    "default tag c"
+  ],
+  "google calender data": null
+}

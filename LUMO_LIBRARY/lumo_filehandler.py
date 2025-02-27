@@ -1,9 +1,9 @@
-import os
 import datetime
-import time
+import os
 import pathlib
-import LUMO_LIBRARY.lumo_json_utils as l_json_utils
+import time
 
+import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 
 # ---FILES--- #
 home = pathlib.Path.home()
@@ -21,6 +21,7 @@ checklist_cards_folder = os.path.join(rootpath, "CARDS/CARDS_E_CHECKLISTS")
 recurring_cards_folder = os.path.join(rootpath, "CARDS/CARDS_F_RECURRING")
 archived_cards_folder = os.path.join(rootpath, "CARDS/CARDS_G_ARCHIVED")
 
+journal_folder = os.path.join(rootpath, "JOURNAL")
 support_files_folder = os.path.join(rootpath, "SUPPORT_FILES")
 internal_cards_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_INTERNAL_CARDS")
 json_cards_folder = os.path.join(rootpath, "SUPPORT_FILES/JSON_CARDS")
@@ -28,7 +29,6 @@ temp_folder = os.path.join(rootpath, "SUPPORT_FILES/TEMP")
 credentials_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_CREDENTIALS")
 
 sounds_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_SOUNDS")
-
 
 # ---TIME--- #
 today = datetime.datetime.today()
@@ -40,9 +40,9 @@ today_dayof_year = today.strftime("%j")
 local_time = time.localtime(time.time())
 local_hour = local_time[3]
 
-
 curr_time = today.strftime("%H:%M:%S")
 curr_time_hr = "----------{}----------".format(curr_time)
+
 
 def isolate_date_units():
     day = today.strftime("%A")
@@ -58,15 +58,14 @@ planner_folder = os.path.join(rootpath, "PLANNER")
 today_planner_file = f"{today_frmttd.upper()}_planner.txt"
 today_planner_fullpath = os.path.join(planner_folder, today_planner_file)
 
-
 # ---- RESPONSES ---- #
 negative_user_responses = [
-      "no"
+    "no"
     , "exit"
     , "quit"
     , "stop"
     , "cancel"
-    ]
+]
 
 
 # ---- FUCNTIONS ---- #
@@ -92,7 +91,6 @@ def get_json_settings():
 
 
 def basic_wrtr(content, card_fullpath):
-
     with open(card_fullpath, "a+") as fin:
         fin.write(content)
 
@@ -106,14 +104,12 @@ def basic_wrtr_custom_dir(content, card_filename, var_dir):
 
 
 def over_wrtr(content, card_fullpath):
-
     with open(card_fullpath, "w+") as fin:
         fin.write(content)
         fin.write("\n")
 
 
 def over_wrtr_list(var_list, card_fullpath):
-
     with open(card_fullpath, "w+") as fin:
         for item in var_list:
             fin.write(item)
@@ -121,7 +117,6 @@ def over_wrtr_list(var_list, card_fullpath):
 
 
 def basic_wrtr_list(var_list, card_fullpath):
-
     with open(card_fullpath, "a+") as fin:
         for item in var_list:
             fin.write(item)
@@ -154,10 +149,3 @@ def proceed(input_text="... "):
 if __name__ == '__main__':
     print("hello from main")
     print(get_near_focus_cards())
-
-# ---- ETC ---- #
-# is_Sunday = (datetime.date.weekday(today) == 6)
-# week_from_today = (today + datetime.timedelta(weeks=1)).strftime("%A, %B %d, %Y")
-#
-# tomrrw = today + datetime.timedelta(days=1)
-# tomrrw_frmttd = tomrrw.strftime("%d%b %Y")
