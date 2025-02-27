@@ -112,7 +112,7 @@ def display_submenu(var_dict):
     menu_equalize = len(HOME_MENU) - len(SUB_MENU)
 
     print()
-    print("LUMOCARDS ::MORE:: ")
+    print("LUMOCARDS ::MORE:: ")git 
     print("\n")
 
     for k, v in var_dict.items():

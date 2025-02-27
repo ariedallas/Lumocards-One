@@ -1,16 +1,15 @@
 {
   "card location": "CARDS_A_FOCUS_NEAR",
-  "card category abbreviation": "E",
-  "card category": "Errand",
-  "calender event": null,
-  "calendar repeating event": null,
+  "card category abbreviation": "R",
+  "card category": "Creative Projects",
   "recurring freq": 0,
   "recurring freq time unit": null,
   "last occurrence": null,
-  "card created": "2025-01-16 14:44:26",
+  "card created": "2025-02-26 10:57:00",
   "tags": [
     "default tag a",
     "default tag b",
     "default tag c"
-  ]
+  ],
+  "google calender data": null
 }
