@@ -8,16 +8,6 @@ import LUMO_LIBRARY.lumo_filehandler as l_files
 
 selected_sound = os.path.join(l_files.sounds_folder, "block.mp3")
 
-parser = ArgumentParser()
-parser.add_argument(
-        'minutes',
-        metavar='Minutes to time',
-        help="How many minutes?")
-
-options = parser.parse_args()
-timer_duration = float(options.minutes)
-
-
 def pomodoro(var_mins):
 
     time_in_secs = int((var_mins * 60))
@@ -47,6 +37,17 @@ def pomodoro(var_mins):
         run(f'pw-play {selected_sound}', shell=True)
 
 
-pomodoro(timer_duration)
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument(
+        'minutes',
+        metavar='Minutes to time',
+        help="How many minutes?")
+
+    options = parser.parse_args()
+    timer_duration = float(options.minutes)
+
+    pomodoro(timer_duration)
+
 
 

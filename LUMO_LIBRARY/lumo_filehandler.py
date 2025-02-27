@@ -2,7 +2,7 @@ import os
 import datetime
 import time
 import pathlib
-import LUMO_LIBRARY.lumo_json_utilities as l_json_utils
+import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 
 
 # ---FILES--- #

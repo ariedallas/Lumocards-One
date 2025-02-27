@@ -37,10 +37,12 @@ lumo_welcome_msg() {
     echo "Welcome to Lumocards, where you decide what cards to put in focus."
 }
 
-alias lumocards="python3 LUMO_LIBRARY/lumo_cardsrun.py"
-alias locard="python3 LUMO_LIBRARY/lumo_search_cards.py"
-alias newcard="python3 LUMO_LIBRARY/lumo_newcard_refactor.py"
+alias lumo="python3 -m LUMO_LIBRARY.__main__"
+alias lu="python3 -m LUMO_LIBRARY.scratch"
+alias lumocards="python3 -m LUMO_LIBRARY.lumo_cardsrun"
+alias locard="python3 -m LUMO_LIBRARY.lumo_search_cards"
+alias newcard="python3 -m LUMO_LIBRARY.lumo_newcard_refactor"
 alias planner="open PLANNER"
-alias today="python3 LUMO_LIBRARY/lumo_gettoday.py"
-alias pomodoro="python3 LUMO_LIBRARY/lumo_pomodoro.py"
-alias checklist="python3 LUMO_LIBRARY/lumo_checklist.py"
+alias today="python3 -m LUMO_LIBRARY.lumo_gettoday"
+alias pomodoro="python3 -m LUMO_LIBRARY.lumo_pomodoro"
+alias checklist="python3 -m LUMO_LIBRARY.lumo_checklist"

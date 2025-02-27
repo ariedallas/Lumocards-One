@@ -1,22 +1,21 @@
 import os
 import pathlib
-import sys
 import subprocess
+import sys
 from argparse import ArgumentParser
 
+import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_formatters as l_formatters
-import LUMO_LIBRARY.lumo_animationlibrary as l_animators
-import LUMO_LIBRARY.lumo_recurring as l_recurring
-import LUMO_LIBRARY.lumo_json_utilities as l_json_utils
-import LUMO_LIBRARY.lumo_search_cards as l_search
+import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_menus as l_menus
+import LUMO_LIBRARY.lumo_recurring as l_recurring
+import LUMO_LIBRARY.lumo_search_cards as l_search
 
 settings = l_files.get_json_settings()
 
 all_card_categories = l_files.get_lumocards_categories()
 default_text = "\n".join(("...", "...", "..."))
-
 
 parser = ArgumentParser(add_help=False)
 parser.add_argument("-o", "--output", action="store_true",
@@ -28,19 +27,16 @@ parser.add_argument(
     , help="Use an abbreviating letter"
 )
 parser.add_argument(
-    # "-o"
-    # , "--card_name"
-    "cardname"
+    "title"
     , action="store"
     , nargs="+"
     , metavar="Optional card name?"
-    , default="unnamed"
+    , default="Make a title for the card"
     , help="…?")
 
 
-# change this so that it returns the same kind of type, i.e. true / false
-def test_for_args():
-    if len(sys.argv) > 1:
+def test_for_local_args():
+    if len(sys.argv) > 1 and __name__ == "__main__":
         return True
     else:
         return False
@@ -48,23 +44,16 @@ def test_for_args():
 
 def get_cardname_from_input():
     print()
-    cardname = input("NEW CARD NAME:  ").title()
+    cardname = input("Card Name >  ").title()
     result = cardname.replace(" ", "")
     return result
 
 
 def get_category_from_input():
-
-    print("\n")
-
-    print("CARD CATEGORIES .......")
-    print()
-    print("{:<10}{:^10}{:>10}".format("[Aa]_ADIO", "[Pp]_PNTG", "[Rr]_MAKE", "\n"))
-    print("{:<10}{:^10}{:>10}".format("[Ee]_ERND", ".....", "[Ff]_SOIL", "\n"))
-    print("{:<10}{:^10}{:>10}".format("[Cc]_COMP", "[Dd]_DOMS", "[Ss]_SLFC", "\n"))
-
-    print("\n")
-    result = input("Select a category letter > ")
+    result = input("Card Category >  ")
+    # print("{:<10}{:^10}{:>10}".format("[Aa]_ADIO", "[Pp]_PNTG", "[Rr]_MAKE", "\n"))
+    # print("{:<10}{:^10}{:>10}".format("[Ee]_ERND", ".....", "[Ff]_SOIL", "\n"))
+    # print("{:<10}{:^10}{:>10}".format("[Cc]_COMP", "[Dd]_DOMS", "[Ss]_SLFC", "\n"))
 
     return category_check(result)
 
@@ -82,19 +71,23 @@ def category_check(card_category):
         return card_category.upper()
 
 
-def validate_from_parsed():
-    outcome = test_for_args()
+def validate_from_local_parser():
+    parsed_args = parser.parse_args()
+    card_filename = parsed_to_filename(parsed_args.category, parsed_args.title)
+    exists_card_already = check_for_dupes(card_filename)
 
-    if outcome:
-        parsed_args = parser.parse_args()
-        card_filename = parsed_to_filename(parsed_args)
-        exists_card_already = check_for_dupes(card_filename)
+    if not exists_card_already:
+        return card_filename
+    else:
+        return None
 
-        if not exists_card_already:
-            return card_filename
-        else:
-            return None
 
+def validate_from_lumo_parser(category, title):
+    card_filename = parsed_to_filename(category, title)
+    exists_card_already = check_for_dupes(card_filename)
+
+    if not exists_card_already:
+        return card_filename
     else:
         return None
 
@@ -109,29 +102,29 @@ def validate_from_input():
         return None
 
 
-def parsed_to_filename(parsed_options):
-    cardname_as_list = [t.title() for t in parsed_options.cardname]
-    cardname = "".join(cardname_as_list)
+def parsed_to_filename(card_category, card_title):
+    card_title_as_list = [t.title() for t in card_title]
+    formatted_title = "".join(card_title_as_list)
 
-    result = parsed_options.category.upper()
-    category = category_check(result)
+    formatted_category = card_category.upper()
+    valid_category = category_check(formatted_category)
 
-    card_name = "_".join((category, cardname))
-    complete_card_name = f"{card_name}.txt"
+    categorized_card = "_".join((valid_category, formatted_title))
+    card_filename = f"{categorized_card}.txt"
 
-    return complete_card_name
+    return card_filename
 
 
 def input_to_filename():
-    cardname = get_cardname_from_input()
-    category = get_category_from_input()
-    joined = "_".join((category, cardname))
-    result = f"{joined}.txt"
-    return result
+
+    card_title = get_cardname_from_input()
+    card_category = get_category_from_input()
+    joined = "_".join((card_category, card_title))
+    card_filename = f"{joined}.txt"
+    return card_filename
 
 
 def check_for_dupes(card_filename):
-
     card_exists = False
 
     if card_filename in os.listdir(l_files.cards_near_folder):
@@ -154,6 +147,7 @@ def check_for_dupes(card_filename):
 
 def add_custom_or_default_steps():
     scratchpad_file = os.path.join(l_files.temp_folder, "scratchpad.txt")
+    print()
     if l_files.proceed("Edit steps? >  "):
         with open(scratchpad_file, "w") as fin:
             fin.write("")
@@ -169,40 +163,48 @@ def add_custom_or_default_steps():
     return steps
 
 
-def get_card():
-    card_filename = validate_from_parsed()
-    if card_filename:
-        card_steps = add_custom_or_default_steps()
-        return card_filename, card_steps
-
-    else:
-        if not test_for_args():
-            pass
-        else:
-            print()
-            l_animators.animate_text("A card with this name already exists...")
-            l_animators.animate_text("Try another card name.")
-            sys.argv.clear()
-
-    card_filename_input = validate_from_input()
-    if card_filename_input:
-        card_steps = add_custom_or_default_steps()
-        return card_filename_input, card_steps
-
-    else:
-        print()
-        l_animators.animate_text("A card with this name already exists...")
-        l_animators.animate_text("Try another card name.")
-        return None, None
-
-
-def write_card():
-    letters_filtered_copy = l_menus.letters_filtered.copy()
-
-    card_filename, card_steps = get_card()
+def retry_loop_card_filename(card_filename):
     if not card_filename:
-        return "RESTART", None
+        l_animators.animate_text("A card with this name already exists...")
+        # TODO: to continue type any key but [q]; [q] for quit
+        # TODO: -OR- inform user they can undo after next step and to make a dummy card
 
+        while True:
+            retry_card_filename = validate_from_input()
+            if retry_card_filename:
+                return retry_card_filename
+            else:
+                print()
+                l_animators.animate_text("A card with this name already exists...")
+
+    return card_filename
+
+# def add_card_steps_or_retry(card_filename):
+#     if card_filename:
+#
+#         return card_filename
+#
+#     else:
+#         if not test_for_local_args():
+#             pass
+#         else:
+#             print()
+#             l_animators.animate_text("A card with this name already exists...")
+#             l_animators.animate_text("Try another card name.")
+#             sys.argv.clear()
+#
+#     card_filename_input = validate_from_input()
+#     if card_filename_input:
+#         card_steps = add_custom_or_default_steps()
+#         return card_filename_input, card_steps
+#
+#     else:
+#
+#         return None, None
+
+
+def write_card(card_filename, card_steps):
+    letters_filtered_copy = l_menus.letters_filtered.copy()
     focus_menu_d, focus_menu_l = l_menus.prep_newcard_menu(l_menus.focus_menu,
                                                            letters_filtered_copy,
                                                            pop_letters=True)
@@ -213,12 +215,9 @@ def write_card():
 
     combined_menus_dict = focus_menu_d | schedule_menu_d
 
-    status = "CREATING CARD"
-    response = True
-
-    while response not in l_files.negative_user_responses:
+    while True:
         print()
-        print(f"Status: {status}")
+        l_animators.animate_text(f"CREATING CARD: {card_filename}", finish_delay=.4)
 
         print()
         l_animators.standard_interval_printer(focus_menu_l, speed_interval=0)
@@ -262,7 +261,6 @@ def write_card():
 
             # ---- SCHEDULING MENU ---- #
 
-
             elif combined_menus_dict[response.upper()] == "Set as ➝ Checklist Card":
 
                 card_abspath, json_file = write_card_and_json(card_filename,
@@ -298,17 +296,13 @@ def write_card():
 
             elif combined_menus_dict[response.upper()] == "Schedule to ➝ Calendar":
                 l_animators.animate_text("  This function currently unavailable...")
-                # card_abspath = generate_card(card_filename, l_files.recurring_cards_folder)
-                # l_animators.animate_text("Card set to ➝ Recurring Cards")
-                # return "CREATED CARD", card_abspath
-
 
         elif response.lower() == "x":
-            return "RESTART", None
+            return "RELOOP", None
 
         elif response.lower() == "q":
-            l_animators.animate_text("Quitting...")
-            sys.exit(0)
+            l_animators.animate_text("  Quit Lumo: New Card", finish_delay=.4)
+            return "QUIT", None
 
         else:
             l_animators.animate_text("  Options available in this context are just shortcut letters.")
@@ -335,49 +329,37 @@ def write_card_and_json(card_filename, folder, add_custom_steps=None):
     return formatted_card_fullpath, json_fullpath
 
 
-def card_creation_loop():
-    status = "RESTART"
+def card_write_loop(card_filename, card_steps):
+    status = None
+    round_one = True
     possible_card_abspath = None
 
-    while status == "RESTART":
-        status, possible_card_abspath = write_card()
+    while not status or status == "RELOOP":
+        if round_one:
+            status, possible_card_abspath = write_card(card_filename, card_steps)
+            round_one = False
+        else:
+            possible_card_filename = validate_from_input()
+            new_card_filename = retry_loop_card_filename(possible_card_filename)
+            new_card_steps = add_custom_or_default_steps()
+            status, possible_card_abspath = write_card(new_card_filename, new_card_steps)
 
-    if possible_card_abspath:
-        card_path = os.path.basename(possible_card_abspath)
-        card = l_formatters.filename_to_card(card_path)
-
-        return card, card_path
-
-    else:
-        return None, None
+    return status, possible_card_abspath
 
 
 def card_menu_loop(result_card, result_path):
-
-    if result_card and result_path:
-        hotkey_dict, hotkey_list = l_menus.prep_newcard_menu(l_menus.newcard_main_actions, l_menus.letters_filtered.copy())
-        status, return_path = l_search.cardsearch_main_options(var_card=result_card,
-                                                               var_card_filename=result_path,
+    hotkey_dict, hotkey_list = l_menus.prep_newcard_menu(l_menus.newcard_main_actions,
+                                                         l_menus.letters_filtered.copy())
+    status, return_path = l_search.cardsearch_main_options(var_card=result_card,
+                                                           var_card_filename=result_path,
+                                                           var_hotkey_dict=hotkey_dict,
+                                                           var_hotkey_list=hotkey_list)
+    while status == "RELOOP":
+        card = l_formatters.filename_to_card(return_path)
+        status, return_path = l_search.cardsearch_main_options(var_card=card,
+                                                               var_card_filename=return_path,
                                                                var_hotkey_dict=hotkey_dict,
                                                                var_hotkey_list=hotkey_list)
-        while status == "RELOOP":
-            card = l_formatters.filename_to_card(return_path)
-            status, return_path = l_search.cardsearch_main_options(var_card=card,
-                                                                   var_card_filename=return_path,
-                                                                   var_hotkey_dict=hotkey_dict,
-                                                                   var_hotkey_list=hotkey_list)
-    else:
-        print()
-        l_animators.animate_text("Quit Lumocards: New Card")
-        sys.exit(0)
-
-    print()
-    l_animators.animate_text("Quit Lumocards: New Card")
-
-
-def main():
-    result_card, result_path = card_creation_loop()
-    card_menu_loop(result_card, result_path)
 
 # ---- LUMO CALENDAR FUNCTIONS ---- #
 def check_for_calendar_cards(card_filename):
@@ -416,9 +398,37 @@ def write_calendar_card_and_json(card_filename, folder, google_calendar_data, ad
 
     return formatted_card_fullpath, json_fullpath
 
+
+def main(card_category=None, card_title=None, from_lumo_menu=False):
+    from_local_args = test_for_local_args()
+    locally_run = (__name__ == "__main__")
+
+    print()
+    for s in settings.get('card categories').items():
+        print(s)
+
+    if from_lumo_menu and card_category and card_title:
+        possible_card_filename = validate_from_lumo_parser(card_category, card_title)
+    elif from_local_args:
+        possible_card_filename = validate_from_local_parser()
+    else:  # get from input
+        possible_card_filename = validate_from_input()
+
+    card_filename = retry_loop_card_filename(possible_card_filename)
+    card_steps = add_custom_or_default_steps()
+    status, possible_card_abspath = card_write_loop(card_filename, card_steps)
+
+    if status == "QUIT" and locally_run:
+        sys.exit(0)
+    elif status == "QUIT" and from_lumo_menu:
+        return
+    else: # status == "CREATED CARD":
+        card_path = os.path.basename(possible_card_abspath)
+        card = l_formatters.filename_to_card(card_path)
+        card_menu_loop(card, card_path)
+
 if __name__ == "__main__":
     main()
-
 
 # ---- ETC. / UNUSED ---- #
 #
@@ -439,4 +449,3 @@ if __name__ == "__main__":
 #         full_hotkey_set_dict.values())]
 #
 #     return full_hotkey_set_dict, full_hotkey_set_list
-

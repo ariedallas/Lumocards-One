@@ -115,11 +115,11 @@ def select_card_from_found(searchterm):
 
     if total_amt_matches > 24:
         print(f"More than 24 possible matches for term \'{searchterm}\'... try something more specific.")
-        return None, None
+        return None, None, False
 
     if total_amt_matches == 0:
         print(f"No matches found for your term \'{searchterm}\'... ")
-        return None, None
+        return None, None, False
 
     if len(all_matches_formatted[5]) > 1:
         archived_matches_line = all_matches_formatted[5][1]
@@ -151,20 +151,13 @@ def select_card_from_found(searchterm):
             chosen_file = shortcut_file_matches[letter_as_listindex]
             card = l_formatters.filename_to_card(chosen_file)
 
-            return card, chosen_file
+            return card, chosen_file, False
 
         elif response.lower() == "x":
-            return None, None
+            return None, None, False
 
         elif response.lower() == "q":
-            print("Quit")
-            print()
-            sys.exit(0)
-
-        elif response in l_files.negative_user_responses:
-            print("Quit")
-            print()
-            sys.exit(0)
+            return None, None, True
 
         else:
             print( "\nYou entered something other than one letter "
@@ -238,14 +231,10 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
             return "NEW SEARCH", None
 
         elif response.upper() in l_menus.hotkey_quit_dict.keys():
-            print()
-            l_animators.animate_text("Quit Lumocards: Search")
-            sys.exit(0)
+            return "QUIT", None
 
         elif response.lower() == "quit":
-            print()
-            l_animators.animate_text("Quit Lumocards: Search")
-            sys.exit(0)
+            return "QUIT", None
 
         else:
             print()
@@ -266,32 +255,22 @@ def steps_preview(card_steps, steps_amt, steps_idx):
     return card_steps_three
 
 
-def main():
-    command_line_arg_parser = argparse.ArgumentParser()
-    command_line_arg_parser.add_argument(
-        "match_term"
-        , action="store"
-        , metavar="Match Term"
-        , help="This is what regex uses to search for...i.e. 'potatoes' ")
-
-    options = command_line_arg_parser.parse_args()
-
-    status = "INITIAL SEARCH"
-    response = True
+def main(initial_search_term=None):
+    status = "INITIAL SEARCH" if initial_search_term else "NEW SEARCH"
     return_path = None
 
-    while response not in l_files.negative_user_responses:
+    while True:
         print()
 
         if status == "INITIAL SEARCH":
-            print(f"{status} ➝ '{options.match_term}'")
-
-            card, matched_path = select_card_from_found(options.match_term)
+            print(f"{status}: '{initial_search_term}'")
+            card, matched_path, user_quit = select_card_from_found(initial_search_term)
 
             if card:
                 hotkey_dict, hotkey_list = l_menus.prep_menu(l_menus.cardsearch_main_menu_actions)
                 status, return_path = cardsearch_main_options(card, matched_path, hotkey_dict, hotkey_list)
-
+            elif user_quit:
+                status = "QUIT"
             else:
                 status = "NEW SEARCH"
 
@@ -304,18 +283,40 @@ def main():
 
         elif status == "NEW SEARCH":
             print(status)
-            response = input("\nTry entering a new search term or type 'quit' > ")
+            response = input(
+                "\n"                
+                "                (Type 'quit' to quit)"
+                "\nEnter a single search term i.e. 'hat'  >  " )
 
-            if response not in l_files.negative_user_responses:
-                card, matched_path = select_card_from_found(response)
+            if response == "quit":
+                status = "QUIT"
+                continue
 
-                if card:
-                    hotkey_dict, hotkey_list = l_menus.prep_menu(l_menus.cardsearch_main_menu_actions)
-                    status, return_path = cardsearch_main_options(card, matched_path, hotkey_dict, hotkey_list)
+            card, matched_path, user_quit = select_card_from_found(response)
+
+            if card:
+                hotkey_dict, hotkey_list = l_menus.prep_menu(l_menus.cardsearch_main_menu_actions)
+                status, return_path = cardsearch_main_options(card, matched_path, hotkey_dict, hotkey_list)
+            elif user_quit:
+                status = "QUIT"
+
+
+        else: # status == "QUIT"
+            l_animators.animate_text("Quit Lumo: Search", finish_delay=.4)
+            break
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "match_term"
+        , action="store"
+        , metavar="Match Term"
+        , help="This is what regex uses to search for...i.e. 'potatoes' ")
+
+    parsed = parser.parse_args()
+
+    main(parsed.match_term)
 
 
 # ---- ETC. / UNUSED ---- #

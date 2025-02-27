@@ -1,7 +1,12 @@
 NEXT:
 	- update json_dicts for existing cards (include 'google calendar info') --> in branch 'calendar_sync_basic'
 	- json dict updater for all existing...
-	- pip install -e / real python video
+	- pip install -e my project
+		- create argparser basics
+		- setup .toml file etc.
+		- ref 'IMPORTS'
+		- setup entry point script
+		- clone to 'ARIE'
 	- basic .toml file
 	- make sure the word calendar / schedule are used in a way that makes sense...
 		- mostly calendar unless you need schedule
@@ -12,13 +17,18 @@ NEXT:
 OUTLINE BIG:
 	> CODE READING 
 	> REFACTOR to TYPES
-	> WEEK VIEW 
-	> SYNC CALENDAR
-	> SCHEDULING
-	> NEW USER
-	> DESIGN PATTERNS
+	> CALENDAR :: SYNC :: RECURRING :: MENUS :: SHCEDULING ::
+	> PACKAGING
+		- NEW USERS
+		- DISTRIBUTION
+		- WINDOWS
+
+	> PRODUCTION CODE:
+		- DESIGN PATTERNS
+		- HITCHHIKER'S GUIDE TO PYTHON
 
 EMAILS:
+	Hitchhikers Guide to my EDU list
 	Double Quotes to single
 	Put some of my money in a local bank
 	CLIG.dev
@@ -142,6 +152,7 @@ SCHEDULE / CALENDAR!!!
 
 
 -- LUMO (ALL)
+	--  consider checking out your use of circular dependencies!!
 	--  at some point, make sure that the menus give you decent pathways for setting calendar events (make sure refactor works with added folder CARDS_D_CALENDAR)
     --  When you type 'back' on Near Cards it shows the previous card that has moved
 

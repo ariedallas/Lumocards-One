@@ -1,16 +1,18 @@
 import math
-import sys
 
 from dateutil.relativedelta import relativedelta
 
-from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay, CalendarPageWeek
-                                ,get_day_blocks
-                                ,get_time_window_2
-                                ,parse_brackets
-                                ,get_adjacent_month
-                                ,today_date
-                                ,curr_year
-                                ,curr_month)
+from LUMO_LIBRARY.lumo_calendar_utils import (
+    CalendarPageDay
+, CalendarPageWeek
+, get_day_blocks
+, get_time_window_2
+, parse_brackets
+, get_adjacent_month
+, today_date
+, curr_year
+, curr_month)
+
 
 class CalendarInterface:
 
@@ -170,8 +172,10 @@ class CalendarInterface:
 
         return separated_weeks
 
-
-if __name__ == "__main__":
+def main():
     calendar_interface = CalendarInterface()
     # calendar_interface.paginate_days()
     calendar_interface.paginate_weeks()
+
+if __name__ == "__main__":
+    main()
