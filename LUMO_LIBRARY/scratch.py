@@ -1,4 +1,6 @@
 import argparse
+import collections
+
 
 def function_timer(func):
     def wrapper(*args, **kwargs):
@@ -12,32 +14,32 @@ def function_timer(func):
 
     return wrapper
 
-x = True
-y = True
-z = True
+ALL_MENU = collections.OrderedDict([
+    ("A", "Planner")
+    , ("B", "New Card")
+    , ("C", "Calendar")
+    , ("D", "Journal")
+    , ("E", "Search")
+    , ("F", "Timer")
+    , ("G", ":: settings ::")
+    , ("H", ":: about ::")
+])
 
-if x and y and z:
-    print("hey")
+length = len(ALL_MENU)
+print(length)
+
+x = "PPP"
+x.lower()
+print(x)
+
+t = "a" in ["a", "b", "c"] or "b"
+print(t)
+
+for i, n in enumerate(ALL_MENU.items()):
+    if i == 4:
+        print()
+    if i == length - 2:
+        print()
+    print(n, i)
 
 
-parser = argparse.ArgumentParser(exit_on_error=False)
-# parser.add_argument('milk', nargs='?', action='store', type=str)
-sub = parser.add_subparsers(dest='command')
-cal = sub.add_parser('match')
-bee = sub.add_parser('clown')
-
-cal.add_argument('match2', nargs="?")
-cal.add_argument('match3', nargs="*")
-
-# p, u = parser.parse_known_args(['baby', 'match', 'traby', 'raby'])
-# print(p, u)
-# print(p)
-
-
-try:
-    p, u = parser.parse_known_args()
-    print(p, u)
-except:
-    p, u = parser.parse_known_args([])
-
-print(p,u)

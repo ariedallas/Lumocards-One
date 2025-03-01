@@ -1,19 +1,23 @@
 :::::NEXT:::::
 	- setup basic routes
-		- pass a status message back to root loop that it's coming
-		- do stuff for submenu_loop
-		- make a fake settings.py
-		- make a fake journal.py
+		- pomodoro has bug with floats
+		- lumo ::all::
+		
+		- micro shortcut for shift, space and 
+		- figure out micro shortcuts for enter+shift etc. 
+		- software updates to linux
 
 		
 :::::NEXT LVL 2:::::
 	
+	- figure out quit error when you loop through multiple programs
+
 	- integrate all routes
+		- remove unnecessary print() from beginning of sub-program's main()
 		- setup relevant sub parser arguments
 		- do necessary refactors for integrating
 		- quit transitions for all sub programs
 
-	- figure out quit error when you loop through multiple programs
 		
 	- pip install -e my project
 		- create argparser basics
@@ -208,9 +212,10 @@
 		--  is it possible that the format could be cardname then optional card category
 			- could it support leaving off the category so that it prompts user depending on context to add one or not?
 
-	LUMO MENUS:
+	 MENUS:
 		- dict comprehensions / print formatting from dicts
 		- what about an option for delete menu for multiple cards?
+		- "help" menu for all sub-programs like pomodoro help, calendar help, etc. 
 
 	SOUNDS:
 		--  cross platform???
@@ -254,11 +259,12 @@
 		-can it ship with 'micro'? it auto load 'micro?' is this possible???
 
 	SETTINGS:
-		-should it be able to configure a text editor based on 'settings?'
-		-should there be an interface to work with settings?
-		-settings feature for updating the names of categories
-	-lumo_install.sh should be able to set up a calendar credentials, or guide people
-	-export something like usr/bin/lumo
+		- users can configue what is in the home 'Lumo' menu
+		- should it be able to configure a text editor based on 'settings?'
+		- should there be an interface to work with settings?
+		- settings feature for updating the names of categories
+		- lumo_install.sh should be able to set up a calendar credentials, or guide people
+		- export something like usr/bin/lumo
 
 
 

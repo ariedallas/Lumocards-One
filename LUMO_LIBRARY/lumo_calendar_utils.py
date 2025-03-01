@@ -582,7 +582,7 @@ class CalendarPageWeek:
             print("{0:^{width}}".format(line, width=CalendarPageWeek.total_width))
 
     def display_week(self):
-        # subprocess.run(["clear"], shell=True)
+        subprocess.run(["clear"], shell=True)
 
         self.cal_header()
 

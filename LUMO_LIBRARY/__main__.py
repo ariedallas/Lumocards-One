@@ -1,11 +1,16 @@
 import argparse
+import collections
 import subprocess
 import time
+from symtable import Class
+from typing import Dict
 
 from LUMO_LIBRARY import (
     lumo_animationlibrary as l_animators,
+    lumo_cardsrun as l_cards,
     lumo_journal as l_journal,
     lumo_newcard_refactor as l_newcard,
+    lumo_pomodoro as l_pomodoro,
     lumo_search_cards as l_search,
     lumo_settings as l_settings
 )
@@ -55,11 +60,12 @@ def get_argument_parser():
         , description="""Lumocards is an interactive tool to manage and plan your day,
                         and manage projects."""
     )
-    sub_parser.add_parser(
+    pomodoro = sub_parser.add_parser(
         "pomodoro"
         , help="A simple timer to use in various ways."
         , description="A simple timer feature."
     )
+    pomodoro.add_argument("minutes", nargs="?")
 
     search = sub_parser.add_parser(
         "search"
@@ -74,132 +80,157 @@ def get_argument_parser():
         , description="Interactive settings program to adjust program features"
     )
 
-    sub_parser.add_parser(
+    timer = sub_parser.add_parser(
         "timer"
         , help="A simple timer to use in various ways."
         , description="A simple timer feature."
     )
+    timer.add_argument("minutes", nargs="?")
 
     return parser
 
 
-HOME_MENU = {
-    "A": "Planner"
-    , "B": "New Card"
-    , "C": "Calendar"
-    , "D": "Journal"
-    , "E": ":: more ::"
-    , "F": ":: settings::"
-}
+class LumoMenu:
+    def __init__(self, name: str, var_dict: Dict):
+        self.name = name
+        self.menu = var_dict
 
-SUB_MENU = {
-    "A": "Timer"
-    , "B": "Search Cards"
-}
+
+    def display_main(self):
+        dict_length = len(self.menu)
+
+        clear()
+        print()
+        print("LUMOCARDS")
+        print("\n")
+
+        for idx, item in enumerate(self.menu.items()):
+            if idx == dict_length - 1:
+                print()
+
+            k, v = item
+            print(f"  [{k.upper()}]  {v}")
+
+
+    def display_all(self):
+        dict_length = len(self.menu)
+
+        clear()
+
+        print()
+        print("LUMOCARDS ::all:: ")
+        print("\n")
+
+        for idx, item in enumerate(self.menu.items()):
+            if idx == 4:
+                print()
+            if idx == dict_length - 3:
+                print()
+            if idx == dict_length - 1:
+                print()
+
+            k, v = item
+            print(f"  [{k.upper()}]  {v}")
+
+
+MAIN_MENU = collections.OrderedDict([
+    ("a", "Planner")
+    , ("b", "New Card")
+    , ("c", "Calendar")
+    , ("d", "Journal")
+    , ("e", ":: all | more ::")
+    , ("f", ":: settings ::")
+    , ("q", "Quit")
+])
+
+ALL_MENU = collections.OrderedDict([
+    ("a", "Planner")
+    , ("b", "New Card")
+    , ("c", "Calendar")
+    , ("d", "Journal")
+    , ("e", "Search")
+    , ("f", "Timer")
+    , ("g", ":: settings ::")
+    , ("h", ":: about ::")
+    , ("q", "Quit")
+])
+
 
 def clear():
     subprocess.run(["clear"], shell=True)
 
+
 def load_dots():
     l_animators.animate_text(" ...", speed=.1, finish_delay=.2)
+
 
 def load_transition():
     clear()
     load_dots()
     print()
 
-def display_home(var_dict):
-    clear()
-    print()
-    print("LUMOCARDS")
-    print("\n")
 
-    for k, v in var_dict.items():
-        print(f"  [{k}]  {v}")
-
-    print()
-    print(f"  [Q]  Quit")
-
-
-def display_submenu(var_dict):
-    clear()
-    menu_equalize = len(HOME_MENU) - len(SUB_MENU)
-
-    print()
-    print("LUMOCARDS ::MORE:: ")
-    print("\n")
-
-    for k, v in var_dict.items():
-        print(f"  [{k}]  {v}")
-    print()
-    print(f"  [X]  Back / Exit")
-
-    for _ in range(menu_equalize):
-        print()
+main_menu = LumoMenu("main", MAIN_MENU)
+all_menu = LumoMenu("all", ALL_MENU)
 
 
 def root_loop(parsed_args, unknown):
     status = None
-    # print(parsed_args, unknown)
+    menu = main_menu
 
-    if parsed_args.route == "home" or not parsed_args.route:
-        while True:
-            if status == "QUIT":
-                break
+    _, from_cli = _determine_input_origin(parsed_args)
 
-            display_home(HOME_MENU)
-
-            if status == "RELOOP":
-                l_animators.animate_text("  unrecognized option")
-
-            print()
-            response = input("  > ")
-            status = router(response, [])
-
-    else:
-        router(parsed_args, unknown)
-
-
-def submenu_loop():
-    status = None
+    if from_cli:
+        router(parsed_args, unknown, main_menu)
 
     while True:
-        display_submenu(SUB_MENU)
+        if status == "QUIT":
+            break
+
+        if menu.name == "all":
+            current_menu = all_menu
+            all_menu.display_all()
+        else:
+            current_menu = main_menu
+            main_menu.display_main()
 
         if status == "RELOOP":
             l_animators.animate_text("  unrecognized option")
 
-        if status == "EXIT":
-            break
-
         print()
         response = input("  > ")
-        status = sub_router(response)
+        status, menu = router(response, [], current_menu)
 
 
 def _determine_input_origin(user_input):
     if type(user_input) == argparse.Namespace:
-        choice = user_input.route.lower()
-        origin = "CLI PARSED"
+        choice = user_input.route
+        from_cli = True if choice not in {None, "home"} else False
     else:
-        choice = user_input.lower()
-        origin = "HOME MENU"
+        choice = user_input
+        from_cli = False
 
-    return choice, origin
+    return choice, from_cli
 
 
-def router(user_input, unknown):
+def router(user_input, unknown, contextual_menu: LumoMenu):
     """TODO: refactor, if choice:
             then do func(choice), rather than so much logic in each elif..."""
-    choice, origin = _determine_input_origin(user_input)
+    choice, from_cli = _determine_input_origin(user_input)
+    key = choice.lower()
+    value = contextual_menu.menu[key] if key in contextual_menu.menu.keys() else "_"
 
-    if choice in ["a", "planner"]:
-        print("planner")
-        time.sleep(2)
-        root_loop(parser.parse_args(["home"]), [])
+    if (choice.lower() in {"planner", "agenda"} or
+            value.lower() in {"planner", "agenda"}):
 
-    elif choice in ["b", "new card", "newcard"]:
-        if origin == "CLI PARSED" and (user_input.card_category and user_input.card_title):
+        load_transition()
+        l_cards.main()
+        return None, main_menu
+
+    elif (choice.lower() in {"new card", "newcard"} or
+          value.lower() in {"new card", "newcard"}):
+
+        if from_cli and (user_input.card_category and user_input.card_title):
             category, title = user_input.card_category, user_input.card_title
             load_transition()
             l_newcard.main(category, title, from_lumo_menu=True)
@@ -207,65 +238,66 @@ def router(user_input, unknown):
             load_transition()
             l_newcard.main(from_lumo_menu=True)
 
-        root_loop(parser.parse_args(["home"]), [])
+        return None, main_menu
 
-    elif choice in ["c", "calendar"]:
-        # from LUMO_LIBRARY import lumo_calendar_main
-        #
-        # lumo_calendar_main.main()
-        print("calendar")
-        time.sleep(2)
-        root_loop(parser.parse_args(["home"]), [])
+    elif (choice.lower() in {"calendar"} or
+          value.lower() in {"calendar"}):
 
-    elif choice in ["d", "journal"]:
+        from LUMO_LIBRARY import lumo_calendar_main
+
+        load_transition()
+        lumo_calendar_main.main()
+        return None, main_menu
+
+    elif (choice.lower() in {"journal"} or
+          value.lower() in {"journal"}):
+
         l_journal.main()
-        root_loop(parser.parse_args(["home"]), [])
+        return None, main_menu
 
-    elif choice in ["e", "more"]:
-        submenu_loop()
+    elif (choice.lower() in {"all", "more"} or
+          value.lower() in {":: all | more ::"}):
 
-    elif choice in ["f", "settings"]:
+        load_transition()
+        return None, all_menu
+
+    elif (choice.lower() in {"settings"} or
+          value.lower() in {":: settings ::"}):
+
         load_transition()
         l_settings.main()
-        root_loop(parser.parse_args(["home"]), [])
+        return None, main_menu
 
-    elif choice in ["timer", "pomodoro"]:
-        print("timer")
-        time.sleep(2)
-        root_loop(parser.parse_args(["home"]), [])
+    elif (choice.lower() in {"pomodoro", "timer"} or
+          value.lower() in {"pomodoro", "timer"}):
 
-    elif choice == "search":
-        if origin == "CLI PARSED" and user_input.search_term:
+        if from_cli:
+            load_transition()
+            l_pomodoro.main(user_input.minutes)
+        else:
+            load_transition()
+            l_pomodoro.main()
+
+        return None, main_menu
+
+    elif (choice.lower() in {"search", "find"} or
+          value.lower() in {"search", "find"}):
+
+        if from_cli and user_input.search_term:
             load_transition()
             l_search.main(user_input.search_term)
         else:
             load_transition()
             l_search.main()
-        root_loop(parser.parse_args(["home"]), [])
+        return None, main_menu
 
-    elif choice in ["q", "quit"]:
-        return "QUIT"
+    elif (choice.lower() in {"quit", "exit"} or
+          value.lower() in {"quit", "exit"}):
 
-    else:
-        return "RELOOP"
-
-
-def sub_router(option):
-    if option.lower() in ["a", "timer"]:
-        # lumo_pomodoro.main()
-        time.sleep(2)
-        print("timer")
-        root_loop(parser.parse_args(["home"]), [])
-
-    elif option.lower() in ["b", "search", "search cards"]:
-        l_search.main()
-        root_loop(parser.parse_args(["home"]), [])
-
-    elif option.lower() in ["x", "exit", "back"]:
-        return "EXIT"
+        return "QUIT", None
 
     else:
-        return "RELOOP"
+        return "RELOOP", contextual_menu
 
 
 def main():
@@ -282,23 +314,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# ---- ETC./UNUSED ---- #
-    # parser.add_argument(
-    #     "entry"
-    #     , nargs="?"
-    #     , action="store"
-    #     , default="menu"
-    #     , type=str
-    #     , help=""
-    # )
-    # lumo add dinner with john @ today @ 2:00p - 3:00p @ my house
-
-
-# def safe_parse(parser):
-#     try:
-#         parsed_args, unknown = parser.parse_known_args()
-#         return parsed_args, unknown
-#     except argparse.ArgumentError:
-#         parsed_args, unknown = parser.parse_known_args(["home"])
-#         return parsed_args, unknown
