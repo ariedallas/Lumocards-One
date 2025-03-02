@@ -5,7 +5,7 @@ import subprocess
 from argparse import ArgumentParser
 
 import LUMO_LIBRARY.lumo_filehandler as l_files
-import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
@@ -262,7 +262,7 @@ def create_card():
 
             elif combined_menus_dict[response.upper()] == "Make into ➝ Recurring Card":
 
-                card_title_formatted = l_formatters.format_card_title(card_filename.replace(".txt", ""))
+                card_title_formatted = l_card_utils.format_card_title(card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus.prep_newcard_menu(l_menus.recurring_menu,
                                                                        l_menus.letters_filtered,
                                                                        pop_letters=False)
@@ -332,7 +332,7 @@ def card_creation_loop():
 
     if possible_card_abspath:
         card_path = os.path.basename(possible_card_abspath)
-        card = l_formatters.filename_to_card(card_path)
+        card = l_card_utils.filename_to_card(card_path)
 
         return card, card_path
 
@@ -349,7 +349,7 @@ def card_menu_loop(result_card, result_path):
                                                                var_hotkey_dict=hotkey_dict,
                                                                var_hotkey_list=hotkey_list)
         while status == "RELOOP":
-            card = l_formatters.filename_to_card(return_path)
+            card = l_card_utils.filename_to_card(return_path)
             status, return_path = l_search.cardsearch_main_options(var_card=card,
                                                                    var_card_filename=return_path,
                                                                    var_hotkey_dict=hotkey_dict,

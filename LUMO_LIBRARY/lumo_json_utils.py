@@ -1,10 +1,10 @@
 import datetime
-import os
 import json
+import os
 import pathlib
 
 import LUMO_LIBRARY.lumo_filehandler as l_files
-import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 
 
 def get_json_card_fullpath(json_filename):
@@ -20,6 +20,7 @@ def get_json_card_fullpath(json_filename):
 def read_and_get_json_data(json_filename, var_fullpath=None, is_json_card=True):
     if is_json_card:
         json_fullpath = get_json_card_fullpath(json_filename)
+
     # Else if you are reading json data that's not specifically a 'json card', i.e. settings.json
     elif var_fullpath and is_json_card == False:
         json_fullpath = var_fullpath
@@ -34,7 +35,6 @@ def read_and_get_json_data(json_filename, var_fullpath=None, is_json_card=True):
 
 
 def write_json(json_filename, json_data):
-
     json_fullpath = get_json_card_fullpath(json_filename)
 
     with open(json_fullpath, "w+") as fout:
@@ -56,25 +56,24 @@ def make_dflt_json_dict(location, category_letter, google_calendar_data=None):
     category = get_category_from_json_settings(category_letter)
 
     dict_for_json = {
-            "card location": location,
-            "card category abbreviation": category_letter.upper(),
-            "card category": category,
-            "recurring freq": 0,
-            "recurring freq time unit": None,
-            "last occurrence": None,
-            "card created": datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
-            "tags":
-                [ "default tag a"
+        "card location": location,
+        "card category abbreviation": category_letter.upper(),
+        "card category": category,
+        "recurring freq": 0,
+        "recurring freq time unit": None,
+        "last occurrence": None,
+        "card created": datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+        "tags":
+            ["default tag a"
                 , "default tag b"
                 , "default tag c"],
-            "google calender data": google_calendar_data
-        }
+        "google calender data": google_calendar_data
+    }
 
     return dict_for_json
 
 
 def flexible_json_updater(json_filename, location=None, update_category=False):
-
     if location:
         json_data = read_and_get_json_data(json_filename)
 
@@ -99,7 +98,7 @@ def rename_json_card(src_filename, dest_filename):
 
 
 def make_json_for_unpaired_card(json_filename):
-    card_fullpath = l_formatters.get_card_abspath(json_filename)
+    card_fullpath = l_card_utils.get_card_abspath(json_filename)
     loc = pathlib.Path(card_fullpath).parent.name
     abbr = json_filename[0]
 
@@ -110,4 +109,3 @@ def make_json_for_unpaired_card(json_filename):
 
 if __name__ == "__main__":
     print("Hello from main")
-

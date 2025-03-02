@@ -7,7 +7,7 @@ import sys
 
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
-import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_menus as l_menus
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 # import lumo_json_utilities as l_json_utils
@@ -49,7 +49,7 @@ def iterate_and_find(searchterm, folder):
 
 
 def reshow_match(chosen_file):
-    card = l_formatters.filename_to_card(chosen_file)
+    card = l_card_utils.filename_to_card(chosen_file)
     l_menus.prep_menu(l_menus.cardsearch_main_menu_actions)
     return card, chosen_file
 
@@ -149,7 +149,7 @@ def select_card_from_found(searchterm):
             letter_as_listindex = ord(response.lower()) - 97
 
             chosen_file = shortcut_file_matches[letter_as_listindex]
-            card = l_formatters.filename_to_card(chosen_file)
+            card = l_card_utils.filename_to_card(chosen_file)
 
             return card, chosen_file, False
 
@@ -167,9 +167,9 @@ def select_card_from_found(searchterm):
 
 def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_hotkey_list):
 
-    card_fullpath = l_formatters.get_card_abspath(var_card_filename)
+    card_fullpath = l_card_utils.get_card_abspath(var_card_filename)
 
-    l_formatters.card_header(var_card)
+    l_card_utils.card_header(var_card)
 
     l_animators.standard_interval_printer(var_hotkey_list, speed_interval=0)
     print()
@@ -208,7 +208,7 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
                 return "RELOOP", var_card_filename
 
             elif var_hotkey_dict[response.upper()] == l_menus.action_set_recurring:
-                card_title_formatted = l_formatters.format_card_title(var_card_filename.replace(".txt", ""))
+                card_title_formatted = l_card_utils.format_card_title(var_card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus.prep_newcard_menu(l_menus.recurring_menu,
                                                                        l_menus.letters_filtered,
                                                                        pop_letters=False)
@@ -220,7 +220,7 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
                 recurrence_settings = l_menus.menu_recurrence_settings(var_menu=recur_menu_d)
 
                 l_recurring.update_recurring_data(var_card_filename, recurrence_settings, initialized=True)
-                l_formatters.card_renamer(curr_name=var_card_filename
+                l_card_utils.card_renamer(curr_name=var_card_filename
                                           , dst_dir=l_files.recurring_cards_folder
                                           , dst_name=var_card_filename)
 
@@ -243,15 +243,15 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
 
 def steps_preview(card_steps, steps_amt, steps_idx):
     if 3 > steps_amt > 0:
-        initial = [f" {n} — {l_formatters.step_abbreviator(step)}" for n, step in
+        initial = [f" {n} — {l_card_utils.step_abbreviator(step)}" for n, step in
                    zip(range(1, steps_idx), card_steps[0:steps_amt])]
-        filler = [f" {n} — {step}" for n, step in zip(range(steps_idx, 4), l_formatters.default_card_steps)]
+        filler = [f" {n} — {step}" for n, step in zip(range(steps_idx, 4), l_card_utils.default_card_steps)]
         card_steps_three = initial + filler
     elif steps_amt >= 3:
-        card_steps_three = [f" {n} — {l_formatters.step_abbreviator(step)}" for n, step in
+        card_steps_three = [f" {n} — {l_card_utils.step_abbreviator(step)}" for n, step in
                             zip(range(4), card_steps[0:3])]
     else:
-        card_steps_three = [f" {n} — {step}" for n, step in l_formatters.default_card_steps]
+        card_steps_three = [f" {n} — {step}" for n, step in l_card_utils.default_card_steps]
     return card_steps_three
 
 

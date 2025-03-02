@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_filehandler as l_files
-import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_menus as l_menus
 import LUMO_LIBRARY.lumo_recurring as l_recurring
@@ -271,7 +271,7 @@ def write_card(card_filename, card_steps):
 
             elif combined_menus_dict[response.upper()] == "Make into ➝ Recurring Card":
 
-                card_title_formatted = l_formatters.format_card_title(card_filename.replace(".txt", ""))
+                card_title_formatted = l_card_utils.format_card_title(card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus.prep_newcard_menu(l_menus.recurring_menu,
                                                                        l_menus.letters_filtered,
                                                                        pop_letters=False)
@@ -354,7 +354,7 @@ def card_menu_loop(result_card, result_path):
                                                            var_hotkey_dict=hotkey_dict,
                                                            var_hotkey_list=hotkey_list)
     while status == "RELOOP":
-        card = l_formatters.filename_to_card(return_path)
+        card = l_card_utils.filename_to_card(return_path)
         status, return_path = l_search.cardsearch_main_options(var_card=card,
                                                                var_card_filename=return_path,
                                                                var_hotkey_dict=hotkey_dict,
@@ -426,7 +426,7 @@ def main(card_category=None, card_title=None, from_lumo_menu=False):
         return
     else: # status == "CREATED CARD":
         card_path = os.path.basename(possible_card_abspath)
-        card = l_formatters.filename_to_card(card_path)
+        card = l_card_utils.filename_to_card(card_path)
         card_menu_loop(card, card_path)
 
 if __name__ == "__main__":

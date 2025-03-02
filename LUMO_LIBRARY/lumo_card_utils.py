@@ -1,17 +1,17 @@
 import os
-import re
 import pathlib
+import re
 import sys
+
 import send2trash
 
+import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
-import LUMO_LIBRARY.lumo_animationlibrary as l_animators
-
 
 default_card_steps = ["..."
-                     ,"..."
-                     ,"..."]
+    , "..."
+    , "..."]
 
 
 def card_header(var_card):
@@ -36,7 +36,6 @@ def step_abbreviator(var_step):
 
 
 def steps_preview(card_steps, steps_amt, steps_idx):
-
     if 0 < steps_amt < 3:
 
         initial = [f" {n} — {step_abbreviator(step)}" for n, step in
@@ -82,7 +81,8 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
     if l_files.proceed("  Type 'cancel' to stop or press any key to continue > "):
         os.rename(source, dest)
         l_json_utils.rename_json_card(src_filename=curr_name, dest_filename=dst_name)
-        l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name, update_category=category_change)
+        l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name,
+                                           update_category=category_change)
 
 
 def card_deleter(card_filename):
@@ -131,6 +131,43 @@ def near_focus_to_archive(card_filename):
     source = os.path.join(l_files.cards_near_folder, card_filename)
     dest = os.path.join(l_files.archived_cards_folder, card_filename)
     os.rename(source, dest)
+
+
+def check_unpaired_cards():
+    txt_cards = l_files.get_all_cards()
+    json_cards = l_files.get_all_json_cards()
+
+    unique_txts = txt_cards.difference(json_cards)
+    unique_jsons = json_cards.difference(txt_cards)
+
+    if unique_txts:
+        print(f"{len(unique_txts)} unique .txt file found:\n")
+
+        for u in unique_txts:
+            print(f"  {u}.txt", end=" ")
+            response = input("——> [D]elete this or [C]reate .json files to pair it? >  ")
+            if response.lower() == 'd':
+                card_fullpath = get_card_abspath(f"{u}.txt")
+                send2trash.send2trash(card_fullpath)
+            elif response.lower() == 'c':
+                pass
+            else:
+                print("        (You skipped this card for now.)")
+
+    print()
+    if unique_jsons:
+        print(f"{len(unique_jsons)} unique .json file found:\n")
+
+        for u in unique_jsons:
+            print(f"  {u}.json", end=" ")
+            response = input("——> [D]elete this or [C]reate .txt files to pair it? >  ")
+            if response.lower() == 'd':
+                json_fullpath = l_json_utils.get_json_card_fullpath(f"{u}.json")
+                send2trash.send2trash(json_fullpath)
+            elif response.lower() == 'c':
+                pass
+            else:
+                print("        (You skipped this card for now.)")
 
 
 def cycler(list_of_steps):
@@ -193,7 +230,7 @@ def camel_case_separator(card_filename):
 
     for n in range(len(breaks) - 1):
         start = breaks[n]
-        stop = breaks[n+1]
+        stop = breaks[n + 1]
 
         card_name += "{} ".format(card_filename[start:stop])
 
@@ -216,7 +253,6 @@ def camel_case_separator_b(card_filename):
         word = card_filename[start:stop]
         initial_group.append(word)
 
-
     additions = recursive_parser(initial_group)
 
     card_name = " ".join(additions)
@@ -224,7 +260,6 @@ def camel_case_separator_b(card_filename):
     if first_nums:
         updated_card_name = f"{first_nums.group()} {card_name}"
         return updated_card_name
-
 
     return card_name
 
@@ -328,3 +363,4 @@ def test_for_float(text):
 
 if __name__ == "__main__":
     print("Hello from main")
+    check_unpaired_cards()

@@ -1,24 +1,22 @@
-import os
-import datetime
-import subprocess
 import calendar
-
+import datetime
+import os
+import subprocess
 from pprint import pprint as pp
 
 import dateutil.tz
 from dateutil.relativedelta import relativedelta
-
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-import LUMO_LIBRARY.lumo_filehandler as l_files
-import LUMO_LIBRARY.lumo_formatters as l_formatters
-import LUMO_LIBRARY.lumo_newcard_refactor as l_newcard
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
+import LUMO_LIBRARY.lumo_newcard_refactor as l_newcard
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 creds_file = os.path.join(l_files.credentials_folder, "credentials.json")
@@ -56,9 +54,8 @@ def get_google_event_by_id(credentials, id):
     try:
         service = build("calendar", "v3", credentials=credentials)
 
-
         event_result = (service.events().get(
-              calendarId="primary"
+            calendarId="primary"
             , eventId=id)
                         .execute())
 
@@ -75,8 +72,7 @@ def get_google_events(credentials, time_min, time_max):
         service = build("calendar", "v3", credentials=credentials)
 
         start = datetime.datetime(year=time_min.year, month=time_min.month, day=time_min.day).isoformat() + "Z"
-        end   = datetime.datetime(year=time_max.year, month=time_max.month, day=time_max.day).isoformat() + "Z"
-
+        end = datetime.datetime(year=time_max.year, month=time_max.month, day=time_max.day).isoformat() + "Z"
 
         event_result = service.events().list(
             calendarId="primary",
@@ -148,7 +144,7 @@ def delete_calendar_card(credentials, card_filename):
 
     delete_event_from_google(credentials, calendar_card_id)
 
-    l_formatters.card_deleter(card_filename)
+    l_card_utils.card_deleter(card_filename)
 
     l_animators.animate_text("The card was deleted from the external (Google) calendar.")
     l_animators.animate_text("This Lumo card is deleted.")
@@ -180,7 +176,6 @@ def standard_to_military(standard_time):
 
 
 def percenter(percentage, number):
-
     perc_as_dec = percentage / 100
     return round(number * perc_as_dec)
 
@@ -279,7 +274,6 @@ def get_local_calendar_cards(window_start, window_end):
 
     return calendar_cards_found
 
-
     # start time > specified start and start time < specified end
 
 
@@ -298,11 +292,11 @@ def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
 
     window = fill_time_window_dates(window_start, window_end)
     for date in window:
-       """Transform whatever events are found from Google into a full list where every day has a placeholder
-        Adds an empty list if no Google events exist for date."""
-       matched_events = [e for e in converted_events if e[0] == date]
-       day_block = DayBlock.from_date(date, matched_events)
-       expanded_events.append(day_block)
+        """Transform whatever events are found from Google into a full list where every day has a placeholder
+         Adds an empty list if no Google events exist for date."""
+        matched_events = [e for e in converted_events if e[0] == date]
+        day_block = DayBlock.from_date(date, matched_events)
+        expanded_events.append(day_block)
 
     return expanded_events
 
@@ -318,6 +312,7 @@ class DayBlock:
         # self.event_2 = DayBlock.list_safe_idx_get(self.events, 1, "--- --- ---")
         # self.event_3 = DayBlock.list_safe_idx_get(self.events, 2, "--- --- ---")
 
+
     @classmethod
     def from_date(cls, var_datetime, events):
         day = var_datetime.day
@@ -326,6 +321,7 @@ class DayBlock:
         date = var_datetime
 
         return DayBlock(day, dayname, date, events)
+
 
     @staticmethod
     def list_safe_get_item(var_list, idx):
@@ -348,19 +344,23 @@ class CalendarPageDay:
 
     line = ("-" * content_width)
 
+
     def __init__(self, var_dayblock):
         self.header_date = CalendarPageDay.format_date_for_header(var_dayblock.date)
         self.events = var_dayblock.events
+
 
     @staticmethod
     def format_date_for_header(var_date):
         formatted = datetime.date.strftime(var_date, "%A: %B %d, %Y")
         return formatted
 
+
     def row_cal_header(self):
         print("{0:^{width}}\n".format(self.header_date.upper(), width=CalendarPageDay.total_width))
         print("{0:^{width}}".format(CalendarPageDay.line, width=CalendarPageDay.total_width))
         print()
+
 
     @staticmethod
     def _row_style_2(var_sel, var_event, var_start_t, var_end_t):
@@ -370,6 +370,7 @@ class CalendarPageDay:
 
         group = selector + event + time
         print("{0:^{width}}\n".format(group, width=CalendarPageDay.total_width))
+
 
     def display_day(self):
         start, end = (self.events[0][2], self.events[0][3]) if self.events else ("     ", "     ")
@@ -408,6 +409,7 @@ class CalendarPageWeek:
         self.day_blocks = week_of_day_blocks
         self.header_date = CalendarPageWeek.get_header_date(week_of_day_blocks)
 
+
     @staticmethod
     def get_header_date(var_week_block):
         bucket_1 = []
@@ -431,11 +433,13 @@ class CalendarPageWeek:
         header_month = (calendar.Month(month_int).name)
         return header_month
 
+
     def cal_header(self):
         print()
         # print("{0:^{width}}".format(CalendarPageDay.line, width=CalendarPageWeek.total_width))
         print("{0:^{width}}".format(self.header_date, width=CalendarPageWeek.total_width))
         print()
+
 
     @staticmethod
     def row_style_days(dates):
@@ -443,10 +447,10 @@ class CalendarPageWeek:
         dt_1_frmt = "{:02d}".format(dt_1)
         dt_2_frmt = "{:02d}".format(dt_2)
 
-
         print("{0:-<{width}}".format(dt_1_frmt, width=CalendarPageWeek.COL_WIDTH)
               , CalendarPageWeek.COL_SPACER
               , "{0:-<{width}}".format(dt_2_frmt, width=CalendarPageWeek.COL_WIDTH))
+
 
     @staticmethod
     def row_style_daynames(daynames):
@@ -456,9 +460,11 @@ class CalendarPageWeek:
               , CalendarPageWeek.COL_SPACER
               , "{0:-<{width}}".format(dayname_2, width=CalendarPageWeek.COL_WIDTH))
 
+
     @staticmethod
     def line_break():
         print()
+
 
     @staticmethod
     def row_style_event(event_1, event_2):
@@ -467,18 +473,18 @@ class CalendarPageWeek:
         summary_1, time_1 = event_1
         summary_2, time_2 = event_2
 
+        print("{0:-<{width}}".format(summary_1, width=summary_width), time_1
+              , CalendarPageWeek.COL_SPACER
+              , "{0:-<{width}}".format(summary_2, width=summary_width), time_2)
 
         print("{0:-<{width}}".format(summary_1, width=summary_width), time_1
               , CalendarPageWeek.COL_SPACER
-              ,"{0:-<{width}}".format(summary_2, width=summary_width), time_2)
+              , "{0:-<{width}}".format(summary_2, width=summary_width), time_2)
 
         print("{0:-<{width}}".format(summary_1, width=summary_width), time_1
               , CalendarPageWeek.COL_SPACER
-              ,"{0:-<{width}}".format(summary_2, width=summary_width), time_2)
+              , "{0:-<{width}}".format(summary_2, width=summary_width), time_2)
 
-        print("{0:-<{width}}".format(summary_1, width=summary_width), time_1
-              , CalendarPageWeek.COL_SPACER
-              ,"{0:-<{width}}".format(summary_2, width=summary_width), time_2)
 
     @staticmethod
     def row_style_addnl_events(addnl_events_indicators):
@@ -491,15 +497,18 @@ class CalendarPageWeek:
               , CalendarPageWeek.COL_SPACER
               , "{0:>{width}}".format(formatted_text_2, width=CalendarPageWeek.COL_WIDTH))
 
+
     @staticmethod
     def half_row_style_day(day):
         day_frmt = "{:02d}".format(day)
 
         return "{0:<{width}}".format(day_frmt, width=CalendarPageWeek.COL_WIDTH)
 
+
     @staticmethod
     def half_row_style_dayname(dayname):
         return "{0:-<{width}}".format(dayname, width=CalendarPageWeek.COL_WIDTH)
+
 
     @staticmethod
     def half_row_style_addnl_events(num):
@@ -507,11 +516,13 @@ class CalendarPageWeek:
 
         return "{0:>{width}}".format(formatted_text, width=CalendarPageWeek.COL_WIDTH)
 
+
     @staticmethod
     def half_row_style_editor_header():
         editor_header = "EDITING--02-DEC-2025"
         editor_header_formatted = "{0:-^{width}}".format(editor_header, width=CalendarPageWeek.COL_WIDTH)
         return editor_header_formatted
+
 
     @staticmethod
     def half_row_style_event(event):
@@ -523,17 +534,21 @@ class CalendarPageWeek:
 
         return "{0:<{width}}".format(summary, width=summary_width) + times
 
+
     @staticmethod
     def half_row_style_line_break():
         return "{0:<{width}}".format("", width=CalendarPageWeek.COL_WIDTH)
+
 
     @staticmethod
     def half_row_style_line():
         return "{0:-<{width}}".format("", width=CalendarPageWeek.COL_WIDTH)
 
+
     @staticmethod
     def half_row_style_menu(menu_item):
         return "  {0:<{width}}".format(menu_item, width=CalendarPageWeek.COL_WIDTH - 2)
+
 
     @staticmethod
     def make_editor_block():
@@ -545,14 +560,16 @@ class CalendarPageWeek:
         menu_3 = CalendarPageWeek.half_row_style_menu("[C]  Go back")
         menu_4 = CalendarPageWeek.half_row_style_menu("[X]  Exit")
 
-        return [ br
-                ,header
-                ,summary
-                ,br
-                ,menu_1, menu_2, menu_3
-                ,br
-                ,menu_4
+        return [br
+            , header
+            , summary
+            , br
+            , menu_1, menu_2, menu_3
+            , br
+            , menu_4
                 ]
+
+
     @staticmethod
     def format_day_block(day_block):
         event_1 = DayBlock.list_safe_get_item(day_block.events, 0)
@@ -567,19 +584,21 @@ class CalendarPageWeek:
         event_3_row = CalendarPageWeek.half_row_style_event(event_3)
         addl_events = CalendarPageWeek.half_row_style_addnl_events(3)
 
-        return [ day
-                ,dayname
-                ,br
-                ,event_1_row, event_2_row, event_3_row
-                ,br
-                ,addl_events
-                ,br]
+        return [day
+            , dayname
+            , br
+            , event_1_row, event_2_row, event_3_row
+            , br
+            , addl_events
+            , br]
+
 
     @staticmethod
     def block_zipper(block_1, block_2):
         for l1, l2 in zip(block_1, block_2):
             line = l1 + CalendarPageWeek.COL_SPACER + l2
             print("{0:^{width}}".format(line, width=CalendarPageWeek.total_width))
+
 
     def display_week(self):
         subprocess.run(["clear"], shell=True)
@@ -602,15 +621,13 @@ class CalendarPageWeek:
         CalendarPageWeek.line_break()
 
 
-
-
-
 if __name__ == "__main__":
     print("Hello from main")
     creds = get_creds()
 
     start, end = get_time_window_2(today_date, 8)
     get_local_calendar_cards(start, end)
+
 
     # delete_calendar_card(creds, "A_SingleEvent.txt")
 
@@ -683,6 +700,7 @@ if __name__ == "__main__":
         title = f"A_{title}"
 
         l_newcard.write_calendar_card_and_json(title, l_files.cards_calendar_folder, google_data, details_as_list)
+
 
     make_local_card_from_google()
 

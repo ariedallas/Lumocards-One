@@ -2,16 +2,16 @@ import math
 
 from dateutil.relativedelta import relativedelta
 
-from LUMO_LIBRARY.lumo_calendar_utils import (
-    CalendarPageDay
-, CalendarPageWeek
-, get_day_blocks
-, get_time_window_2
-, parse_brackets
-, get_adjacent_month
-, today_date
-, curr_year
-, curr_month)
+from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
+                                              CalendarPageWeek,
+                                              curr_month,
+                                              curr_year,
+                                              get_adjacent_month,
+                                              get_day_blocks,
+                                              get_time_window_2,
+                                              parse_brackets,
+                                              today_date
+                                              )
 
 
 class CalendarInterface:

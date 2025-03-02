@@ -6,7 +6,7 @@ import sys
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
-import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_cardsdisplay_boxformatter as l_boxify
 import LUMO_LIBRARY.lumo_menus as l_menus
 
@@ -38,7 +38,7 @@ def cards_intro():
 
 
 def add_step_via_integers(card_steps, card_title, response_filtered):
-    selected_integers = l_formatters.add_multiple_steps_from_card(response_filtered)
+    selected_integers = l_card_utils.add_multiple_steps_from_card(response_filtered)
     total_cards = len(card_steps)
     selected_integers_filtered = [num for num in selected_integers if (0 < int(num) <= total_cards)]
     for card_step in selected_integers_filtered:
@@ -56,7 +56,7 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
     card_title, card_steps = card[0], card[1]
 
     response = input("    \n> ")
-    response_filtered = l_formatters.add_blank_space(response)
+    response_filtered = l_card_utils.add_blank_space(response)
 
     # ---- START OF MAIN IF/ELIF ---- #
 
@@ -102,7 +102,7 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
 
 
         elif route == 'edit':
-            card_fullpath = l_formatters.get_card_abspath(card_filename)
+            card_fullpath = l_card_utils.get_card_abspath(card_filename)
             l_animators.animate_text((l_menus.hotkey_feedback[response_filtered.lower()][0]))
             subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
 
@@ -143,7 +143,7 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
     card_title, card_steps = card[0], card[1]
 
     response = input("    \n> ")
-    response_filtered = l_formatters.add_blank_space(response)
+    response_filtered = l_card_utils.add_blank_space(response)
 
 
     # ---- START OF MAIN IF/ELIF ---- #
@@ -226,9 +226,9 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
 
 def cardsrun_macro_menu(card_filename, card, hkey_dict, hkey_list):
 
-    card_fullpath = l_formatters.get_card_abspath(card_filename)
+    card_fullpath = l_card_utils.get_card_abspath(card_filename)
 
-    l_formatters.card_header(card)
+    l_card_utils.card_header(card)
 
     l_animators.standard_interval_printer(hkey_list, speed_interval=0)
     print()
@@ -271,7 +271,7 @@ def cardsrun_macro_menu(card_filename, card, hkey_dict, hkey_list):
                 return "CARD REFOCUSED", None
 
             elif hkey_dict[response.upper()] == l_menus.action_set_recurring:
-                card_title_formatted = l_formatters.format_card_title(card_filename.replace(".txt", ""))
+                card_title_formatted = l_card_utils.format_card_title(card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus.prep_newcard_menu(l_menus.recurring_menu,
                                                                        l_menus.letters_filtered,
                                                                        pop_letters=False)
@@ -283,7 +283,7 @@ def cardsrun_macro_menu(card_filename, card, hkey_dict, hkey_list):
                 recurrence_settings = l_menus.menu_recurrence_settings(var_menu=recur_menu_d)
 
                 l_recurring.update_recurring_data(card_filename, recurrence_settings, initialized=True)
-                l_formatters.card_renamer(curr_name=card_filename
+                l_card_utils.card_renamer(curr_name=card_filename
                                           , dst_dir=l_files.recurring_cards_folder
                                           , dst_name=card_filename)
 
@@ -314,7 +314,7 @@ def iterate_cards(var_list_cards, mode):
         card_no = idx + 1
         card_counter_feedback_text = "Card ({}) of ({})".format(card_no, total_cards).upper()
 
-        card = l_formatters.filename_to_card(card_path)
+        card = l_card_utils.filename_to_card(card_path)
 
         l_animators.standard_interval_printer(["", card_counter_feedback_text], speed_interval=0)
         l_boxify.display_card(card)
@@ -389,7 +389,7 @@ def update_cards():
 
         if l_files.proceed("> "):
             for card in archived_cards:
-                l_formatters.near_focus_to_archive(card)
+                l_card_utils.near_focus_to_archive(card)
 
 
     if len(deleted_cards) > 0:
@@ -399,7 +399,7 @@ def update_cards():
 
         if l_files.proceed("> "):
             for card in deleted_cards:
-                l_formatters.card_deleter(card)
+                l_card_utils.card_deleter(card)
 
     if not l_files.exists_planner_file():
         l_animators.animate_text("Creating Planner file for today...")

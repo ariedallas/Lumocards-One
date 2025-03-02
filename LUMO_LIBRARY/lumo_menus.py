@@ -1,7 +1,7 @@
 import string
 
 import LUMO_LIBRARY.lumo_filehandler as l_files
-import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 import LUMO_LIBRARY.lumo_newcard_refactor as l_newcard
@@ -193,7 +193,7 @@ def prep_card_run_menu(actions_list):
 
 
 def prep_card_modify_menu(actions_list, card_filename):
-    current_focus = l_formatters.get_card_focus(card_filename)
+    current_focus = l_card_utils.get_card_focus(card_filename)
 
     hotkey_dict = {}
 
@@ -230,7 +230,7 @@ def menu_recurrence_settings(var_menu):
         units = var_menu[response.upper()]
         response = input(f"  Select a number of {units}? e.g. '2' > ")
 
-        if not l_formatters.test_for_float(response):
+        if not l_card_utils.test_for_float(response):
             print()
             print(f"  It's gotta be just a number")
             continue
@@ -260,19 +260,19 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
 
             if var_hotkey_dict[response.upper()] == action_set_near:
                 l_recurring.remove_recurring_data(json_filename=selected_card)
-                l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_near_folder, dst_name=selected_card)
+                l_card_utils.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_near_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card set to ➝ Near Focus")
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == action_set_middle:
                 l_recurring.remove_recurring_data(json_filename=selected_card)
-                l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_middle_folder, dst_name=selected_card)
+                l_card_utils.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_middle_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card set to ➝ Middle Focus")
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == action_set_dist:
                 l_recurring.remove_recurring_data(json_filename=selected_card)
-                l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_dist_folder, dst_name=selected_card)
+                l_card_utils.card_renamer(curr_name=selected_card, dst_dir=l_files.cards_dist_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card set to ➝ Distant Focus")
                 return "CARD REFOCUSED", None
 
@@ -280,17 +280,17 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
                 retitled_card_path = l_newcard.get_card_from_input()
                 print()
                 # l_animators.animate_text(f"  Card will been renamed from '{selected_card}' → '{retitled_card_path}'")
-                l_formatters.card_renamer(curr_name=selected_card, dst_name=retitled_card_path)
+                l_card_utils.card_renamer(curr_name=selected_card, dst_name=retitled_card_path)
                 return None, retitled_card_path
 
             elif var_hotkey_dict[response.upper()] == action_archive:
                 l_recurring.remove_recurring_data(json_filename=selected_card)
-                l_formatters.card_renamer(curr_name=selected_card, dst_dir=l_files.archived_cards_folder, dst_name=selected_card)
+                l_card_utils.card_renamer(curr_name=selected_card, dst_dir=l_files.archived_cards_folder, dst_name=selected_card)
                 l_animators.animate_text("  Card Archived")
                 return None, None
 
             elif var_hotkey_dict[response.upper()] == action_delete:
-                l_formatters.card_deleter(selected_card)
+                l_card_utils.card_deleter(selected_card)
                 return "DELETED CARD", None
 
             elif var_hotkey_dict[response.upper()] == action_mark_delete:

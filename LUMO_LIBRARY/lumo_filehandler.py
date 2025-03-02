@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import os
 import pathlib
 import time
@@ -88,6 +89,24 @@ def get_json_settings():
     json_settings = l_json_utils.read_and_get_json_data(json_filename=None, var_fullpath=settings_fullpath,
                                                         is_json_card=False)
     return json_settings
+
+
+def get_all_json_cards():
+    all_json_cards = set([c[:-5] for c in os.listdir(json_cards_folder)])
+    return all_json_cards
+
+def get_all_cards():
+    all_txt_cards =  set(itertools.chain(
+    [l[:-4] for l in os.listdir(cards_near_folder)],
+    [l[:-4] for l in os.listdir(cards_middle_folder)],
+    [l[:-4] for l in os.listdir(cards_dist_folder)],
+    [l[:-4] for l in os.listdir(cards_calendar_folder)],
+
+    [l[:-4] for l in os.listdir(checklist_cards_folder)],
+    [l[:-4] for l in os.listdir(recurring_cards_folder)],
+    [l[:-4] for l in os.listdir(archived_cards_folder)],
+))
+    return all_txt_cards
 
 
 def basic_wrtr(content, card_fullpath):

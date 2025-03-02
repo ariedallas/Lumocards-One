@@ -1,8 +1,8 @@
-import LUMO_LIBRARY.lumo_formatters as l_formatters
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 
 
 def display_card(var_card, display_qty=6, length=50, height=10):
-    f_card_name = l_formatters.format_card_title(var_card[0])
+    f_card_name = l_card_utils.format_card_title(var_card[0])
     todo_items = var_card[1]
 
     print("|" + ("•" * length) + "|")
