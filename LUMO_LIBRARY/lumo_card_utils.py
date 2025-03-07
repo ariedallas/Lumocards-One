@@ -133,7 +133,10 @@ def near_focus_to_archive(card_filename):
     os.rename(source, dest)
 
 
-def check_unpaired_cards():
+def clean_cards():
+    """Check to make sure that each .txt card is coupled with a .json card
+    If not, ask the user to make either a .txt or .json file to pair
+    or delete the solo card."""
     txt_cards = l_files.get_all_cards()
     json_cards = l_files.get_all_json_cards()
 
@@ -356,4 +359,4 @@ def test_for_float(text):
 
 if __name__ == "__main__":
     print("Hello from main")
-    check_unpaired_cards()
+    clean_cards()
