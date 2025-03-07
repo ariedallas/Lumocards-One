@@ -170,13 +170,6 @@ def check_unpaired_cards():
                 print("        (You skipped this card for now.)")
 
 
-def cycler(list_of_steps):
-    for item in list_of_steps:
-        result = l_files.proceed(item)
-        if not result:
-            sys.exit(0)
-
-
 def format_card_title(card_filename):
     try:
         subbed_underscores = card_filename.replace("_", " ")

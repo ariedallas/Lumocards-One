@@ -31,6 +31,8 @@ credentials_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_CREDENTIALS")
 
 sounds_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_SOUNDS")
 
+settings_fullpath = os.path.join(rootpath, 'SUPPORT_FILES/settings.json')
+
 # ---TIME--- #
 today = datetime.datetime.today()
 now = datetime.datetime.now().isoformat() + "Z"

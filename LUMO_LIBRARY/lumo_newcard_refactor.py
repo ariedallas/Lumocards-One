@@ -300,7 +300,8 @@ def write_card(card_filename, card_steps):
             return "RELOOP", None
 
         elif response.lower() == "q":
-            l_animators.animate_text("  Quit Lumo: New Card", finish_delay=.4)
+            print()
+            l_animators.animate_text("  Quit Lumo: New Card", finish_delay=.5)
             return "QUIT", None
 
         else:
@@ -398,7 +399,6 @@ def write_calendar_card_and_json(card_filename, folder, google_calendar_data, ad
     return formatted_card_fullpath, json_fullpath
 
 def program_header():
-    print()
     print("NEW CARD")
     print()
     for k, v in settings.get('card categories').items():

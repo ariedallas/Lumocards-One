@@ -118,7 +118,7 @@ def select_card_from_found(searchterm):
         return None, None, False
 
     if total_amt_matches == 0:
-        print(f"No matches found for your term \'{searchterm}\'... ")
+        l_animators.animate_text(f"No matches found for your term \'{searchterm}\'... ", finish_delay=.5)
         return None, None, False
 
     if len(all_matches_formatted[5]) > 1:
@@ -260,8 +260,6 @@ def main(initial_search_term=None):
     return_path = None
 
     while True:
-        print()
-
         if status == "INITIAL SEARCH":
             print(f"{status}: '{initial_search_term}'")
             card, matched_path, user_quit = select_card_from_found(initial_search_term)
@@ -282,6 +280,9 @@ def main(initial_search_term=None):
             status, return_path = cardsearch_main_options(card, return_path, hotkey_dict, hotkey_list)
 
         elif status == "NEW SEARCH":
+            if initial_search_term:
+                print()
+
             print(status)
             response = input(
                 "\n"                
@@ -302,7 +303,8 @@ def main(initial_search_term=None):
 
 
         else: # status == "QUIT"
-            l_animators.animate_text("Quit Lumo: Search", finish_delay=.4)
+            print()
+            l_animators.animate_text("Quit Lumo: Search", finish_delay=.5)
             break
 
 

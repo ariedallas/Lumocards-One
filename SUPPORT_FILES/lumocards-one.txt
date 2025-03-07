@@ -1,16 +1,15 @@
 :::::NEXT:::::
-	- setup basic routes
-		- pomodoro has bug with floats
-		- lumo ::all::
-		
-		- micro shortcut for shift, space and 
-		- figure out micro shortcuts for enter+shift etc. 
-		- software updates to linux
+	- complete checklist loop / menu
+	- show 'quit feedback' for each program
+	- make the pomodoro actually be an option, design on whiteboard
+
+	- CODE READING> can I run GCALCLI modeuls? 
+	
+	- reintegrate Arie's version with Lumocards-One
 
 		
 :::::NEXT LVL 2:::::
 	
-	- figure out quit error when you loop through multiple programs
 
 	- integrate all routes
 		- remove unnecessary print() from beginning of sub-program's main()
@@ -20,15 +19,11 @@
 
 		
 	- pip install -e my project
-		- create argparser basics
-		- setup .toml file etc.
 		- ref 'IMPORTS'
 		- setup entry point script
 		- clone to 'ARIE'
 		- basic .toml file
-		-commit
 
-	- reintegrate Arie's version with Lumocards-One
 
 	**  put tape on my keyboard for better finding of l ctrl and alt.
 			
@@ -53,6 +48,7 @@
 		- DESIGN PATTERNS
 		- HITCHHIKER'S GUIDE TO PYTHON
 
+
 :::::SCHEDULE / CALENDAR:::::
 	- CREATION:
 		- user can schedule cards
@@ -73,6 +69,7 @@
 
 		- should selecting an event  on the chosen day show a new screen when editing?
 			- I think so, but we can do it both ways to see...
+
 
 	- REPEATING EVENTS:
 		
@@ -157,6 +154,7 @@
 
 	FUNCTIONALITY / FEATURES:
 		--  at some point accomodate .ics files?
+		-- localized times etc. 
 
 	TESTING / EDGE CASES:
 		- how the fuck do I test this thoroughly?
@@ -174,20 +172,33 @@
 		--  see if you can have someone look at your code?
 		--  difference of 'case' vs. 'elif/if'
 		--  look into python generator?? for pomodoro?
+		--  unify the variable name for the result of input() i.e. response, rsp, etc. 
+		--  what is the indentation setting rule for all programs in Lumo?
 		
 	ANIMATIONS:
 		- get coherent and consistent system / rules
 		- when you xsition back from a sub program to main menu, do ... loader transition
 
 	LUMO HOME MENU:
+		- at some point chance ALL_MENU and MAIN_MENU to be constructed with zipping letters rather than hardcoding.
+		- gracefull inform user if the command line arguments after 'lumo' are unrecognized
+		- inform user of options with unrecognized inputs in the home menu
+
+		- implement 'fuzzy' find for command lind args, i.e. 'checklists' or 'routine' should map to 'checklist in parser
+	 	- make sure there is something for the :: about :: section in __main__
+	 		- print the version info or something | should I have a _version.py file?
+	 	- :: tutorial :: section?
 		- support parsing actions like typing 'Lumo newcard A mycard' or 'Lumo search blah'
 		- if they type in 'lumo' ignore it and just parse the rest
 		- have flexible defaults for errors in parsing
 
 		- search 'exit' vs. 'quit'
 
-	MENUS:
-		--  at some point, make sure that the menus give you decent pathways for setting calendar events (make sure refactor works with added folder CARDS_D_CALENDAR)
+	 MENUS:
+ 		- at some point, make sure that the menus give you decent pathways for setting calendar events (make sure refactor works with added folder CARDS_D_CALENDAR)
+		- dict comprehensions / print formatting from dicts
+		- what about an option for delete menu for multiple cards?
+		- "help" menu for all sub-programs like pomodoro help, calendar help, etc. subparser.add_argument "help"
 
 	CARDSRUN:
 	    --  When you type 'back' on Near Cards / Cardsrun / Planner it shows the previous card that has moved
@@ -206,16 +217,20 @@
 		--  can lumocards have a version where it shows in paren() the location of the found card when it's previewing the card from the 1...2...3... menu?
 		--  issue with how after you 'show full' card if you try to edit it, it won't work?
 		
-
+	CHECKLIST:
+	 	--  move cycler() to checklist; it's in card_utils.py right now
+	 	--  what if you have more than 24 checklists?
+		--  how does the user edit the essentials and the errands checklist card inside lumo?
+			- can this be abstracted so that they can choose if a certain card always gets asked to run?   	
+			- same thing for a card that runs each time in the begginning?
+		--  option to make a new checklist card from the checklist menu
+		--  option to edit essentials card and errands card from checklist menu
+		--  do the TODO's on that file
+		
 	NEWCARD:
 		--  should there be an option to make a newcard after making a newcard?
 		--  is it possible that the format could be cardname then optional card category
 			- could it support leaving off the category so that it prompts user depending on context to add one or not?
-
-	 MENUS:
-		- dict comprehensions / print formatting from dicts
-		- what about an option for delete menu for multiple cards?
-		- "help" menu for all sub-programs like pomodoro help, calendar help, etc. 
 
 	SOUNDS:
 		--  cross platform???
@@ -226,6 +241,7 @@
 		- demo video
 		- homebrew?
 		- see all the ways the micro can be installed
+		- should install be like other programs with ~/.config
 		-intro to explain settings
 		-explain to users what kinds of cards there are and how they work
 		-introduction feature to have user set up caterogires, one at a time
@@ -264,7 +280,9 @@
 		- should there be an interface to work with settings?
 		- settings feature for updating the names of categories
 		- lumo_install.sh should be able to set up a calendar credentials, or guide people
-		- export something like usr/bin/lumo
+
+		- checklist settings: can this be abstracted so that they can choose if a certain card always gets asked to run?   	
+		- checklist settings: same thing for a card that runs each time in the begginning?
 
 
 

@@ -356,11 +356,11 @@ def card_menu_loop(result_card, result_path):
                                                                    var_hotkey_list=hotkey_list)
     else:
         print()
-        l_animators.animate_text("Quit Lumocards: New Card")
+        l_animators.animate_text("Quit Lumo: New Card", finish_delay=.5)
         sys.exit(0)
 
     print()
-    l_animators.animate_text("Quit Lumocards: New Card")
+    l_animators.animate_text("Quit Lumo: New Card", finish_delay=.5)
 
 
 def main():

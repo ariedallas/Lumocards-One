@@ -416,8 +416,12 @@ def update_cards():
     l_animators.animate_text("This round of cards has completed.")
     print()
 
+def program_header():
+    print("PLANNER")
+    print()
 
 def main():
+    program_header()
     cards_intro()
 
     while True:

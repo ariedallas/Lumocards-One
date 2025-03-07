@@ -10,11 +10,18 @@ selected_sound = os.path.join(l_files.sounds_folder, "block.mp3")
 
 
 def get_input_to_mins():
-    var_mins = input("Set timer for how many minutes? >  ")
+    var_mins = input("  Set timer for how many minutes? >  ")
     return var_mins
 
 
+def program_header():
+    print("TIMER / POMODORO")
+    print()
+
+
 def main(var_mins=None):
+    program_header()
+
     if not var_mins:
         var_mins = get_input_to_mins()
 
@@ -24,13 +31,13 @@ def main(var_mins=None):
             break
 
         except ValueError as e:
-            l_animators.animate_text("Try using justs numbers (decimals OK)")
-            var_mins = input("Try again? >  ")
+            print()
+            l_animators.animate_text("  Try using just numbers (decimals OK)")
+            var_mins = input("  >  ")
 
     time_in_secs = int((float_mins * 60))
 
-    print()
-    print("{} minute timer started".format(float_mins))
+    print("  {} minute timer started".format(float_mins), end="\n  ")
     subprocess.run(f'pw-play {selected_sound}', shell=True)
 
     for x in range(time_in_secs):
@@ -51,10 +58,12 @@ def main(var_mins=None):
         print(f"  {blinker}", end="    \r")
         time.sleep(.6)
 
-    print("Done")
+    print("  Done")
     for n in range(3):
         subprocess.run(f'pw-play {selected_sound}', shell=True)
 
+    print()
+    l_animators.animate_text(f"  Quit Lumo: Pomodoro", finish_delay=.5)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

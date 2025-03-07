@@ -2,6 +2,7 @@ import datetime
 import os
 import string
 import subprocess
+import time
 
 import LUMO_LIBRARY.lumo_filehandler as l_files
 
@@ -31,7 +32,14 @@ def get_or_make_journal():
     else:
         make_journal_file()
 
+def program_header():
+    print("JOURNAL")
+    print()
+    time.sleep(.5)
+
+
 def main():
+    program_header()
     get_or_make_journal()
     subprocess.run([f"{settings.get("text editor")} +9999999 {journal_abspath}"], shell=True)
 

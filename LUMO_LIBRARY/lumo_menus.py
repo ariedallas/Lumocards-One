@@ -6,8 +6,8 @@ import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 import LUMO_LIBRARY.lumo_newcard_refactor as l_newcard
 
-letters = string.ascii_lowercase
-letters_filtered = [l.upper() for l in letters if not (l == 'q') and not (l == 'x')]
+letters = string.ascii_uppercase
+letters_filtered = [l for l in letters if not (l == 'Q') and not (l == 'X')]
 
 completed_hotkey_feedback_phrases = [
     "Nice Job!"
@@ -72,10 +72,11 @@ action_newsearch = "New search"
 action_retitle = "Rename card"
 action_retitle_B = "Retitle + Change Category card"
 
-action_exit_menu = "➝ Exit Menu"
-action_start_over = "➝ Start Over"
-action_cancel = "➝ Cancel"
-action_quit = "➝ Quit"
+action_exit_menu = "Exit Menu"
+action_simple_exit = "Exit"
+action_start_over = "Start Over"
+action_cancel = "Cancel"
+action_quit = "Quit"
 
 # hotkey_exit_menu = {"X": f"{action_exit_menu}"}
 
@@ -136,20 +137,22 @@ newcard_main_actions = [
 ]
 
 
-start_over_menu = [f"  [X] {action_start_over}"]
+start_over_menu = [f"  [X]  {action_start_over}"]
 hotkey_start_over_dict = {"X": f"{action_start_over}"}
 
-exit_menu = [f"  [X] {action_exit_menu}"]
+exit_menu = [f"  [X]  {action_exit_menu}"]
 hotkey_exit_dict = {"X": f"{action_exit_menu}"}
 
-cancel_menu = [f"  [X] {action_cancel}"]
+simple_exit = [f"  [X]  {action_simple_exit}"]
+simple_exit_dict = {"X": f"{action_simple_exit}"}
+
+cancel_menu = [f"  [X]  {action_cancel}"]
 hotkey_cancel_dict = {"X": f"{action_cancel}" }
 
-quit_menu = [f"  [Q] {action_quit}"]
+quit_menu = [f"  [Q]  {action_quit}"]
 hotkey_quit_dict = {"Q": f"{action_quit}"}
 
-display_hotkey_exit_menu = [f"  [X] {action_exit_menu}"]
-display_hotkey_quit = [f"  [Q] {action_quit}"]
+display_hotkey_exit_menu = [f"  [X]  {action_exit_menu}"]
 
 
 def prep_newcard_menu(var_menu, var_letters, pop_letters=False):
@@ -160,7 +163,7 @@ def prep_newcard_menu(var_menu, var_letters, pop_letters=False):
         full_hotkey_set_dict = {f"{ltr}":f"{match}" for ltr, match in zip(letters_filtered, var_menu)}
 
 
-    full_hotkey_set_list = [f"  [{letter}] {action}" for letter, action in zip(
+    full_hotkey_set_list = [f"  [{letter}]  {action}" for letter, action in zip(
         full_hotkey_set_dict.keys(),
         full_hotkey_set_dict.values())]
 
@@ -170,7 +173,7 @@ def prep_newcard_menu(var_menu, var_letters, pop_letters=False):
 def prep_menu(var_menu):
     full_hotkey_set_dict = {f"{ltr}": f"{match}" for ltr, match in zip(letters_filtered, var_menu)}
 
-    full_hotkey_set_list = [f"  [{letter}] {action}" for letter, action in zip(
+    full_hotkey_set_list = [f"  [{letter}]  {action}" for letter, action in zip(
         full_hotkey_set_dict.keys(),
         full_hotkey_set_dict.values())]
 
@@ -185,7 +188,7 @@ def prep_card_run_menu(actions_list):
 
     full_hotkey_set_dict = hotkey_dict
 
-    full_hotkey_set_list = [f"  [{letter}] {action}" for letter, action in zip(
+    full_hotkey_set_list = [f"  [{letter}]  {action}" for letter, action in zip(
         full_hotkey_set_dict.keys(),
         full_hotkey_set_dict.values())]
 
@@ -209,7 +212,7 @@ def prep_card_modify_menu(actions_list, card_filename):
 
     full_hotkey_set_dict = hotkey_dict
 
-    full_hotkey_set_list = [f"  [{letter}] {action}" for letter, action in zip(
+    full_hotkey_set_list = [f"  [{letter}]  {action}" for letter, action in zip(
         full_hotkey_set_dict.keys(),
         full_hotkey_set_dict.values())]
 

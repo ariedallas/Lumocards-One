@@ -38,7 +38,7 @@ def write_json(json_filename, json_data):
     json_fullpath = get_json_card_fullpath(json_filename)
 
     with open(json_fullpath, "w+") as fout:
-        fout.write(json.dumps(json_data, indent=2))
+        fout.write(json.dumps(json_data, indent=4))
 
 
 def get_category_from_json_settings(var_ltr):
