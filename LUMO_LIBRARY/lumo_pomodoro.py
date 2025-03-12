@@ -1,12 +1,16 @@
 import collections
 import datetime
+import os
 import subprocess
+import threading
 import time
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_menus as l_menus
+
+selected_sound = os.path.join(l_files.sounds_folder, "block.mp3")
 
 
 class Data:
@@ -48,6 +52,9 @@ class Data:
                               "Edit Preset 1",
                               "Edit Preset 2"]
 
+        Data.TIMER_PAUSED_MENU = ["  [Any Key]  Resume timer", "  [X]  Exit"]
+        Data.TIMER_RUNNING_MENU = ["  [Any Key]  Pause timer", "  [X]  Exit"]
+
 
 class Menu:
     def __init__(self, menu):
@@ -87,6 +94,17 @@ class Menu:
 
         if show_quit or show_exit:
             print()
+
+
+    @staticmethod
+    def simple_display(menu_options, marker=None):
+        if isinstance(marker, int):
+            default_action_choice = menu_options[marker] + " ➝ (Default action)"
+            list_menu_updated = menu_options.copy()
+            list_menu_updated[marker] = default_action_choice
+            l_animators.standard_interval_printer(list_menu_updated, speed_interval=0)
+        else:
+            l_animators.standard_interval_printer(menu_options, speed_interval=0)
 
 
     def menu_update_prepend(self, option, var_menu):
@@ -161,13 +179,133 @@ class Menu:
         return valid_focus_mins, valid_break_mins
 
 
+class Timer:
+    def __init__(self, initial_mins, timer_style):
+        timer_styles = {"standard": self.standard_timer,
+                        "dots": Timer.dots_timer,
+                        "dev": Timer.dev_timer}
+
+        self.timer = timer_styles.get(timer_style, Timer.standard_timer)
+        self.initial_mins = initial_mins
+        self.is_running = True
+
+
+    def running_menu(self):
+        user_input = input("  ")
+        self.is_running = False
+
+        if user_input.lower() == "x":
+            print(self.seconds_counter)
+        else:
+            return "PAUSE"
+
+    def pause_menu(self):
+        Menu.clear()
+        Menu.program_header()
+        l_animators.animate_text(f"  Timer paused at ...");
+        print()
+        Menu.simple_display(Data.TIMER_PAUSED_MENU, marker=0)
+
+        user_input = input("  ")
+
+        if user_input.lower() == "x":
+            print(self.seconds_counter)
+        else:
+            self.is_running = True
+
+    def standard_timer(self, var_mins):
+        subprocess.run(f'pw-play {selected_sound}', shell=True)
+        self.seconds_counter = 0
+
+        base_mins = int(var_mins)
+        remaining_whole_mins = (base_mins - 1) if base_mins > 1 else None
+        clip_top_mins = (var_mins - base_mins) + 1 if base_mins > 0 else (var_mins - base_mins)
+        clip_top_secs = round(clip_top_mins * 60)
+
+        if clip_top_secs:
+            Menu.clear()
+            Menu.program_header()
+            l_animators.animate_text(f"  Timer currently on minute: {base_mins}+ ...");
+            print()
+            Menu.simple_display(Data.TIMER_RUNNING_MENU, marker=0)
+            print("\n  >  ", end=" ")
+
+            for n in range(clip_top_secs):
+                self.seconds_counter += 1
+                if not self.is_running:
+                    return
+                time.sleep(.1)
+
+        if remaining_whole_mins:
+            for n in reversed(range(1, (base_mins))):
+                Menu.clear()
+                Menu.program_header()
+                l_animators.animate_text(f"  Timer currently on minute: {n} ...")
+                print()
+                Menu.simple_display(Data.TIMER_RUNNING_MENU, marker=0)
+                print("\n  >  ", end="")
+
+                for s in range(60):
+                    self.seconds_counter += 1
+                    if not self.is_running:
+                        return
+                    time.sleep(.1)
+
+        # time_in_secs = int((var_mins * 60))
+        # mins_remaining = round(var_mins) - (x // 60)
+
+        print("  Done")
+        for n in range(3):
+            subprocess.run(f'pw-play {selected_sound}', shell=True)
+
+
+    @staticmethod
+    def dots_timer(var_mins):
+        subprocess.run(f'pw-play {selected_sound}', shell=True)
+
+        time_in_secs = int((var_mins * 60))
+        for x in range(time_in_secs):
+            mins_remaining = round(var_mins) - (x // 60)
+            mins_as_dots = "." * mins_remaining
+            blinker = "." * (mins_remaining - 1)
+
+            print(f"  {mins_as_dots}", end="\r  ")
+            time.sleep(.1)
+            print(" " * 30, end="\r  ")
+            time.sleep(.1)
+
+            print(f"  {mins_as_dots}", end="\r  ")
+            time.sleep(.1)
+            print(" " * 30, end="\r  ")
+            time.sleep(.1)
+
+            print(f"  {blinker}", end="\r  ")
+            time.sleep(.6)
+
+        print("  Done")
+        for n in range(3):
+            subprocess.run(f'pw-play {selected_sound}', shell=True)
+
+
+    @staticmethod
+    def dev_timer(var_mins):
+        print(f"    {var_mins}")
+        print("    .")
+        time.sleep(.3)
+        print("    .")
+        time.sleep(.3)
+        print("    .")
+        time.sleep(.3)
+        print()
+
+
 class Pomodoro:
     round_counter_int = 0
     current_round = {}
     log = collections.deque()
 
 
-    def __init__(self, focus_mins=None, break_mins=None):
+    def __init__(self, timer_style, focus_mins=None, break_mins=None):
 
         self.focus_mins = focus_mins
         self.break_mins = break_mins
@@ -181,6 +319,8 @@ class Pomodoro:
         self.user_request_new_pomodoro = False
         self.quit_marker = False
         self.exit_marker = False
+
+        self.selected_timer_style = timer_style
 
 
     @classmethod
@@ -327,6 +467,11 @@ class Pomodoro:
             pass
 
 
+    def set_custom_pomodoro(self):
+        print()
+        self.focus_mins, self.break_mins = Menu.ask_pomodoro_ratio()
+
+
     def run_timer_loop(self):
         while True:
             if self.quit_marker:
@@ -346,26 +491,16 @@ class Pomodoro:
             self.go_break(self.break_mins)
 
 
-    def set_custom_pomodoro(self):
-        print()
-        self.focus_mins, self.break_mins = Menu.ask_pomodoro_ratio()
-
-
     @round_counter
-    def go_focus(self, mins):
-        Menu.clear()
-        Menu.program_header()
-        print(f"    {self.focus_mins}")
+    def go_focus(self, var_mins):
 
-        print("    .")
-        time.sleep(.3)
+        pomodoro_timer = Timer(initial_mins=var_mins, timer_style=self.selected_timer_style)
+        timer_thread = threading.Thread(target=pomodoro_timer.timer, args=(pomodoro_timer.initial_mins,))
+        timer_thread.start()
 
-        print("    .")
-        time.sleep(.3)
-
-        print("    .")
-        time.sleep(.3)
-        print()
+        running_outcome = pomodoro_timer.running_menu()
+        if running_outcome == "PAUSE":
+            pause_outcome = pomodoro_timer.pause_menu()
 
         l_animators.animate_text("  Main timer finished")
         print()
@@ -395,20 +530,13 @@ class Pomodoro:
             break
 
 
-    def go_break(self, mins):
+    def go_break(self, var_mins):
         Menu.clear()
         Menu.program_header()
-        print(f"    {self.break_mins}")
-
-        print("    _")
-        time.sleep(.3)
-
-        print("    _")
-        time.sleep(.3)
-
-        print("    _")
-        time.sleep(.3)
+        print("  {} minute timer started".format(var_mins));
         print()
+
+        self.timer(var_mins)
 
         l_animators.animate_text("  Break finished")
         print()
@@ -522,7 +650,7 @@ class Pomodoro:
 
 def main():
     Data.load_data()
-    pomodoro = Pomodoro()
+    pomodoro = Pomodoro(timer_style="standard")
     pomodoro.run_setup_loop()
 
 
