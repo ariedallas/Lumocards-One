@@ -1,15 +1,11 @@
 :::::NEXT:::::
-	- complete checklist loop / menu
-	- show 'quit feedback' for each program
-	- make the pomodoro actually be an option, design on whiteboard
-
-	- CODE READING> can I run GCALCLI modeuls? 
 	
+	- show menu after break
 	- reintegrate Arie's version with Lumocards-One
 
 		
 :::::NEXT LVL 2:::::
-	
+	- refactor lumo __main__ to use l_menus
 
 	- integrate all routes
 		- remove unnecessary print() from beginning of sub-program's main()
@@ -24,15 +20,13 @@
 		- clone to 'ARIE'
 		- basic .toml file
 
-
+	- 
 	**  put tape on my keyboard for better finding of l ctrl and alt.
 			
 	- json dict updater for all existing...	
 		- update json_dicts for existing cards (include 'google calendar info') --> in branch 'calendar_sync_basic'
 	- make sure the word calendar / schedule are used in a way that makes sense...
 		- mostly calendar unless you need schedule
-	- make a function where if you delete a card.txt file, it will then check to delete the json file as well
-		- clean up fucntion
 	- probably an event should become an object at some point... (currently it's a list)
 
 
@@ -164,8 +158,15 @@
 			- how does it account for this?
 
 :::::LUMO:::::
+	CODE READING IDEAS:
+		- datetime.now(tzlocal())
+		- namedtuple; dicts can be coverted to namedtuples
+		
+		
 	REFACTORS:
-		--  try using a @decorator to do loading transitions
+		--  stick with one option of ascii.lowercase or ascii.uppercase
+		--  make all print() formatting lines trailing semicolons; print()
+		--  all 'unrecognized options' should have finish delay that's .5
 		--  consider checking out your use of circular dependencies!!
 		--  at some point you should use types in your functions
 		--  enum vs. str as input to a function
@@ -180,9 +181,11 @@
 		- when you xsition back from a sub program to main menu, do ... loader transition
 
 	LUMO HOME MENU:
+		- update "all" menu to include pomodoro
 		- at some point chance ALL_MENU and MAIN_MENU to be constructed with zipping letters rather than hardcoding.
 		- gracefull inform user if the command line arguments after 'lumo' are unrecognized
-		- inform user of options with unrecognized inputs in the home menu
+		- inform user of options with unrecognized argv inputs in the home menu
+		- refactor to use l_menus and check for cohesion
 
 		- implement 'fuzzy' find for command lind args, i.e. 'checklists' or 'routine' should map to 'checklist in parser
 	 	- make sure there is something for the :: about :: section in __main__
@@ -194,11 +197,23 @@
 
 		- search 'exit' vs. 'quit'
 
-	 MENUS:
+	TIMER:
+		- curses for independent painting of timer animation + menu
+		- Timer should ask you at the end if you want to make a new timer, repeat or etc. 
+
+	POMODORO:
+		- curses for independent painting of timer animation + menu
+		- when showing stats after a break or focus timer, it doesn't go back to pause: maybe something like, "self.show menu again?"
+		- ability to input pomodoro from argv?
+		- test all menus etc. 
+	
+	MENUS:
+	 	- unify menus across all programs to decide where l_menus gets used, where x.lower() vs. x.upper() is implemented, etc. 
  		- at some point, make sure that the menus give you decent pathways for setting calendar events (make sure refactor works with added folder CARDS_D_CALENDAR)
 		- dict comprehensions / print formatting from dicts
 		- what about an option for delete menu for multiple cards?
 		- "help" menu for all sub-programs like pomodoro help, calendar help, etc. subparser.add_argument "help"
+		- periods or not in menus?
 
 	CARDSRUN:
 	    --  When you type 'back' on Near Cards / Cardsrun / Planner it shows the previous card that has moved
@@ -236,8 +251,8 @@
 		--  cross platform???
 		--  spend a few hours one morning going through the playsound python package
 		--  is it possible to use part of ffmpeg, ffplay, pyaudio?
-	
-	 INSTALLATION NEW USERS
+
+	INSTALLATION NEW USERS
 		- demo video
 		- homebrew?
 		- see all the ways the micro can be installed
