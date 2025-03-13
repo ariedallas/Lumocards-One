@@ -1,13 +1,13 @@
 import os
 import pathlib
 import re
-import sys
 
 import send2trash
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
+import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 
 default_card_steps = ["..."
     , "..."
@@ -78,7 +78,7 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
     elif curr_name != dst_name:
         l_animators.animate_text(f"  Renaming from '{curr_name}' to '{dst_name}' ")
 
-    if l_files.proceed("  Type 'cancel' to stop or press any key to continue > "):
+    if l_menus_funcs.proceed("  Type 'cancel' to stop or press any key to continue > "):
         os.rename(source, dest)
         l_json_utils.rename_json_card(src_filename=curr_name, dest_filename=dst_name)
         l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name,
@@ -148,11 +148,11 @@ def clean_cards():
 
         for u in unique_txts:
             print(f"  {u}.txt", end=" ")
-            response = input("——> [D]elete this or [C]reate .json files to pair it? >  ")
-            if response.lower() == 'd':
+            user_input = input("——> [D]elete this or [C]reate .json files to pair it? >  ")
+            if user_input.lower() == 'd':
                 card_fullpath = get_card_abspath(f"{u}.txt")
                 send2trash.send2trash(card_fullpath)
-            elif response.lower() == 'c':
+            elif user_input.lower() == 'c':
                 pass
             else:
                 print("        (You skipped this card for now.)")
@@ -163,11 +163,11 @@ def clean_cards():
 
         for u in unique_jsons:
             print(f"  {u}.json", end=" ")
-            response = input("——> [D]elete this or [C]reate .txt files to pair it? >  ")
-            if response.lower() == 'd':
+            user_input = input("——> [D]elete this or [C]reate .txt files to pair it? >  ")
+            if user_input.lower() == 'd':
                 json_fullpath = l_json_utils.get_json_card_fullpath(f"{u}.json")
                 send2trash.send2trash(json_fullpath)
-            elif response.lower() == 'c':
+            elif user_input.lower() == 'c':
                 pass
             else:
                 print("        (You skipped this card for now.)")

@@ -1,6 +1,4 @@
 :::::NEXT:::::
-	
-	- show menu after break
 	- reintegrate Arie's version with Lumocards-One
 
 		
@@ -199,10 +197,14 @@
 
 	TIMER:
 		- curses for independent painting of timer animation + menu
+		- settings option to turn off sounds; play different sounds
 		- Timer should ask you at the end if you want to make a new timer, repeat or etc. 
 
 	POMODORO:
+		- when showing log in go_focus or go_break, don't immediately resume, go back to menu
+		- settings option to turn off sounds; play different sounds
 		- curses for independent painting of timer animation + menu
+		- you could have the selected_timer return the actual elapsed time and add it to the log for more accurate logs
 		- when showing stats after a break or focus timer, it doesn't go back to pause: maybe something like, "self.show menu again?"
 		- ability to input pomodoro from argv?
 		- test all menus etc. 

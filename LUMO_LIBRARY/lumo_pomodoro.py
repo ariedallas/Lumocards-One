@@ -8,7 +8,8 @@ import time
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
-import LUMO_LIBRARY.lumo_menus as l_menus
+import LUMO_LIBRARY.lumo_menus_data as l_menus_data
+import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 
 selected_sound = os.path.join(l_files.sounds_folder, "block.mp3")
 
@@ -58,7 +59,7 @@ class Data:
 
 class Menu:
     def __init__(self, menu):
-        self.menus_combined = l_menus.prep_menu(menu)
+        self.menus_combined = l_menus_funcs.prep_menu(menu)
         self.dict_menu = self.menus_combined[0]
         self.list_menu = self.menus_combined[1]
 
@@ -88,9 +89,9 @@ class Menu:
             print()
 
         if show_exit:
-            l_animators.standard_interval_printer(l_menus.simple_exit, speed_interval=0)
+            l_animators.standard_interval_printer(l_menus_data.SIMPLE_EXIT_LIST, speed_interval=0)
         if show_quit:
-            l_animators.standard_interval_printer(l_menus.quit_menu, speed_interval=0)
+            l_animators.standard_interval_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
 
         if show_quit or show_exit:
             print()
@@ -109,7 +110,7 @@ class Menu:
 
     def menu_update_prepend(self, option, var_menu):
         updated_menu = [option] + var_menu
-        self.menus_combined = l_menus.prep_menu(updated_menu)
+        self.menus_combined = l_menus_funcs.prep_menu(updated_menu)
         self.dict_menu = self.menus_combined[0]
         self.list_menu = self.menus_combined[1]
 
@@ -303,7 +304,10 @@ class TimerStandard:
             subprocess.run(f'pw-play {selected_sound}', shell=True)
 
         self.completed = True
-        print("\n  Press any key to continue >  ", end="")
+
+        Menu.clear()
+        Menu.program_header()
+        print("  Timer finished.\n  press any key to continue >  ", end="")
 
 
 class TimerDev:
@@ -565,7 +569,7 @@ class PomodoroFlow:
 
         Menu.clear()
         Menu.program_header()
-        l_animators.animate_text("  Main timer finished")
+        print("  Break Menu")
         print()
 
         self.round_updater("focus")
@@ -603,7 +607,7 @@ class PomodoroFlow:
 
         Menu.clear()
         Menu.program_header()
-        l_animators.animate_text("  Break finished")
+        print("  Continue Menu")
         print()
 
         self.round_updater("break")

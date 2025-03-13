@@ -1,7 +1,8 @@
 import os
 
 import LUMO_LIBRARY.lumo_filehandler as l_files
-import LUMO_LIBRARY.lumo_newcard as l_newcard
+import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
+import LUMO_LIBRARY.lumo_newcard_refactor as l_newcard
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 
 category_letters = l_files.get_lumocards_categories()
@@ -32,7 +33,7 @@ def delete_all_cards():
     print("Deleting all sample cards and initializing folders with nothing.")
     print()
 
-    if l_files.proceed("OK? "):
+    if l_menus_funcs.proceed("OK? "):
         delete_cards_from_folder(l_files.cards_near_folder)
         delete_cards_from_folder(l_files.cards_middle_folder)
         delete_cards_from_folder(l_files.cards_dist_folder)

@@ -5,12 +5,12 @@ import time
 from typing import Dict
 
 from LUMO_LIBRARY import (lumo_animationlibrary as l_animators,
-                          lumo_cardsrun as l_cards,
+                          lumo_cards_planner as l_cards,
                           lumo_checklist as l_checklist,
                           lumo_journal as l_journal,
                           lumo_newcard_refactor as l_newcard,
                           lumo_pomodoro as l_pomodoro,
-                          lumo_search_cards as l_search,
+                          lumo_search as l_search,
                           lumo_settings as l_settings,
                           lumo_timer as l_timer)
 
@@ -121,7 +121,6 @@ class LumoMenu:
         dict_length = len(self.menu)
 
         clear()
-
         print()
         print("LUMOCARDS ::all:: ")
         print("\n")
@@ -139,7 +138,7 @@ class LumoMenu:
 
 
 MAIN_MENU = collections.OrderedDict([
-    ("a", "Planner")
+    ("a", "Cards Planner")
     , ("b", "New Card")
     , ("c", "Calendar")
     , ("d", "Journal")
@@ -149,7 +148,7 @@ MAIN_MENU = collections.OrderedDict([
 ])
 
 ALL_MENU = collections.OrderedDict([
-    ("a", "Planner")
+    ("a", "Cards Planner")
     , ("b", "New Card")
     , ("c", "Calendar")
     , ("d", "Journal")
@@ -207,8 +206,8 @@ def root_loop(parsed_args, unknown):
             main_menu.display_main()
 
         print()
-        response = input("  > ")
-        status, menu = router(response, [], current_menu)
+        user_input = input("  > ")
+        status, menu = router(user_input, [], current_menu)
 
 
 def _determine_input_origin(user_input):

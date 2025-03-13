@@ -1,16 +1,16 @@
-import os
 import argparse
+import os
 import re
 import string
 import subprocess
-import sys
 
-import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
-import LUMO_LIBRARY.lumo_menus as l_menus
+import LUMO_LIBRARY.lumo_filehandler as l_files
+import LUMO_LIBRARY.lumo_menus_data as l_menus_data
+import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 import LUMO_LIBRARY.lumo_recurring as l_recurring
-# import lumo_json_utilities as l_json_utils
+
 
 letters = string.ascii_lowercase
 letters_filtered = [l.upper() for l in letters if not (l == "q") and not (l == "x")]
@@ -50,7 +50,7 @@ def iterate_and_find(searchterm, folder):
 
 def reshow_match(chosen_file):
     card = l_card_utils.filename_to_card(chosen_file)
-    l_menus.prep_menu(l_menus.cardsearch_main_menu_actions)
+    l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
     return card, chosen_file
 
 
@@ -132,31 +132,31 @@ def select_card_from_found(searchterm):
             l_animators.standard_interval_printer(matches_list, speed_interval=0)
             print()
 
-    print(l_menus.exit_menu[0])
-    print(l_menus.quit_menu[0])
+    print(l_menus_data.EXIT_MENU_LIST[0])
+    print(l_menus_data.QUIT_MENU_LIST[0])
 
     while True:
-        response = input("\n  > ")
+        user_input = input("\n  > ")
 
-        if response.upper() == archives_letter:
+        if user_input.upper() == archives_letter:
             print("  Archived cards are not shown in this mode, but"
                   "\n  the number indicator is shown for reference."
                   f"\n  i.e. there is/are ({len(found_matches[5])}) archived cards that pertain.")
             continue
 
         # change this to be if ... in dict.keys() etc.
-        if response.isalpha() and len(response) == 1 and (response.upper() in used_letters):
-            letter_as_listindex = ord(response.lower()) - 97
+        if user_input.isalpha() and len(user_input) == 1 and (user_input.upper() in used_letters):
+            letter_as_listindex = ord(user_input.lower()) - 97
 
             chosen_file = shortcut_file_matches[letter_as_listindex]
             card = l_card_utils.filename_to_card(chosen_file)
 
             return card, chosen_file, False
 
-        elif response.lower() == "x":
+        elif user_input.lower() == "x":
             return None, None, False
 
-        elif response.lower() == "q":
+        elif user_input.lower() == "q":
             return None, None, True
 
         else:
@@ -173,24 +173,24 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
 
     l_animators.standard_interval_printer(var_hotkey_list, speed_interval=0)
     print()
-    l_animators.standard_interval_printer(l_menus.exit_menu, speed_interval=0)
-    l_animators.standard_interval_printer(l_menus.quit_menu, speed_interval=0)
+    l_animators.standard_interval_printer(l_menus_data.EXIT_MENU_LIST, speed_interval=0)
+    l_animators.standard_interval_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
 
     while True:
-        response = input("\n  > ")
+        user_input = input("\n  > ")
 
-        if response.upper() in var_hotkey_dict.keys():
+        if user_input.upper() in var_hotkey_dict.keys():
 
-            if var_hotkey_dict[response.upper()] == l_menus.action_open:
+            if var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_OPEN:
                 subprocess.run([f"{settings.get("text editor")} {card_fullpath}"], shell=True)
                 return "RELOOP", var_card_filename
 
-            elif var_hotkey_dict[response.upper()] == l_menus.action_modify:
+            elif var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_MODIFY:
 
-                hotkey_list, hotkey_dict = l_menus.prep_card_modify_menu(l_menus.cardsearch_modify_menu_actions.copy(),
+                hotkey_list, hotkey_dict = l_menus_funcs.prep_card_modify_menu(l_menus_data.SEARCH_MODIFY_MENU.copy(),
                                                                          card_filename=var_card_filename)
 
-                possible_status, possible_returned_card = l_menus.menu_modify_card(selected_card=var_card_filename,
+                possible_status, possible_returned_card = l_menus_funcs.menu_modify_card(selected_card=var_card_filename,
                                                                                    var_hotkey_list=hotkey_list,
                                                                                    var_hotkey_dict=hotkey_dict)
                 if possible_returned_card:
@@ -203,21 +203,21 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
                     return "RELOOP", var_card_filename
 
 
-            elif var_hotkey_dict[response.upper()] == l_menus.action_schedule:
+            elif var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
                 l_animators.animate_text("  This feature not fully available")
                 return "RELOOP", var_card_filename
 
-            elif var_hotkey_dict[response.upper()] == l_menus.action_set_recurring:
+            elif var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING_2:
                 card_title_formatted = l_card_utils.format_card_title(var_card_filename.replace(".txt", ""))
-                recur_menu_d, recur_menu_l = l_menus.prep_newcard_menu(l_menus.recurring_menu,
-                                                                       l_menus.letters_filtered,
+                recur_menu_d, recur_menu_l = l_menus_funcs.prep_newcard_menu(l_menus_data.RECURRING_MENU,
+                                                                       l_menus_data.LETTERS_FILTERED,
                                                                        pop_letters=False)
                 print()
                 l_animators.standard_interval_printer([card_title_formatted])
                 print()
                 l_animators.standard_interval_printer(recur_menu_l)
 
-                recurrence_settings = l_menus.menu_recurrence_settings(var_menu=recur_menu_d)
+                recurrence_settings = l_menus_funcs.menu_recurrence_settings(var_menu=recur_menu_d)
 
                 l_recurring.update_recurring_data(var_card_filename, recurrence_settings, initialized=True)
                 l_card_utils.card_renamer(curr_name=var_card_filename
@@ -227,13 +227,13 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
                 return "RELOOP", var_card_filename
 
 
-        elif response.upper() in l_menus.hotkey_exit_dict.keys():
+        elif user_input.upper() in l_menus_data.EXIT_MENU_DICT.keys():
             return "NEW SEARCH", None
 
-        elif response.upper() in l_menus.hotkey_quit_dict.keys():
+        elif user_input.upper() in l_menus_data.QUIT_MENU_DICT.keys():
             return "QUIT", None
 
-        elif response.lower() == "quit":
+        elif user_input.lower() == "quit":
             return "QUIT", None
 
         else:
@@ -265,7 +265,7 @@ def main(initial_search_term=None):
             card, matched_path, user_quit = select_card_from_found(initial_search_term)
 
             if card:
-                hotkey_dict, hotkey_list = l_menus.prep_menu(l_menus.cardsearch_main_menu_actions)
+                hotkey_dict, hotkey_list = l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
                 status, return_path = cardsearch_main_options(card, matched_path, hotkey_dict, hotkey_list)
             elif user_quit:
                 status = "QUIT"
@@ -276,7 +276,7 @@ def main(initial_search_term=None):
             print(status)
 
             card, return_path = reshow_match(return_path)
-            hotkey_dict, hotkey_list = l_menus.prep_menu(l_menus.cardsearch_main_menu_actions)
+            hotkey_dict, hotkey_list = l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
             status, return_path = cardsearch_main_options(card, return_path, hotkey_dict, hotkey_list)
 
         elif status == "NEW SEARCH":
@@ -284,19 +284,19 @@ def main(initial_search_term=None):
                 print()
 
             print(status)
-            response = input(
+            user_input = input(
                 "\n"                
                 "                (Type 'quit' to quit)"
                 "\nEnter a single search term i.e. 'hat'  >  " )
 
-            if response == "quit":
+            if user_input == "quit":
                 status = "QUIT"
                 continue
 
-            card, matched_path, user_quit = select_card_from_found(response)
+            card, matched_path, user_quit = select_card_from_found(user_input)
 
             if card:
-                hotkey_dict, hotkey_list = l_menus.prep_menu(l_menus.cardsearch_main_menu_actions)
+                hotkey_dict, hotkey_list = l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
                 status, return_path = cardsearch_main_options(card, matched_path, hotkey_dict, hotkey_list)
             elif user_quit:
                 status = "QUIT"
@@ -320,31 +320,3 @@ if __name__ == "__main__":
 
     main(parsed.match_term)
 
-
-# ---- ETC. / UNUSED ---- #
-
-
-# elif var_hotkey_dict[response.upper()] == action_schedule:
-#     print("Future function to be created with Google API")
-#     return "RELOOP", var_card_path
-#
-# elif var_hotkey_dict[response.upper()] == action_newsearch:
-#     return "NEW SEARCH", var_card_path
-#
-# elif var_hotkey_dict[response.upper()] == action_retitle:
-#     print(var_card_path)
-#
-#     retitled_card_path = l_newcard.get_card_from_input()
-#
-#     l_animators.animate_text(f"Card will been renamed from "{var_card_path}" ➝ "{retitled_card_path}"")
-#
-#     if l_files.proceed("> "):
-#         l_animators.animate_text("Card renamed")
-#         src = os.path.join(l_files.cards_near_folder, var_card_path)
-#         dst = os.path.join(l_files.cards_near_folder, retitled_card_path)
-#         os.rename(src, dst)
-#
-#         return "RELOOP", retitled_card_path
-#
-#     else:
-#         return "RELOOP", var_card_path

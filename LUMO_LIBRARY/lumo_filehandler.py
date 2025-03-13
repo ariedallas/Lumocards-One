@@ -30,7 +30,6 @@ temp_folder = os.path.join(rootpath, "SUPPORT_FILES/TEMP")
 credentials_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_CREDENTIALS")
 
 sounds_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_SOUNDS")
-
 settings_fullpath = os.path.join(rootpath, 'SUPPORT_FILES/settings.json')
 
 # ---TIME--- #
@@ -56,19 +55,10 @@ def isolate_date_units():
     return day, day_num, month, year
 
 
-# ---- PLANNER ---- #
+# ---- PLANNER FILES ---- #
 planner_folder = os.path.join(rootpath, "PLANNER")
 today_planner_file = f"{today_frmttd.upper()}_planner.txt"
 today_planner_fullpath = os.path.join(planner_folder, today_planner_file)
-
-# ---- RESPONSES ---- #
-negative_user_responses = [
-    "no"
-    , "exit"
-    , "quit"
-    , "stop"
-    , "cancel"
-]
 
 
 # ---- FUCNTIONS ---- #
@@ -160,11 +150,6 @@ def get_days_from_date(birth_year, birth_month, birth_day):
 
     delta = d_present - d_birth
     return delta.days
-
-
-def proceed(input_text="... "):
-    response = input(f"{input_text} ")
-    return True if response not in negative_user_responses else False
 
 
 if __name__ == '__main__':

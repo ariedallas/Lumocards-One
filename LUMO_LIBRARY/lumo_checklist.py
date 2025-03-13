@@ -1,15 +1,11 @@
 import os
-import string
 import subprocess
-import time
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_filehandler as l_files
-import LUMO_LIBRARY.lumo_menus as l_menus
-
-letters = string.ascii_lowercase
-letters_filtered = [l for l in letters if not (l == 'q') and not (l == 'x')]
+import LUMO_LIBRARY.lumo_menus_data as l_menus_data
+import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 
 main_card_path = os.path.join(l_files.internal_cards_folder, "Checklist_Main.txt")
 main_card = l_card_utils.fullpath_to_card(main_card_path)
@@ -23,9 +19,9 @@ checklist_cards = sorted([card for card in os.listdir(l_files.checklist_cards_fo
 
 fetched = [l_card_utils.filename_to_card(file) for file in checklist_cards]
 fetched_titles = [l_card_utils.format_card_title(card[0]) for card in fetched]
-formatted_results_dict = {f"{ltr}": card for ltr, card in zip(letters_filtered, fetched)}
+formatted_results_dict = {f"{ltr}": card for ltr, card in zip(l_menus_data.LETTERS_FILTERED, fetched)}
 formatted_results_menu = [f"  [{ltr.upper()}]  {card_title}"
-                          for ltr, card_title in zip(letters_filtered, fetched_titles)]
+                          for ltr, card_title in zip(l_menus_data.LETTERS_FILTERED, fetched_titles)]
 
 
 def cycler(list_of_steps):
@@ -34,7 +30,7 @@ def cycler(list_of_steps):
 
 
 def display_menu():
-    full_menu = formatted_results_menu + [""] + l_menus.simple_exit + l_menus.quit_menu
+    full_menu = formatted_results_menu + [""] + l_menus_data.SIMPLE_EXIT_LIST + l_menus_data.QUIT_MENU_LIST
     for line in full_menu:
         print(line)
 
@@ -67,8 +63,8 @@ def display_selected_checklist(card_title, card_steps):
 
 def main_checklist_review():
     print()
-    rsp = l_files.proceed("Would you like to review the Essentials Checklist? ")
-    if rsp:
+    user_input = l_menus_funcs.proceed("Would you like to review the Essentials Checklist? ")
+    if user_input:
         main_card_title_formatted = l_card_utils.format_card_title(main_card_title).upper()
         print()
         l_animators.animate_text(main_card_title_formatted)
@@ -79,8 +75,8 @@ def main_checklist_review():
 
 def errand_checklist_review():
     print()
-    rsp = l_files.proceed("Would you like to review the Errands Checklist? ")
-    if rsp:
+    user_input = l_menus_funcs.proceed("Would you like to review the Errands Checklist? ")
+    if user_input:
         errand_card_title_formatted = l_card_utils.format_card_title(errand_card_title).upper()
         print()
         l_animators.animate_text(errand_card_title_formatted)
