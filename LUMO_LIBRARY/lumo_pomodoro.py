@@ -179,18 +179,39 @@ class Menu:
         return valid_focus_mins, valid_break_mins
 
 
-class Timer:
-    def __init__(self, initial_mins, timer_style):
-        timer_styles = {"standard": self.standard_timer,
-                        "dots": Timer.dots_timer,
-                        "dev": Timer.dev_timer}
-
-        self.timer = timer_styles.get(timer_style, Timer.standard_timer)
+class TimerStandard:
+    def __init__(self, initial_mins=0):
         self.initial_mins = initial_mins
         self.secs_elapsed = 0
-        self.calculate_mins_remain()
         self.is_running = True
         self.completed = False
+        self.mins_remain = None
+
+
+    def run_timer(self):
+        self.calculate_mins_remain()
+
+        while not self.completed:
+            timer_thread = threading.Thread(target=self.standard_timer, args=(self.mins_remain,))
+            timer_thread.start()
+            exit_marker = False
+
+            running_outcome = self.running_menu()
+            if running_outcome == "EXIT":
+                exit_marker = True
+                break
+
+            elif not self.completed:
+                self.calculate_mins_remain()
+                pause_outcome = self.pause_menu()
+                if pause_outcome == "EXIT":
+                    exit_marker = True
+                    break
+                elif pause_outcome == "RESUME":
+                    self.is_running = True
+                    continue
+
+            return exit_marker
 
 
     def calculate_mins_remain(self):
@@ -200,7 +221,7 @@ class Timer:
         secs_portion = total_secs_remain % 60
         secs_fraction = round(secs_portion / 60, 2)
 
-        self.mins_remain =  mins_portion + secs_fraction
+        self.mins_remain = mins_portion + secs_fraction
 
 
     def format_mins_elapsed(self):
@@ -285,13 +306,41 @@ class Timer:
         print("\n  Press any key to continue >  ", end="")
 
 
+class TimerDev:
+    def __init__(self, initial_mins=0):
+        self.initial_mins = initial_mins
 
-    def dots_timer(self, var_mins):
+
+    def run_timer(self):
+        self.dev_timer()
+
+
+    def dev_timer(self):
+        print(f"    {self.initial_mins}")
+        print("    .")
+        time.sleep(.3)
+        print("    .")
+        time.sleep(.3)
+        print("    .")
+        time.sleep(.3)
+        print()
+
+
+class TimerDots:
+    def __init__(self, initial_mins=0):
+        self.initial_mins = initial_mins
+
+
+    def run_timer(self):
+        self.dots_timer()
+
+
+    def dots_timer(self):
         subprocess.run(f'pw-play {selected_sound}', shell=True)
 
-        time_in_secs = int((var_mins * 60))
+        time_in_secs = int((self.initial_mins * 60))
         for x in range(time_in_secs):
-            mins_remaining = round(var_mins) - (x // 60)
+            mins_remaining = round(self.initial_mins) - (x // 60)
             mins_as_dots = "." * mins_remaining
             blinker = "." * (mins_remaining - 1)
 
@@ -308,29 +357,18 @@ class Timer:
             print(f"  {blinker}", end="\r  ")
             time.sleep(.6)
 
-        print("  Done")
+        print("Done")
         for n in range(3):
             subprocess.run(f'pw-play {selected_sound}', shell=True)
 
 
-    def dev_timer(self, var_mins):
-        print(f"    {var_mins}")
-        print("    .")
-        time.sleep(.3)
-        print("    .")
-        time.sleep(.3)
-        print("    .")
-        time.sleep(.3)
-        print()
-
-
-class Pomodoro:
+class PomodoroFlow:
     round_counter_int = 0
     current_round = {}
     log = collections.deque()
 
 
-    def __init__(self, timer_style, focus_mins=None, break_mins=None):
+    def __init__(self, timer, focus_mins=None, break_mins=None):
 
         self.focus_mins = focus_mins
         self.break_mins = break_mins
@@ -345,7 +383,7 @@ class Pomodoro:
         self.quit_marker = False
         self.exit_marker = False
 
-        self.selected_timer_style = timer_style
+        self.selected_timer = timer
 
 
     @classmethod
@@ -361,7 +399,7 @@ class Pomodoro:
     @staticmethod
     def round_counter(func):
         def wrapper(*args, **kwargs):
-            Pomodoro.round_counter_int += 1
+            PomodoroFlow.round_counter_int += 1
             result = func(*args, **kwargs)
             return result
 
@@ -371,9 +409,9 @@ class Pomodoro:
 
     def round_updater(self, status):
         if status == "focus":
-            Pomodoro.current_round["focus"] = self.focus_mins
+            PomodoroFlow.current_round["focus"] = self.focus_mins
         elif status == "break":
-            Pomodoro.current_round["break"] = self.break_mins
+            PomodoroFlow.current_round["break"] = self.break_mins
 
 
     def run_setup_loop(self):
@@ -423,7 +461,7 @@ class Pomodoro:
         elif user_choice == "Pomodoro settings":
             self.go_settings()
         else:  # Log | stats
-            Pomodoro.display_log()
+            PomodoroFlow.display_log()
 
 
     def breaktime_router(self, user_choice):
@@ -443,7 +481,7 @@ class Pomodoro:
         elif user_choice == "Preset break, then start a new custom pomodoro":
             self.user_request_new_pomodoro = True
         else:  # Log | stats
-            Pomodoro.display_log()
+            PomodoroFlow.display_log()
 
 
     def continuation_router(self, user_choice):
@@ -454,7 +492,7 @@ class Pomodoro:
         elif user_choice == "Start new custom pomodoro":
             self.set_custom_pomodoro()
         else:  # Log | stats
-            Pomodoro.display_log()
+            PomodoroFlow.display_log()
 
 
     def settings_router(self, user_choice):
@@ -519,29 +557,10 @@ class Pomodoro:
     @round_counter
     def go_focus(self, var_mins):
 
-        pomodoro_timer = Timer(initial_mins=var_mins, timer_style=self.selected_timer_style)
-        # Pomodoro(pomodoro_timer)
+        self.selected_timer.initial_mins = var_mins
+        exit_marker = self.selected_timer.run_timer()
 
-        while not pomodoro_timer.completed:
-            timer_thread = threading.Thread(target=pomodoro_timer.timer, args=(pomodoro_timer.mins_remain,))
-            timer_thread.start()
-
-            running_outcome = pomodoro_timer.running_menu()
-            if running_outcome == "EXIT":
-                self.exit_marker = True
-                break
-
-            elif not pomodoro_timer.completed:
-                pomodoro_timer.calculate_mins_remain()
-                pause_outcome = pomodoro_timer.pause_menu()
-                if pause_outcome == "EXIT":
-                    self.exit_marker = True
-                    break
-                elif pause_outcome == "RESUME":
-                    pomodoro_timer.is_running = True
-                    continue
-
-        if self.exit_marker:
+        if exit_marker:
             return
 
         Menu.clear()
@@ -576,27 +595,10 @@ class Pomodoro:
 
 
     def go_break(self, var_mins):
-        pomodoro_timer = Timer(initial_mins=var_mins, timer_style=self.selected_timer_style)
-        while not pomodoro_timer.completed:
-            timer_thread = threading.Thread(target=pomodoro_timer.timer, args=(pomodoro_timer.mins_remain,))
-            timer_thread.start()
+        self.selected_timer.initial_mins = var_mins
+        exit_marker = self.selected_timer.run_timer()
 
-            running_outcome = pomodoro_timer.running_menu()
-            if running_outcome == "EXIT":
-                self.exit_marker = True
-                break
-
-            elif not pomodoro_timer.completed:
-                pomodoro_timer.calculate_mins_remain()
-                pause_outcome = pomodoro_timer.pause_menu()
-                if pause_outcome == "EXIT":
-                    self.exit_marker = True
-                    break
-                elif pause_outcome == "RESUME":
-                    pomodoro_timer.is_running = True
-                    continue
-
-        if self.exit_marker:
+        if exit_marker:
             return
 
         Menu.clear()
@@ -676,19 +678,19 @@ class Pomodoro:
 
     @classmethod
     def round_logger(cls, status):
-        possible_text_focus = "min." if Pomodoro.current_round.get("focus") else ""
-        possible_text_break = "min." if Pomodoro.current_round.get("break") else ""
+        possible_text_focus = "min." if PomodoroFlow.current_round.get("focus") else ""
+        possible_text_break = "min." if PomodoroFlow.current_round.get("break") else ""
 
-        focus_text = f"Main: {Pomodoro.current_round.get("focus")} {possible_text_focus}"
-        break_text = f"Break: {Pomodoro.current_round.get("break")} {possible_text_break}"
-        curr_round = f"Rnd{Pomodoro.round_counter_int} — {focus_text} | {break_text}"
+        focus_text = f"Main: {PomodoroFlow.current_round.get("focus")} {possible_text_focus}"
+        break_text = f"Break: {PomodoroFlow.current_round.get("break")} {possible_text_break}"
+        curr_round = f"Rnd{PomodoroFlow.round_counter_int} — {focus_text} | {break_text}"
 
         if status == "focus":
-            Pomodoro.log.appendleft(curr_round)
+            PomodoroFlow.log.appendleft(curr_round)
         elif status == "break":
-            Pomodoro.log.popleft()
-            Pomodoro.log.appendleft(curr_round)
-            Pomodoro.current_round = {}
+            PomodoroFlow.log.popleft()
+            PomodoroFlow.log.appendleft(curr_round)
+            PomodoroFlow.current_round = {}
 
 
     @classmethod
@@ -702,10 +704,10 @@ class Pomodoro:
         print(f"  {today_date}")
         print()
 
-        if not Pomodoro.log:
+        if not PomodoroFlow.log:
             l_animators.animate_text("  Nothing to display for this session")
         else:
-            for record in Pomodoro.log:
+            for record in PomodoroFlow.log:
                 print(f"  {record}")
 
         print()
@@ -714,7 +716,7 @@ class Pomodoro:
 
 def main():
     Data.load_data()
-    pomodoro = Pomodoro(timer_style="standard")
+    pomodoro = PomodoroFlow(timer=TimerStandard())
     pomodoro.run_setup_loop()
 
 
