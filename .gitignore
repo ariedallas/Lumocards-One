@@ -4,8 +4,8 @@ SUPPORT_FILES/TEMP/*
 SUPPORT_FILES/Z_CREDENTIALS/credentials.json
 SUPPORT_FILES/Z_CREDENTIALS/token.json
 LUMO_LIBRARY/scratch.py
+LUMO_LIBRARY/scratch_json.py
 
-LUMO_LIBRARY/scratch.py
 
 # ETC
 .idea/
