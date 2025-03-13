@@ -187,7 +187,27 @@ class Timer:
 
         self.timer = timer_styles.get(timer_style, Timer.standard_timer)
         self.initial_mins = initial_mins
+        self.secs_elapsed = 0
+        self.calculate_mins_remain()
         self.is_running = True
+        self.completed = False
+
+
+    def calculate_mins_remain(self):
+        initial_secs = self.initial_mins * 60
+        total_secs_remain = initial_secs - self.secs_elapsed
+        mins_portion = total_secs_remain // 60
+        secs_portion = total_secs_remain % 60
+        secs_fraction = round(secs_portion / 60, 2)
+
+        self.mins_remain =  mins_portion + secs_fraction
+
+
+    def format_mins_elapsed(self):
+        mins_portion = self.secs_elapsed // 60
+        secs_portion = self.secs_elapsed % 60
+
+        return f"{mins_portion:02}:{secs_portion:02}"
 
 
     def running_menu(self):
@@ -195,32 +215,39 @@ class Timer:
         self.is_running = False
 
         if user_input.lower() == "x":
-            print(self.seconds_counter)
+            return "EXIT"
         else:
             return "PAUSE"
 
+
     def pause_menu(self):
+        paused_amt = self.format_mins_elapsed()
+
         Menu.clear()
         Menu.program_header()
-        l_animators.animate_text(f"  Timer paused at ...");
+        l_animators.animate_text(f"  Timer paused at {paused_amt} ...");
         print()
         Menu.simple_display(Data.TIMER_PAUSED_MENU, marker=0)
 
         user_input = input("  ")
 
         if user_input.lower() == "x":
-            print(self.seconds_counter)
+            return "EXIT"
         else:
-            self.is_running = True
+            return "RESUME"
+
 
     def standard_timer(self, var_mins):
         subprocess.run(f'pw-play {selected_sound}', shell=True)
-        self.seconds_counter = 0
 
         base_mins = int(var_mins)
-        remaining_whole_mins = (base_mins - 1) if base_mins > 1 else None
-        clip_top_mins = (var_mins - base_mins) + 1 if base_mins > 0 else (var_mins - base_mins)
-        clip_top_secs = round(clip_top_mins * 60)
+        remaining_whole_mins = base_mins
+        clip_top_secs = None
+        time_is_float = var_mins - base_mins != 0
+        if time_is_float:
+            remaining_whole_mins = (base_mins - 1) if base_mins > 1 else None
+            clip_top_mins = (var_mins - base_mins) + 1 if base_mins > 0 else (var_mins - base_mins)
+            clip_top_secs = round(clip_top_mins * 60)
 
         if clip_top_secs:
             Menu.clear()
@@ -231,13 +258,13 @@ class Timer:
             print("\n  >  ", end=" ")
 
             for n in range(clip_top_secs):
-                self.seconds_counter += 1
+                self.secs_elapsed += 1
                 if not self.is_running:
                     return
-                time.sleep(.1)
+                time.sleep(1)
 
         if remaining_whole_mins:
-            for n in reversed(range(1, (base_mins))):
+            for n in reversed(range(1, (remaining_whole_mins + 1))):
                 Menu.clear()
                 Menu.program_header()
                 l_animators.animate_text(f"  Timer currently on minute: {n} ...")
@@ -246,21 +273,20 @@ class Timer:
                 print("\n  >  ", end="")
 
                 for s in range(60):
-                    self.seconds_counter += 1
+                    self.secs_elapsed += 1
                     if not self.is_running:
                         return
-                    time.sleep(.1)
+                    time.sleep(1)
 
-        # time_in_secs = int((var_mins * 60))
-        # mins_remaining = round(var_mins) - (x // 60)
-
-        print("  Done")
         for n in range(3):
             subprocess.run(f'pw-play {selected_sound}', shell=True)
 
+        self.completed = True
+        print("\n  Press any key to continue >  ", end="")
 
-    @staticmethod
-    def dots_timer(var_mins):
+
+
+    def dots_timer(self, var_mins):
         subprocess.run(f'pw-play {selected_sound}', shell=True)
 
         time_in_secs = int((var_mins * 60))
@@ -287,8 +313,7 @@ class Timer:
             subprocess.run(f'pw-play {selected_sound}', shell=True)
 
 
-    @staticmethod
-    def dev_timer(var_mins):
+    def dev_timer(self, var_mins):
         print(f"    {var_mins}")
         print("    .")
         time.sleep(.3)
@@ -495,15 +520,35 @@ class Pomodoro:
     def go_focus(self, var_mins):
 
         pomodoro_timer = Timer(initial_mins=var_mins, timer_style=self.selected_timer_style)
-        timer_thread = threading.Thread(target=pomodoro_timer.timer, args=(pomodoro_timer.initial_mins,))
-        timer_thread.start()
+        # Pomodoro(pomodoro_timer)
 
-        running_outcome = pomodoro_timer.running_menu()
-        if running_outcome == "PAUSE":
-            pause_outcome = pomodoro_timer.pause_menu()
+        while not pomodoro_timer.completed:
+            timer_thread = threading.Thread(target=pomodoro_timer.timer, args=(pomodoro_timer.mins_remain,))
+            timer_thread.start()
 
+            running_outcome = pomodoro_timer.running_menu()
+            if running_outcome == "EXIT":
+                self.exit_marker = True
+                break
+
+            elif not pomodoro_timer.completed:
+                pomodoro_timer.calculate_mins_remain()
+                pause_outcome = pomodoro_timer.pause_menu()
+                if pause_outcome == "EXIT":
+                    self.exit_marker = True
+                    break
+                elif pause_outcome == "RESUME":
+                    pomodoro_timer.is_running = True
+                    continue
+
+        if self.exit_marker:
+            return
+
+        Menu.clear()
+        Menu.program_header()
         l_animators.animate_text("  Main timer finished")
         print()
+
         self.round_updater("focus")
         self.round_logger("focus")
 
@@ -531,15 +576,34 @@ class Pomodoro:
 
 
     def go_break(self, var_mins):
+        pomodoro_timer = Timer(initial_mins=var_mins, timer_style=self.selected_timer_style)
+        while not pomodoro_timer.completed:
+            timer_thread = threading.Thread(target=pomodoro_timer.timer, args=(pomodoro_timer.mins_remain,))
+            timer_thread.start()
+
+            running_outcome = pomodoro_timer.running_menu()
+            if running_outcome == "EXIT":
+                self.exit_marker = True
+                break
+
+            elif not pomodoro_timer.completed:
+                pomodoro_timer.calculate_mins_remain()
+                pause_outcome = pomodoro_timer.pause_menu()
+                if pause_outcome == "EXIT":
+                    self.exit_marker = True
+                    break
+                elif pause_outcome == "RESUME":
+                    pomodoro_timer.is_running = True
+                    continue
+
+        if self.exit_marker:
+            return
+
         Menu.clear()
         Menu.program_header()
-        print("  {} minute timer started".format(var_mins));
-        print()
-
-        self.timer(var_mins)
-
         l_animators.animate_text("  Break finished")
         print()
+
         self.round_updater("break")
         self.round_logger("break")
 
