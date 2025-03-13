@@ -39,8 +39,8 @@ lumo_welcome_msg() {
 
 alias lumo="python3 -m LUMO_LIBRARY.__main__"
 alias lu="python3 -m LUMO_LIBRARY.scratch"
-alias lumocards="python3 -m LUMO_LIBRARY.lumo_cardsrun"
-alias locard="python3 -m LUMO_LIBRARY.lumo_search_cards"
+alias lumocards="python3 -m LUMO_LIBRARY.lumo_cards_planner"
+alias locard="python3 -m LUMO_LIBRARY.lumo_search"
 alias newcard="python3 -m LUMO_LIBRARY.lumo_newcard_refactor"
 alias planner="open PLANNER"
 alias today="python3 -m LUMO_LIBRARY.lumo_gettoday"
