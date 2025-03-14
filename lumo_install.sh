@@ -37,7 +37,6 @@ lumo_welcome_msg() {
     echo "Welcome to Lumocards, where you decide what cards to put in focus."
 }
 
-alias lumo="python3 -m LUMO_LIBRARY.__main__"
 alias lu="python3 -m LUMO_LIBRARY.scratch"
 alias lumocards="python3 -m LUMO_LIBRARY.lumo_cards_planner"
 alias locard="python3 -m LUMO_LIBRARY.lumo_search"
