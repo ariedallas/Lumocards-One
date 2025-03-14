@@ -1,5 +1,4 @@
 import argparse
-import collections
 import subprocess
 import time
 from typing import Dict
@@ -8,6 +7,7 @@ from LUMO_LIBRARY import (lumo_animationlibrary as l_animators,
                           lumo_cards_planner as l_cards,
                           lumo_checklist as l_checklist,
                           lumo_journal as l_journal,
+                          lumo_menus_data as l_menus_data,
                           lumo_newcard_refactor as l_newcard,
                           lumo_pomodoro as l_pomodoro,
                           lumo_search as l_search,
@@ -24,6 +24,11 @@ def get_argument_parser():
         , dest="route"
     )
 
+    sub_parser.add_parser(
+        "all"
+        , help="Display the full Lumo menu of subprograms"
+        , description="Display the full Lumo menu of subprograms"
+    )
     sub_parser.add_parser(
         "calendar"
         , help="Display the calendar in Lumo."
@@ -69,8 +74,6 @@ def get_argument_parser():
         , help="A timer with preplanned breaks"
         , description="Emulates a pomodoro (tomato) timer"
     )
-    pomodoro.add_argument("minutes", nargs="?")
-    pomodoro.add_argument("minutes", nargs="?")
 
     search = sub_parser.add_parser(
         "search"
@@ -104,7 +107,7 @@ class LumoMenu:
     def display_main(self):
         dict_length = len(self.menu)
 
-        clear()
+        LumoMenu.clear()
         print()
         print("LUMOCARDS")
         print("\n")
@@ -114,13 +117,13 @@ class LumoMenu:
                 print()
 
             k, v = item
-            print(f"  [{k.upper()}]  {v}")
+            print(f"  [{k}]  {v}")
 
 
     def display_all(self):
         dict_length = len(self.menu)
 
-        clear()
+        LumoMenu.clear()
         print()
         print("LUMOCARDS ::all:: ")
         print("\n")
@@ -134,50 +137,27 @@ class LumoMenu:
                 print()
 
             k, v = item
-            print(f"  [{k.upper()}]  {v}")
+            print(f"  [{k}]  {v}")
 
+    @staticmethod
+    def clear():
+        subprocess.run(["clear"], shell=True)
 
-MAIN_MENU = collections.OrderedDict([
-    ("a", "Cards Planner")
-    , ("b", "New Card")
-    , ("c", "Calendar")
-    , ("d", "Journal")
-    , ("e", ":: all | more ::")
-    , ("f", ":: settings ::")
-    , ("q", "Quit")
-])
+    @staticmethod
+    def load_dots():
+        print("\033[33;1m")
+        l_animators.animate_text(" ...", speed=.1, finish_delay=.3)
+        print("\033[0m")
 
-ALL_MENU = collections.OrderedDict([
-    ("a", "Cards Planner")
-    , ("b", "New Card")
-    , ("c", "Calendar")
-    , ("d", "Journal")
-    , ("e", "Search")
-    , ("f", "Checklist")
-    , ("g", "Timer")
-    , ("h", ":: settings ::")
-    , ("i", ":: about ::")
-    , ("q", "Quit")
-])
+    @staticmethod
+    def load_transition():
+        LumoMenu.clear()
+        print()
+        LumoMenu.load_dots()
+        print()
 
-
-def clear():
-    subprocess.run(["clear"], shell=True)
-
-
-def load_dots():
-    l_animators.animate_text(" ...", speed=.1, finish_delay=.3)
-
-
-def load_transition():
-    clear()
-    print()
-    load_dots()
-    print()
-
-
-main_menu = LumoMenu("main", MAIN_MENU)
-all_menu = LumoMenu("all", ALL_MENU)
+main_menu = LumoMenu("main", l_menus_data.LUMO_MAIN_MENU)
+all_menu = LumoMenu("all", l_menus_data.LUMO_ALL_MENU)
 
 
 def root_loop(parsed_args, unknown):
@@ -187,7 +167,7 @@ def root_loop(parsed_args, unknown):
     _, from_cli = _determine_input_origin(parsed_args)
 
     if from_cli:
-        router(parsed_args, unknown, main_menu)
+        status, menu = router(parsed_args, unknown, main_menu)
 
     while True:
         if status == "QUIT":
@@ -197,7 +177,7 @@ def root_loop(parsed_args, unknown):
             print()
             l_animators.animate_text("  unrecognized option", finish_delay=.5)
 
-        load_transition()
+        LumoMenu.load_transition()
         if menu.name == "all":
             current_menu = all_menu
             all_menu.display_all()
@@ -225,13 +205,13 @@ def router(user_input, unknown, contextual_menu: LumoMenu):
     """TODO: refactor, if choice:
             then do func(choice), rather than so much logic in each elif..."""
     choice, from_cli = _determine_input_origin(user_input)
-    key = choice.lower()
+    key = choice.upper()
     value = contextual_menu.menu[key] if key in contextual_menu.menu.keys() else "_"
 
     if (choice.lower() in {"about"} or
-            value.lower() in {":: about ::"}):
+            value in {":: about ::"}):
 
-        load_transition()
+        LumoMenu.load_transition()
         print("LUMOCARDS")
         print()
         l_animators.standard_interval_printer(["This", "is", "the", "about", "section"])
@@ -240,95 +220,92 @@ def router(user_input, unknown, contextual_menu: LumoMenu):
         return None, main_menu
 
     elif (choice.lower() in {"all", "more"} or
-          value.lower() in {":: all | more ::"}):
+          value in {":: all | more ::"}):
 
         return None, all_menu
 
-
     elif (choice.lower() in {"checklist", "checklists"} or
-          value.lower() in {"checklist"}):
+          value in {"Checklist"}):
 
-        load_transition()
+        LumoMenu.load_transition()
         l_checklist.main()
         return None, main_menu
 
-
     elif (choice.lower() in {"calendar"} or
-          value.lower() in {"calendar"}):
+          value in {"Calendar"}):
 
         from LUMO_LIBRARY import lumo_calendar_main as l_calendar
 
-        load_transition()
+        LumoMenu.load_transition()
         l_calendar.main()
         return None, main_menu
 
     elif (choice.lower() in {"journal"} or
-          value.lower() in {"journal"}):
+          value in {"Journal"}):
 
-        load_transition()
+        LumoMenu.load_transition()
         l_journal.main()
         return None, main_menu
 
-
     elif (choice.lower() in {"new card", "newcard"} or
-          value.lower() in {"new card", "newcard"}):
+          value in {"New Card"}):
 
         if from_cli and (user_input.card_category and user_input.card_title):
             category, title = user_input.card_category, user_input.card_title
-            load_transition()
+            LumoMenu.load_transition()
             l_newcard.main(category, title, from_lumo_menu=True)
         else:
-            load_transition()
+            LumoMenu.load_transition()
             l_newcard.main(from_lumo_menu=True)
 
         return None, main_menu
 
-    elif (choice.lower() in {"planner", "agenda"} or
-          value.lower() in {"planner", "agenda"}):
+    elif (choice.lower() in {"planner", "cards planner", "cards"} or
+          value in {"Cards Planner"}):
 
-        load_transition()
+        LumoMenu.load_transition()
         l_cards.main()
         return None, main_menu
 
     elif (choice.lower() in {"pomodoro"} or
-          value.lower() in {"pomodoro"}):
+          value in {"Pomodoro"}):
 
-        load_transition()
+        LumoMenu.load_transition()
         l_pomodoro.main()
         return None, main_menu
 
     elif (choice.lower() in {"search", "find"} or
-          value.lower() in {"search", "find"}):
+          value in {"Search"}):
 
         if from_cli and user_input.search_term:
-            load_transition()
+            LumoMenu.load_transition()
             l_search.main(user_input.search_term)
         else:
-            load_transition()
+            LumoMenu.load_transition()
             l_search.main()
         return None, main_menu
 
     elif (choice.lower() in {"settings"} or
-          value.lower() in {":: settings ::"}):
+          value in {":: settings ::"}):
 
-        load_transition()
+        LumoMenu.load_transition()
         l_settings.main()
         return None, main_menu
 
     elif (choice.lower() in {"timer"} or
-          value.lower() in {"timer"}):
+          value in {"Timer"}):
 
         if from_cli:
-            load_transition()
+            LumoMenu.load_transition()
             l_timer.main(user_input.minutes)
         else:
-            load_transition()
+            LumoMenu.load_transition()
             l_timer.main()
 
         return None, main_menu
 
     elif (choice.lower() in {"quit", "exit"} or
-          value.lower() in {"quit", "exit"}):
+          value in {"Quit"}):
 
         return "QUIT", None
 

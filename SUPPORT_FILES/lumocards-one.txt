@@ -1,6 +1,9 @@
 :::::NEXT:::::
+	- move logic parts of l_menus to other programs
+	- get rid of newcard and rename newcard_refactor to newcard
+	- move pomodoro to __main__ ::all::
 	- reintegrate Arie's version with Lumocards-One
-
+	- my main calendar is ariedallas02, move things over pls :)
 		
 :::::NEXT LVL 2:::::
 	- refactor lumo __main__ to use l_menus
@@ -210,6 +213,7 @@
 		- test all menus etc. 
 	
 	MENUS:
+		- menus should implement classes
 	 	- unify menus across all programs to decide where l_menus gets used, where x.lower() vs. x.upper() is implemented, etc. 
  		- at some point, make sure that the menus give you decent pathways for setting calendar events (make sure refactor works with added folder CARDS_D_CALENDAR)
 		- dict comprehensions / print formatting from dicts
@@ -217,7 +221,7 @@
 		- "help" menu for all sub-programs like pomodoro help, calendar help, etc. subparser.add_argument "help"
 		- periods or not in menus?
 
-	CARDSRUN:
+	CARDS PLANNER:
 	    --  When you type 'back' on Near Cards / Cardsrun / Planner it shows the previous card that has moved
 		--  should the 'macro menu' have an option to be able to menu jump to recurring cards? (I think so...)
 		--  figure out how to format text inside boxes to be left aligned

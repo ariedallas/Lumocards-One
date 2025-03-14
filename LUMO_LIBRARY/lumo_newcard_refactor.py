@@ -381,7 +381,7 @@ def program_header():
     print("NEW CARD")
     print()
     for k, v in settings.get('card categories').items():
-        print(f"[{k}]  {v[1]}")
+        print(f"{k} — {v[1]}")
 
 
 def main(card_category=None, card_title=None, from_lumo_menu=False):
