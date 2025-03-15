@@ -200,14 +200,16 @@ class TimerStandard:
             running_outcome = self.running_menu()
             if running_outcome == "EXIT":
                 exit_marker = True
-                break
+                return exit_marker
+
 
             elif not self.completed:
                 self.calculate_mins_remain()
                 pause_outcome = self.pause_menu()
                 if pause_outcome == "EXIT":
                     exit_marker = True
-                    break
+                    return exit_marker
+
                 elif pause_outcome == "RESUME":
                     self.is_running = True
                     continue

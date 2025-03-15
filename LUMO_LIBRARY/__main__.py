@@ -139,9 +139,11 @@ class LumoMenu:
             k, v = item
             print(f"  [{k}]  {v}")
 
+
     @staticmethod
     def clear():
         subprocess.run(["clear"], shell=True)
+
 
     @staticmethod
     def load_dots():
@@ -149,12 +151,14 @@ class LumoMenu:
         l_animators.animate_text(" ...", speed=.1, finish_delay=.3)
         print("\033[0m")
 
+
     @staticmethod
     def load_transition():
         LumoMenu.clear()
         print()
         LumoMenu.load_dots()
         print()
+
 
 main_menu = LumoMenu("main", l_menus_data.LUMO_MAIN_MENU)
 all_menu = LumoMenu("all", l_menus_data.LUMO_ALL_MENU)
