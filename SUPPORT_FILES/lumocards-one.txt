@@ -1,7 +1,5 @@
 :::::NEXT:::::
-	- move logic parts of l_menus to other programs
 	- get rid of newcard and rename newcard_refactor to newcard
-	- move pomodoro to __main__ ::all::
 	- reintegrate Arie's version with Lumocards-One
 	- my main calendar is ariedallas02, move things over pls :)
 		
