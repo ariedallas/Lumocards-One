@@ -74,6 +74,8 @@ def get_argument_parser():
         , help="A timer with preplanned breaks"
         , description="Emulates a pomodoro (tomato) timer"
     )
+    pomodoro.add_argument("minutes_focus", nargs="?")
+    pomodoro.add_argument("minutes_break", nargs="?")
 
     search = sub_parser.add_parser(
         "search"
@@ -147,7 +149,7 @@ class LumoMenu:
 
     @staticmethod
     def load_dots():
-        print("\033[33;1m")
+        print("\033[33;1m",end="")
         l_animators.animate_text(" ...", speed=.1, finish_delay=.3)
         print("\033[0m")
 
@@ -157,7 +159,6 @@ class LumoMenu:
         LumoMenu.clear()
         print()
         LumoMenu.load_dots()
-        print()
 
 
 main_menu = LumoMenu("main", l_menus_data.LUMO_MAIN_MENU)
@@ -274,8 +275,13 @@ def router(user_input, unknown, contextual_menu: LumoMenu):
     elif (choice.lower() in {"pomodoro"} or
           value in {"Pomodoro"}):
 
-        LumoMenu.load_transition()
-        l_pomodoro.main()
+        if from_cli and (user_input.minutes_focus and user_input.minutes_break):
+            LumoMenu.load_transition()
+            l_pomodoro.main(user_input)
+        else:
+            LumoMenu.load_transition()
+            l_pomodoro.main()
+
         return None, main_menu
 
     elif (choice.lower() in {"search", "find"} or
