@@ -255,14 +255,14 @@ def steps_preview(card_steps, steps_amt, steps_idx):
     return card_steps_three
 
 
-def main(initial_search_term=None):
-    status = "INITIAL SEARCH" if initial_search_term else "NEW SEARCH"
+def main(initial_search_from_cli=None):
+    status = "INITIAL SEARCH" if initial_search_from_cli else "NEW SEARCH"
     return_path = None
 
     while True:
         if status == "INITIAL SEARCH":
-            print(f"{status}: '{initial_search_term}'")
-            card, matched_path, user_quit = select_card_from_found(initial_search_term)
+            print(f"{status}: '{initial_search_from_cli}'")
+            card, matched_path, user_quit = select_card_from_found(initial_search_from_cli)
 
             if card:
                 hotkey_dict, hotkey_list = l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
@@ -280,7 +280,7 @@ def main(initial_search_term=None):
             status, return_path = cardsearch_main_options(card, return_path, hotkey_dict, hotkey_list)
 
         elif status == "NEW SEARCH":
-            if initial_search_term:
+            if initial_search_from_cli:
                 print()
 
             print(status)
