@@ -3,7 +3,7 @@ import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_recurring as l_recurring
-import LUMO_LIBRARY.lumo_newcard_refactor as l_newcard
+import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 
 
 def prep_newcard_menu(var_menu, var_letters, pop_letters=False):

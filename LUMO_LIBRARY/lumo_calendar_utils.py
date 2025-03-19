@@ -16,7 +16,7 @@ import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
-import LUMO_LIBRARY.lumo_newcard_refactor as l_newcard
+import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 creds_file = os.path.join(l_files.credentials_folder, "credentials.json")
