@@ -99,13 +99,4 @@ def rename_json_card(src_filename, dest_filename):
 
 if __name__ == "__main__":
     print("Hello from main")
-    loc = pathlib.Path(card_fullpath).parent.name
-    abbr = json_filename[0]
 
-    default_json = make_dflt_json_dict(location=loc, category_letter=abbr)
-    json_fullpath = get_json_card_fullpath(json_filename)
-    write_json(json_filename=json_fullpath, json_data=default_json)
-
-
-if __name__ == "__main__":
-    print("Hello from main")
