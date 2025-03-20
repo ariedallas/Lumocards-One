@@ -1,25 +1,8 @@
 :::::NEXT:::::
-	- get rid of newcard and rename newcard_refactor to newcard
 	- reintegrate Arie's version with Lumocards-One
 	- my main calendar is ariedallas02, move things over pls :)
 		
 :::::NEXT LVL 2:::::
-	- refactor lumo __main__ to use l_menus
-
-	- integrate all routes
-		- remove unnecessary print() from beginning of sub-program's main()
-		- setup relevant sub parser arguments
-		- do necessary refactors for integrating
-		- quit transitions for all sub programs
-
-		
-	- pip install -e my project
-		- ref 'IMPORTS'
-		- setup entry point script
-		- clone to 'ARIE'
-		- basic .toml file
-
-	- 
 	**  put tape on my keyboard for better finding of l ctrl and alt.
 			
 	- json dict updater for all existing...	
@@ -27,6 +10,8 @@
 	- make sure the word calendar / schedule are used in a way that makes sense...
 		- mostly calendar unless you need schedule
 	- probably an event should become an object at some point... (currently it's a list)
+
+	- continue buildling out .toml file
 
 
 :::::OUTLINE BIG:::::
@@ -180,8 +165,14 @@
 		- when you xsition back from a sub program to main menu, do ... loader transition
 
 	LUMO HOME MENU:
-		- update "all" menu to include pomodoro
+		- integrate all routes
+		- setup relevant sub parser arguments
+		- do necessary refactors for integrating
+		- quit transitions for all sub programs
+
 		- at some point chance ALL_MENU and MAIN_MENU to be constructed with zipping letters rather than hardcoding.
+		- update "all" menu to include pomodoro
+
 		- gracefull inform user if the command line arguments after 'lumo' are unrecognized
 		- inform user of options with unrecognized argv inputs in the home menu
 		- refactor to use l_menus and check for cohesion
@@ -203,6 +194,7 @@
 
 	POMODORO:
 		- when showing log in go_focus or go_break, don't immediately resume, go back to menu
+		- pause menu may need more testing...
 		- settings option to turn off sounds; play different sounds
 		- curses for independent painting of timer animation + menu
 		- you could have the selected_timer return the actual elapsed time and add it to the log for more accurate logs
