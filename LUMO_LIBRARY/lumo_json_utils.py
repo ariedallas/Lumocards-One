@@ -1,10 +1,8 @@
 import datetime
 import json
 import os
-import pathlib
 
 import LUMO_LIBRARY.lumo_filehandler as l_files
-import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 
 
 def get_json_card_fullpath(json_filename):
@@ -52,13 +50,15 @@ def get_category_from_json_settings(var_ltr):
     return selected_category
 
 
-def make_dflt_json_dict(location, category_letter, google_calendar_data=None):
+def make_default_json_dict(location, category_letter, google_calendar_data=None):
     category = get_category_from_json_settings(category_letter)
 
     dict_for_json = {
         "card location": location,
         "card category abbreviation": category_letter.upper(),
         "card category": category,
+        "calendar event": google_calendar_data,
+        "calendar repeating event": None,
         "recurring freq": 0,
         "recurring freq time unit": None,
         "last occurrence": None,
@@ -67,10 +67,10 @@ def make_dflt_json_dict(location, category_letter, google_calendar_data=None):
             ["default tag a"
                 , "default tag b"
                 , "default tag c"],
-        "google calender data": google_calendar_data
     }
 
     return dict_for_json
+
 
 
 def flexible_json_updater(json_filename, location=None, update_category=False):
@@ -97,8 +97,8 @@ def rename_json_card(src_filename, dest_filename):
     os.rename(source, dest)
 
 
-def make_json_for_unpaired_card(json_filename):
-    card_fullpath = l_card_utils.get_card_abspath(json_filename)
+if __name__ == "__main__":
+    print("Hello from main")
     loc = pathlib.Path(card_fullpath).parent.name
     abbr = json_filename[0]
 

@@ -299,7 +299,7 @@ def write_card_and_json(card_filename, folder, add_custom_steps=None):
         with open(formatted_card_fullpath, "w+") as newcard:
             newcard.write(default_text)
 
-    default_json = l_json_utils.make_dflt_json_dict(card_folder, c_abbr)
+    default_json = l_json_utils.make_default_json_dict(card_folder, c_abbr)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
     l_json_utils.write_json(json_filename=json_fullpath, json_data=default_json)
 
@@ -370,7 +370,7 @@ def write_calendar_card_and_json(card_filename, folder, google_calendar_data, ad
         with open(formatted_card_fullpath, "w+") as newcard:
             newcard.write(default_text)
 
-    default_json = l_json_utils.make_dflt_json_dict(card_folder, c_abbr, google_calendar_data)
+    default_json = l_json_utils.make_default_json_dict(card_folder, c_abbr, google_calendar_data)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
     l_json_utils.write_json(json_filename=json_fullpath, json_data=default_json)
 
@@ -412,28 +412,3 @@ def main(card_category=None, card_title=None, from_lumo_menu=False):
 
 if __name__ == "__main__":
     main()
-
-# ---- ETC. ---- #
-
-# def add_card_steps_or_retry(card_filename):
-#     if card_filename:
-#
-#         return card_filename
-#
-#     else:
-#         if not test_for_local_args():
-#             pass
-#         else:
-#             print()
-#             l_animators.animate_text("A card with this name already exists...")
-#             l_animators.animate_text("Try another card name.")
-#             sys.argv.clear()
-#
-#     card_filename_input = validate_from_input()
-#     if card_filename_input:
-#         card_steps = add_custom_or_default_steps()
-#         return card_filename_input, card_steps
-#
-#     else:
-#
-#         return None, None

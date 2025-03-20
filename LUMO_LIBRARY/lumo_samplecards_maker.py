@@ -33,7 +33,7 @@ def delete_all_cards():
     print("Deleting all sample cards and initializing folders with nothing.")
     print()
 
-    if l_menus_funcs.proceed("OK? "):
+    if l_menus_funcs.proceed("Are you sure you want to do this? "):
         delete_cards_from_folder(l_files.cards_near_folder)
         delete_cards_from_folder(l_files.cards_middle_folder)
         delete_cards_from_folder(l_files.cards_dist_folder)

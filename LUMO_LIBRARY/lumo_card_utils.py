@@ -1,3 +1,4 @@
+import datetime
 import os
 import pathlib
 import re
@@ -133,6 +134,58 @@ def near_focus_to_archive(card_filename):
     os.rename(source, dest)
 
 
+def default_json_card_handler(filename):
+    json_filename = f"{filename}.json"
+    card_filename = f"{filename}.txt"
+
+    recurring_set = {c for c in os.listdir(l_files.recurring_cards_folder)}
+    is_recurring = card_filename in recurring_set
+    sched_data = None
+
+    mk_default_json_card(card_filename=card_filename)
+
+    if is_recurring:
+        sched_data = add_default_recurr_data(json_filename=json_filename,
+                                           freq=4,
+                                           unit="Day")
+
+    feedback(is_recurring, sched_data)
+
+
+def mk_default_json_card(card_filename):
+    card_fullpath = get_card_abspath(card_filename)
+    loc = pathlib.Path(card_fullpath).parent.name
+    abbr = card_filename[0]
+
+    default_json = l_json_utils.make_default_json_dict(location=loc, category_letter=abbr)
+    json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
+    l_json_utils.write_json(json_filename=json_fullpath, json_data=default_json)
+
+
+def add_default_recurr_data(json_filename, freq, unit):
+    json_data = l_json_utils.read_and_get_json_data(json_filename)
+
+    json_data["recurring freq"] = freq
+    json_data["recurring freq time unit"] = unit
+    json_data["last occurrence"] = datetime.datetime.strftime(l_files.today, '%b %d %Y, %A')
+
+    l_json_utils.write_json(json_filename=json_filename, json_data=json_data)
+
+    sched_data = f"{freq} {unit} "
+    return sched_data
+
+
+def feedback(is_recurring=False, schedule=None, deleted=False):
+    if is_recurring and not deleted:
+        print(f"        Recurring card created with defaults: {schedule}")
+    elif not deleted and not is_recurring:
+        print(f"        Standard card created")
+    else: # deleted
+        print(f"        Card deleted")
+
+    print()
+
+
 def clean_cards():
     """Check to make sure that each .txt card is coupled with a .json card
     If not, ask the user to make either a .txt or .json file to pair
@@ -148,12 +201,13 @@ def clean_cards():
 
         for u in unique_txts:
             print(f"  {u}.txt", end=" ")
-            user_input = input("——> [D]elete this or [C]reate .json files to pair it? >  ")
+            user_input = input("——> [D]elete this or [C]reate .json file to pair it? >  ")
             if user_input.lower() == 'd':
                 card_fullpath = get_card_abspath(f"{u}.txt")
                 send2trash.send2trash(card_fullpath)
+                feedback(deleted=True)
             elif user_input.lower() == 'c':
-                pass
+                default_json_card_handler(u)
             else:
                 print("        (You skipped this card for now.)")
 
@@ -163,10 +217,11 @@ def clean_cards():
 
         for u in unique_jsons:
             print(f"  {u}.json", end=" ")
-            user_input = input("——> [D]elete this or [C]reate .txt files to pair it? >  ")
+            user_input = input("——> [D]elete this or [C]reate .txt file to pair it? >  ")
             if user_input.lower() == 'd':
                 json_fullpath = l_json_utils.get_json_card_fullpath(f"{u}.json")
                 send2trash.send2trash(json_fullpath)
+                feedback(deleted=True)
             elif user_input.lower() == 'c':
                 pass
             else:

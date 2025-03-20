@@ -342,7 +342,7 @@ def run_remaining_cards():
 
 def review_and_write_recurring():
     if reactivated_cards:
-        l_animators.animate_text(f'{len(reactivated_cards)} cards were reactivated...', speed=.075)
+        l_animators.animate_text(f'{len(reactivated_cards)} cards were reactivated...', finish_delay=.5)
 
         review_set = set(reviewed_recurring_cards)
         remaining_cards = [x for x in reactivated_cards if x not in review_set]
@@ -358,6 +358,9 @@ def review_and_write_recurring():
 
             review_set = set(reviewed_recurring_cards)
             remaining_cards = [x for x in reactivated_cards if x not in review_set]
+
+    else:
+        l_animators.animate_text(f'No recurring cards for today...', finish_delay=.5)
 
 
 def planner_feedback(card_title, card_step):
@@ -402,8 +405,7 @@ def update_cards():
         l_files.basic_wrtr_list(todays_cards, l_files.today_planner_fullpath)
 
     print()
-    l_animators.animate_text("This round of cards has completed.")
-    print()
+    l_animators.animate_text("This round of cards has completed.", finish_delay=.5)
 
 
 def program_header():
@@ -430,9 +432,9 @@ def main():
         if user_input:
             review_and_write_recurring()
 
-    elif status == "SUPER QUIT":
-        update_cards()
-        sys.exit(0)
+    update_cards()
+
+
 
 
 if __name__ == "__main__":
