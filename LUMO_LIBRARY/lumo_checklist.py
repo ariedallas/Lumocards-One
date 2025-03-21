@@ -15,13 +15,12 @@ errand_card_path = os.path.join(l_files.internal_cards_folder, "Checklist_Errand
 errand_card = l_card_utils.fullpath_to_card(errand_card_path)
 errand_card_title, errand_card_steps = errand_card[0], errand_card[1]
 
-checklist_cards = sorted([card for card in os.listdir(l_files.checklist_cards_folder)])
-
-fetched = [l_card_utils.filename_to_card(file) for file in checklist_cards]
-fetched_titles = [l_card_utils.format_card_title(card[0]) for card in fetched]
-formatted_results_dict = {f"{ltr}": card for ltr, card in zip(l_menus_data.LETTERS_FILTERED, fetched)}
-formatted_results_menu = [f"  [{ltr.upper()}]  {card_title}"
-                          for ltr, card_title in zip(l_menus_data.LETTERS_FILTERED, fetched_titles)]
+# checklist_cards = sorted([card for card in os.listdir(l_files.checklist_cards_folder)])
+# fetched = [l_card_utils.filename_to_card(file) for file in checklist_cards]
+# fetched_titles = [l_card_utils.format_card_title(card[0]) for card in fetched]
+# formatted_results_dict = {f"{ltr}": card for ltr, card in zip(l_menus_data.LETTERS_FILTERED, fetched)}
+# formatted_results_menu = [f"  [{ltr.upper()}]  {card_title}"
+#                           for ltr, card_title in zip(l_menus_data.LETTERS_FILTERED, fetched_titles)]
 
 
 def cycler(list_of_steps):
@@ -29,22 +28,23 @@ def cycler(list_of_steps):
         input(f"  {item} ?  ")
 
 
-def display_menu():
-    full_menu = formatted_results_menu + [""] + l_menus_data.SIMPLE_EXIT_LIST + l_menus_data.QUIT_MENU_LIST
+def display_menu(var_menu):
+    full_menu = var_menu + [""] + l_menus_data.SIMPLE_EXIT_LIST + l_menus_data.QUIT_MENU_LIST
     for line in full_menu:
         print(line)
 
 
 def card_select(var_dict):
     lookup = input("\n  > ")
-    match_letters = [ltr for ltr in formatted_results_dict.keys()]
 
     # TODO: change this to a dict lookup
-    if lookup in {"q", "x"}:
-        return (None, None, "EXIT") if lookup == "x" else (None, None, "QUIT")
+    if lookup.lower() in {"q", "x"}:
+        return (None, None, "EXIT") if lookup.lower() == "x" else (None, None, "QUIT")
 
-    elif lookup in match_letters:
-        selected = var_dict[lookup]
+    # Note that var_dict.keys() are capitals; they are created from the base string.ascii_uppercase
+    # this is a style choice which could later be a feature in settings to toggle upper/lower case
+    elif lookup.upper() in var_dict.keys():
+        selected = var_dict[lookup.upper()]
         card_title = l_card_utils.format_card_title(selected[0])
         card_steps = selected[1]
 
@@ -91,9 +91,16 @@ def program_header():
 
 
 def main():
+    checklist_cards = sorted([card for card in os.listdir(l_files.checklist_cards_folder)])
+    fetched = [l_card_utils.filename_to_card(file) for file in checklist_cards]
+    fetched_titles = [l_card_utils.format_card_title(card[0]) for card in fetched]
+    formatted_results_dict = {f"{ltr}": card for ltr, card in zip(l_menus_data.LETTERS_FILTERED, fetched)}
+    formatted_results_menu = [f"  [{ltr.upper()}]  {card_title}"
+                              for ltr, card_title in zip(l_menus_data.LETTERS_FILTERED, fetched_titles)]
+
     while True:
         program_header()
-        display_menu()
+        display_menu(formatted_results_menu)
         title, steps, status = card_select(formatted_results_dict)
         if title and steps:
             break
