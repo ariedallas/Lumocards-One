@@ -1,5 +1,4 @@
 :::::NEXT:::::
-	- reintegrate Arie's version with Lumocards-One
 	- my main calendar is ariedallas02, move things over pls :)
 		
 :::::NEXT LVL 2:::::
@@ -248,18 +247,31 @@
 		--  spend a few hours one morning going through the playsound python package
 		--  is it possible to use part of ffmpeg, ffplay, pyaudio?
 
-	INSTALLATION NEW USERS
+	INSTALLATION NEW USERS / AUTHENITCATION:
+		- 'lumo' could be installed to users home bin so that when the virtual environ
+			-ment is not loaded, it could be a script to start the virtual environment
+			- and then run the command 'lumo'. At any rate, basically you want some
+			- kind of branch that will enable users to only type 'lumo' whether or not
+			- they are in a virtual environment or
 		- demo video
 		- homebrew?
 		- see all the ways the micro can be installed
 		- should install be like other programs with ~/.config
-		-intro to explain settings
-		-explain to users what kinds of cards there are and how they work
-		-introduction feature to have user set up caterogires, one at a time
-		-intro to set user birthday
-		-what if the user wants to change the names of categories? 
+		- intro to explain settings
+		- explain to users what kinds of cards there are and how they work
+		- introduction feature to have user set up caterogires, one at a time
+		- intro to set user birthday
+		- what if the user wants to change the names of categories? 
+		- how could lumo and the entry point 'lumo' be set up to support multiple users / accounts
+
+		- Could authentication be done using a simple website? What makes the app production? What is the best 
+			- to work with the Google Auth system
+
+		- Note for users about temporarily allowing insecure content...
+			- Firefox toggle extensions Clear URLs / possibly disable...
+			- Chrome disable insecure content
+			- Safari ??
 		
-		- pip install -e ??? / the python video from Real Python
 		- requires python
 		- user downloads a tar or compressed folder
 		- then script installs a vitual environment +
