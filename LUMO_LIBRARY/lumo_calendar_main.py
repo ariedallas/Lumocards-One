@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
                                               CalendarPageWeek,
+                                              Menus,
                                               curr_month,
                                               curr_year,
                                               get_adjacent_month,
@@ -15,6 +16,11 @@ from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
 
 
 class CalendarInterface:
+    curr_day_in_focus = None
+    curr_week_in_focus = None
+    curr_view = "DAY"
+
+
 
     def __init__(self):
         past_month = get_adjacent_month(curr_month, curr_year, "past", 1)
@@ -23,16 +29,19 @@ class CalendarInterface:
         self.day_blocks_window = get_day_blocks()
         self.week_blocks_window = self.separate_by_weeks()
 
-    def paginate_days(self):
+
+    def view_days(self):
         idx = self._get_idx_for_today()
         curr_day_block = self.day_blocks_window[idx]
+
 
         while True:
             curr_page = CalendarPageDay(curr_day_block)
             curr_page.display_day()
+            curr_page.display_menu()
 
-            print(" " * CalendarPageDay.l_margin, idx)
-            print(" " * CalendarPageDay.l_margin, end=" ")
+            print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT + f" {str(idx)}")
+            print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT, end=" ")
 
             user_input = input(">  ")
 
@@ -67,7 +76,8 @@ class CalendarInterface:
             else:
                 curr_day_block = self.day_blocks_window[idx]
 
-    def paginate_weeks(self):
+
+    def view_week(self):
         idx = self._get_idx_for_curr_week()
         curr_week_block = self.week_blocks_window[idx]
 
@@ -112,6 +122,7 @@ class CalendarInterface:
                 print("Use one or more brackets '[' or ']' to navigate.")
                 curr_week_block = self.week_blocks_window[idx]
 
+
     def _get_idx_for_today(self):
         total_weeks = len(self.week_blocks_window)
         prior_weeks = round((total_weeks - 1) / 2)
@@ -120,11 +131,13 @@ class CalendarInterface:
 
         return idx
 
+
     def _get_idx_for_curr_week(self):
         total_weeks = len(self.week_blocks_window)
         center_idx = math.floor(total_weeks / 2)
 
         return center_idx
+
 
     def _roll_forward(self, amt_weeks, context):
         curr_final_monday = self.week_blocks_window[-1][0]
@@ -144,6 +157,7 @@ class CalendarInterface:
 
         return idx_shift
 
+
     def _roll_backward(self, amt_weeks, context):
         curr_first_monday = self.week_blocks_window[0][0]
         target_monday = curr_first_monday.date - relativedelta(weeks=amt_weeks)
@@ -162,6 +176,7 @@ class CalendarInterface:
 
         return idx_shift
 
+
     def separate_by_weeks(self):
         separated_weeks = []
         num_weeks = round(len(self.day_blocks_window) / 7)
@@ -172,10 +187,14 @@ class CalendarInterface:
 
         return separated_weeks
 
+
 def main():
     calendar_interface = CalendarInterface()
     # calendar_interface.paginate_days()
-    calendar_interface.paginate_weeks()
+    calendar_interface.view_days()
+
+
+
 
 if __name__ == "__main__":
     main()

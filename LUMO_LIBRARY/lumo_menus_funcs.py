@@ -6,6 +6,11 @@ import LUMO_LIBRARY.lumo_recurring as l_recurring
 import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 
 
+def proceed(input_text="... "):
+    user_input = input(f"{input_text} ")
+    return True if user_input not in l_menus_data.NEGATIVE_USER_RESPONSES else False
+
+
 def prep_newcard_menu(var_menu, var_letters, pop_letters=False):
     if pop_letters:
         full_hotkey_set_dict = {f"{var_letters.pop(0)}": f"{match}" for match in var_menu}
@@ -67,11 +72,6 @@ def prep_card_modify_menu(actions_list, card_filename):
         full_hotkey_set_dict.values())]
 
     return full_hotkey_set_list, full_hotkey_set_dict
-
-
-def proceed(input_text="... "):
-    user_input = input(f"{input_text} ")
-    return True if user_input not in l_menus_data.NEGATIVE_USER_RESPONSES else False
 
 
 def menu_recurrence_settings(var_menu):

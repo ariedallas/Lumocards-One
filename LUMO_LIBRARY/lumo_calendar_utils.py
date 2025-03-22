@@ -13,9 +13,10 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
-import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
+import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
+import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
@@ -301,75 +302,62 @@ def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
     return expanded_events
 
 
-class DayBlock:
-    def __init__(self, day, dayname, date, events):
-        self.day = day
-        self.dayname = dayname
-        self.date = date
-        self.events = events
-
-        # self.event_1 = DayBlock.list_safe_idx_get(self.events, 0, "--- --- ---")
-        # self.event_2 = DayBlock.list_safe_idx_get(self.events, 1, "--- --- ---")
-        # self.event_3 = DayBlock.list_safe_idx_get(self.events, 2, "--- --- ---")
-
-
-    @classmethod
-    def from_date(cls, var_datetime, events):
-        day = var_datetime.day
-        day_int = var_datetime.weekday()
-        dayname = calendar.Day(day_int).name
-        date = var_datetime
-
-        return DayBlock(day, dayname, date, events)
-
-
-    @staticmethod
-    def list_safe_get_item(var_list, idx):
-        if len(var_list) >= (idx + 1):
-            return var_list[idx]
-        else:
-            return [None, None, "     ", "     ", "--- --- ---"]
-
-
 class CalendarPageDay:
     t_size = os.get_terminal_size()
     total_width = int(t_size.columns)
     content_width = percenter(70, total_width)
-    left_margin = round((total_width - content_width) / 2)
 
     EVENTS_WIDTH = 86
     EVENTS_LINE = "-" * EVENTS_WIDTH
-    l_margin = round((total_width - EVENTS_WIDTH) / 2)
-    l_margin_line = "-" * l_margin
+    l_margin_num = round((total_width - EVENTS_WIDTH) / 2) - 1
+    l_margin_space = " " * l_margin_num
+    l_margin_line = "-" * l_margin_num
 
-    line = ("-" * content_width)
+    main_line = ("-" * content_width)
+
+    EVENTS_SELECTOR = 10
+    EVENTS_SELECTOR_SPACE = " " * EVENTS_SELECTOR
+    EVENTS_BODY = 60
+
+    MENU_ITEM_INDENT = " " * (EVENTS_SELECTOR + 2)
+
 
 
     def __init__(self, var_dayblock):
-        self.header_date = CalendarPageDay.format_date_for_header(var_dayblock.date)
+        self.header_date = CalendarPageDay._format_date_for_header(var_dayblock.date)
         self.events = var_dayblock.events
 
 
     @staticmethod
-    def format_date_for_header(var_date):
+    def _format_date_for_header(var_date):
         formatted = datetime.date.strftime(var_date, "%A: %B %d, %Y")
         return formatted
 
 
-    def row_cal_header(self):
-        print("{0:^{width}}\n".format(self.header_date.upper(), width=CalendarPageDay.total_width))
-        print("{0:^{width}}".format(CalendarPageDay.line, width=CalendarPageDay.total_width))
+    def _row_cal_header(self):
+        under_line = ("-" * len(self.header_date))
+
+        print()
+        print("{0:^{width}}".format(self.header_date.upper(), width=CalendarPageDay.total_width))
+        print("{0:^{width}}".format(under_line, width=CalendarPageDay.total_width))
         print()
 
 
     @staticmethod
-    def _row_style_2(var_sel, var_event, var_start_t, var_end_t):
-        selector = "{:<{width}}".format(var_sel, width=10)
-        event = "• {:<{width}}".format(var_event, width=60)
+    def _row_style_event(var_sel, var_event, var_start_t, var_end_t):
+        selector = "{:<{width}}".format(var_sel, width=CalendarPageDay.EVENTS_SELECTOR)
+        event = "• {:<{width}}".format(var_event, width=CalendarPageDay.EVENTS_BODY)
         time = "{} —— {}".format(var_start_t, var_end_t)
 
         group = selector + event + time
         print("{0:^{width}}\n".format(group, width=CalendarPageDay.total_width))
+
+
+    @staticmethod
+    def _row_style_menu(var_sel, var_option):
+        selector = f"[{var_sel}]  "
+
+        print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT + selector + var_option)
 
 
     def display_day(self):
@@ -378,19 +366,34 @@ class CalendarPageDay:
 
         subprocess.run(["clear"], shell=True)
 
-        self.row_cal_header()
-        CalendarPageDay._row_style_2("[A]", summary, start, end)
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[A]", summary, start, end)
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_2("[A]", "something I'll do another time", start, end)
-        CalendarPageDay._row_style_2("[A]", "something I'll do soon", start, end)
+        self._row_cal_header()
+        CalendarPageDay._row_style_event("[A]", summary, start, end)
+        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
+        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
+        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
+        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
+        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
+        CalendarPageDay._row_style_event("[A]", summary, start, end)
+        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
+        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
+        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
+        CalendarPageDay._row_style_event("[A]", "something I'll do another time", start, end)
+        CalendarPageDay._row_style_event("[A]", "something I'll do soon", start, end)
+
+
+    def display_menu(self):
+        menu_dict, menu_list = Menus.main_cal_menu
+
+        print()
+        print(CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + "CALENDAR")
+        print()
+        for k, v in menu_dict.items():
+            CalendarPageDay._row_style_menu(k, v)
+        print()
+
+        # print("\n{0:^{width}}".format(Menus.MENU_BAR_1, width=CalendarPageDay.total_width))
+        # print("{0:^{width}}".format(CalendarPageDay.EVENTS_LINE, width=CalendarPageDay.total_width))
+
 
 
 class CalendarPageWeek:
@@ -621,6 +624,63 @@ class CalendarPageWeek:
         CalendarPageWeek.line_break()
 
 
+class DayBlock:
+    def __init__(self, day, dayname, date, events):
+        self.day = day
+        self.dayname = dayname
+        self.date = date
+        self.events = events
+
+        # self.event_1 = DayBlock.list_safe_idx_get(self.events, 0, "--- --- ---")
+        # self.event_2 = DayBlock.list_safe_idx_get(self.events, 1, "--- --- ---")
+        # self.event_3 = DayBlock.list_safe_idx_get(self.events, 2, "--- --- ---")
+
+
+    @classmethod
+    def from_date(cls, var_datetime, events):
+        day = var_datetime.day
+        day_int = var_datetime.weekday()
+        dayname = calendar.Day(day_int).name
+        date = var_datetime
+
+        return DayBlock(day, dayname, date, events)
+
+
+    @staticmethod
+    def list_safe_get_item(var_list, idx):
+        if len(var_list) >= (idx + 1):
+            return var_list[idx]
+        else:
+            return [None, None, "     ", "     ", "--- --- ---"]
+
+
+class Menus:
+    ACTION_NEW_EVENT = "New event"
+    ACTION_NEW_QUICK = "New quick event"
+    ACTION_MOD_DEL = "Modify / delete event"
+    ACTION_SEARCH = "Search events"
+    ACTION_GOTO = "Go to date / day"
+    ACTION_TOGGLE = "Toggle view ➝ "
+    ACTION_HELP_MORE = "Help / More"
+
+    ACTION_EXIT = "Exit"
+    ACTION_QUIT = "Quit"
+
+    MAIN_CAL_MENU = [
+        ACTION_NEW_EVENT,
+        ACTION_NEW_QUICK,
+        ACTION_MOD_DEL,
+        ACTION_SEARCH,
+        ACTION_GOTO,
+        ACTION_TOGGLE,
+        ACTION_HELP_MORE,
+    ]
+
+    MENU_BAR_1 = " :: MENU :: "
+
+    main_cal_menu = l_menus_funcs.prep_menu(MAIN_CAL_MENU)
+
+
 if __name__ == "__main__":
     print("Hello from main")
     creds = get_creds()
@@ -701,8 +761,7 @@ if __name__ == "__main__":
 
         l_newcard.write_calendar_card_and_json(title, l_files.cards_calendar_folder, google_data, details_as_list)
 
-
-    make_local_card_from_google()
+    # make_local_card_from_google()
 
     # def instances():
     #     page_token = None
