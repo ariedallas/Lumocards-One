@@ -61,10 +61,10 @@ def get_category_from_input():
 
 def category_check(card_category):
     if card_category.upper() not in all_card_categories:
-        l_animators.standard_interval_printer(["", "That category letter currently doesn't exist"], speed_interval=.5)
-        l_animators.standard_interval_printer(["- or -"], speed_interval=.5)
-        l_animators.standard_interval_printer(["You entered something other than one letter.", ""], speed_interval=.5)
-        l_animators.standard_interval_printer(["The system defaults the category to [Rr]_MAKE."], speed_interval=.5)
+        l_animators.list_printer(["", "That category letter currently doesn't exist"], speed_interval=.5)
+        l_animators.list_printer(["- or -"], speed_interval=.5)
+        l_animators.list_printer(["You entered something other than one letter.", ""], speed_interval=.5)
+        l_animators.list_printer(["The system defaults the category to [Rr]_MAKE."], speed_interval=.5)
         return "R"
 
     else:
@@ -196,12 +196,12 @@ def write_card(card_filename, card_steps):
         l_animators.animate_text(f"CREATING CARD: {card_filename}", finish_delay=.4)
 
         print()
-        l_animators.standard_interval_printer(focus_menu_l, speed_interval=0)
+        l_animators.list_printer(focus_menu_l, speed_interval=0)
         print()
-        l_animators.standard_interval_printer(schedule_menu_l, speed_interval=0)
+        l_animators.list_printer(schedule_menu_l, speed_interval=0)
         print()
-        l_animators.standard_interval_printer(l_menus_data.START_OVER_MENU_LIST, speed_interval=0)
-        l_animators.standard_interval_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
+        l_animators.list_printer(l_menus_data.START_OVER_MENU_LIST, speed_interval=0)
+        l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
         print()
         user_input = input("  Select where this card should go > ")
 
@@ -254,9 +254,9 @@ def write_card(card_filename, card_steps):
                                                                              pop_letters=False)
 
                 print()
-                l_animators.standard_interval_printer([card_title_formatted])
+                l_animators.list_printer([card_title_formatted])
                 print()
-                l_animators.standard_interval_printer(recur_menu_l)
+                l_animators.list_printer(recur_menu_l)
 
                 recurrence_settings = l_menus_funcs.menu_recurrence_settings(recur_menu_d)
 

@@ -129,7 +129,7 @@ def select_card_from_found(searchterm):
 
     for matches_list in all_matches_formatted:
         if len(matches_list) > 1:
-            l_animators.standard_interval_printer(matches_list, speed_interval=0)
+            l_animators.list_printer(matches_list, indent_amt=2, speed_interval=0)
             print()
 
     print(l_menus_data.EXIT_MENU_LIST[0])
@@ -171,10 +171,10 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
 
     l_card_utils.card_header(var_card)
 
-    l_animators.standard_interval_printer(var_hotkey_list, speed_interval=0)
+    l_animators.list_printer(var_hotkey_list, indent_amt=2, speed_interval=0)
     print()
-    l_animators.standard_interval_printer(l_menus_data.EXIT_MENU_LIST, speed_interval=0)
-    l_animators.standard_interval_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
+    l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, indent_amt=2, speed_interval=0)
+    l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, indent_amt=2, speed_interval=0)
 
     while True:
         user_input = input("\n  > ")
@@ -213,9 +213,9 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
                                                                        l_menus_data.LETTERS_FILTERED,
                                                                        pop_letters=False)
                 print()
-                l_animators.standard_interval_printer([card_title_formatted])
+                l_animators.list_printer([card_title_formatted])
                 print()
-                l_animators.standard_interval_printer(recur_menu_l)
+                l_animators.list_printer(recur_menu_l, indent_amt=2)
 
                 recurrence_settings = l_menus_funcs.menu_recurrence_settings(var_menu=recur_menu_d)
 

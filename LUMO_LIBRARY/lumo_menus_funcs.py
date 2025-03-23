@@ -28,7 +28,7 @@ def prep_newcard_menu(var_menu, var_letters, pop_letters=False):
 def prep_menu(var_menu):
     full_hotkey_set_dict = {f"{ltr}": f"{match}" for ltr, match in zip(l_menus_data.LETTERS_FILTERED, var_menu)}
 
-    full_hotkey_set_list = [f"  [{letter}]  {action}" for letter, action in zip(
+    full_hotkey_set_list = [f"[{letter}]  {action}" for letter, action in zip(
         full_hotkey_set_dict.keys(),
         full_hotkey_set_dict.values())]
 
@@ -106,9 +106,9 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
     print()
 
     while True:
-        l_animators.standard_interval_printer(var_hotkey_list, speed_interval=0)
+        l_animators.list_printer(var_hotkey_list, speed_interval=0)
         print()
-        l_animators.standard_interval_printer(l_menus_data.EXIT_MENU_LIST, speed_interval=0)
+        l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, speed_interval=0)
 
         response = input("\n  > ")
 

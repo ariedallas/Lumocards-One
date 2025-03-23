@@ -12,7 +12,7 @@ def main():
         formatted_settings.append(f"{k.upper()}:")
         formatted_settings.append(f"    {v}")
 
-    l_animators.standard_interval_printer(formatted_settings)
+    l_animators.list_printer(formatted_settings)
     time.sleep(.5)
 
 

@@ -94,19 +94,19 @@ class Menu:
 
             print(f"  {name.title()}")
             print()
-            l_animators.standard_interval_printer(list_menu_updated, speed_interval=0)
+            l_animators.list_printer(list_menu_updated, indent_amt=2, speed_interval=0)
         else:
             print(f"  {name.title()}")
             print()
-            l_animators.standard_interval_printer(self.list_menu, speed_interval=0)
+            l_animators.list_printer(self.list_menu, indent_amt=2, speed_interval=0)
 
         if show_quit or show_exit:
             print()
 
         if show_exit:
-            l_animators.standard_interval_printer(l_menus_data.SIMPLE_EXIT_LIST, speed_interval=0)
+            l_animators.list_printer(l_menus_data.SIMPLE_EXIT_LIST, indent_amt=2, speed_interval=0)
         if show_quit:
-            l_animators.standard_interval_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
+            l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, indent_amt=2, speed_interval=0)
 
         if show_quit or show_exit:
             print()
@@ -118,10 +118,10 @@ class Menu:
             default_action_choice = menu_options[marker] + " ➝ (Default action)"
             list_menu_updated = menu_options.copy()
             list_menu_updated[marker] = default_action_choice
-            l_animators.standard_interval_printer(list_menu_updated, speed_interval=0)
+            l_animators.list_printer(list_menu_updated, indent_amt=2, speed_interval=0)
         else:
 
-            l_animators.standard_interval_printer(menu_options, speed_interval=0)
+            l_animators.list_printer(menu_options, indent_amt=2, speed_interval=0)
 
 
     def menu_update_prepend(self, option, var_menu):

@@ -4,6 +4,7 @@ import time
 from dateutil.relativedelta import relativedelta
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 
 from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
                                               CalendarPageWeek,
@@ -21,7 +22,9 @@ from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
 class CalendarInterface:
     curr_day_in_focus = None
     curr_week_in_focus = None
-    curr_view = "DAY"
+
+    default_view = "DAY"
+    curr_view_mode: str | None = None
 
 
     def __init__(self):
@@ -32,12 +35,13 @@ class CalendarInterface:
         self.week_blocks_window = self.separate_by_weeks()
 
         self.day_idx = None
+        self.week_idx = None  # is this a thing?
 
 
     def view_days(self):
         self.day_idx = self._get_idx_for_today()
         curr_day_block = self.day_blocks_window[self.day_idx]
-        menu_dict, _ = Menus.main_cal_menus
+        menu_dict, _ = l_menus_funcs.prep_menu(Menus.MAIN_CAL_MENU)
 
         while True:
             curr_page = CalendarPageDay(curr_day_block)
@@ -49,24 +53,27 @@ class CalendarInterface:
 
             user_input = input(">  ")
 
-
             if "]" in user_input or "[" in user_input:
                 curr_day_block = self.paginate_days(user_input)
 
             elif user_input.upper() in menu_dict.keys():
-                self.calendar_actions_router(user_input); time.sleep(.5)
+                self.calendar_actions_router(user_input);
+                time.sleep(.5)
 
             elif user_input.lower() in {"x", "exit"}:
-                print("Exit"); time.sleep(.5)
+                print("Exit");
+                time.sleep(.5)
+
+            elif user_input.lower() in {"t", "toggle"}:
+                CalendarInterface.curr_view_mode = "WEEK"
+                return "TOGGLE"
 
             elif user_input.lower() in {"q", "quit"}:
-                print("Quit"); time.sleep(.5)
+                return "QUIT"
 
-            elif user_input.lower() in {"t", "toggle, toggle view, change view"}:
-                print("Quit"); time.sleep(.5)
 
             else:
-                l_animators.animate_text_indented("  Unrecognized option...", indent=30,  finish_delay=.5)
+                l_animators.animate_text_indented("  Unrecognized option...", indent=30, finish_delay=.5)
 
 
     def paginate_days(self, user_input):
@@ -103,17 +110,20 @@ class CalendarInterface:
 
         return curr_day_block
 
+
     def calendar_actions_router(self):
         print("lemon")
         pass
 
-    def view_week(self):
+
+    def view_weeks(self):
         idx = self._get_idx_for_curr_week()
         curr_week_block = self.week_blocks_window[idx]
 
         while True:
             curr_page = CalendarPageWeek(curr_week_block)
             curr_page.display_week()
+            curr_page.display_menu()
 
             print(" " * CalendarPageWeek.l_margin, idx)
             print(" " * CalendarPageWeek.l_margin, end=" ")
@@ -220,8 +230,18 @@ class CalendarInterface:
 
 def main():
     calendar_interface = CalendarInterface()
-    # calendar_interface.paginate_days()
-    calendar_interface.view_days()
+    CalendarInterface.curr_view_mode = CalendarInterface.default_view
+    status = None
+
+    while True:
+        if status == "QUIT":
+            return
+
+        if CalendarInterface.curr_view_mode == "DAY":
+            status = calendar_interface.view_days()
+
+        elif CalendarInterface.curr_view_mode == "WEEK":
+            status = calendar_interface.view_weeks()
 
 
 if __name__ == "__main__":

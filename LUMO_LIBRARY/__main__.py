@@ -219,7 +219,7 @@ def router(user_input, unknown, contextual_menu: LumoMenu):
         LumoMenu.load_transition()
         print("LUMOCARDS")
         print()
-        l_animators.standard_interval_printer(["This", "is", "the", "about", "section"])
+        l_animators.list_printer(["This", "is", "the", "about", "section"])
         print()
         time.sleep(.5)
         return None, main_menu

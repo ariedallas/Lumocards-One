@@ -3,6 +3,7 @@ import datetime
 import os
 import subprocess
 from pprint import pprint as pp
+from string import whitespace
 
 import dateutil.tz
 from dateutil.relativedelta import relativedelta
@@ -16,6 +17,7 @@ import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
+import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 
@@ -322,7 +324,6 @@ class CalendarPageDay:
     MENU_ITEM_INDENT = " " * (EVENTS_SELECTOR + 2)
 
 
-
     def __init__(self, var_dayblock):
         self.header_date = CalendarPageDay._format_date_for_header(var_dayblock.date)
         self.events = var_dayblock.events
@@ -354,10 +355,21 @@ class CalendarPageDay:
 
 
     @staticmethod
-    def _row_style_menu(var_sel, var_option):
+    def _row_style_menu_dict(var_sel, var_option):
         selector = f"[{var_sel}]  "
 
         print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT + selector + var_option)
+
+
+    @staticmethod
+    def add_whitespace_menu_list(var_menu):
+        whitespace_menu = []
+        for item in var_menu:
+            whitespace_menu.append(
+                CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + item
+            )
+
+        return whitespace_menu
 
 
     def display_day(self):
@@ -382,18 +394,27 @@ class CalendarPageDay:
 
 
     def display_menu(self):
-        menu_dict, menu_list = Menus.main_cal_menus
+        toggle = Menus.ACTION_TOGGLE_BASE + "Week"
+        Menus.TOGGLE_DICT["T"] = toggle
+        TOGGLE_MENU = [f"[{k}]  {v}" for k, v in Menus.TOGGLE_DICT.items()]
+
+        menu_dict, menu_list = l_menus_funcs.prep_menu(Menus.MAIN_CAL_MENU)
+
+        whitespace_menu = CalendarPageDay.add_whitespace_menu_list(menu_list)
+        whitespace_toggle = CalendarPageDay.add_whitespace_menu_list(TOGGLE_MENU)
+        whitespace_quit = CalendarPageDay.add_whitespace_menu_list(l_menus_data.QUIT_MENU_LIST)
 
         print()
         print(CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + "CALENDAR")
         print()
-        for k, v in menu_dict.items():
-            CalendarPageDay._row_style_menu(k, v)
+        l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
         print()
+        l_animators.list_printer(whitespace_toggle, indent_amt=2, speed_interval=0)
+        l_animators.list_printer(whitespace_quit, indent_amt=2, speed_interval=0)
 
+        # whitespace_exit = CalendarPageDay.add_whitespace_menu_list(l_menus_data.EXIT_MENU_LIST)
         # print("\n{0:^{width}}".format(Menus.MENU_BAR_1, width=CalendarPageDay.total_width))
         # print("{0:^{width}}".format(CalendarPageDay.EVENTS_LINE, width=CalendarPageDay.total_width))
-
 
 
 class CalendarPageWeek:
@@ -624,6 +645,26 @@ class CalendarPageWeek:
         CalendarPageWeek.line_break()
 
 
+    def display_menu(self):
+        toggle = Menus.ACTION_TOGGLE_BASE + "Day"
+        Menus.TOGGLE_DICT["T"] = toggle
+        TOGGLE_MENU = [f"[{k}]  {v}" for k, v in Menus.TOGGLE_DICT.items()]
+
+        menu_dict, menu_list = l_menus_funcs.prep_menu(Menus.MAIN_CAL_MENU)
+
+        whitespace_menu = CalendarPageDay.add_whitespace_menu_list(menu_list)
+        whitespace_toggle = CalendarPageDay.add_whitespace_menu_list(TOGGLE_MENU)
+        whitespace_quit = CalendarPageDay.add_whitespace_menu_list(l_menus_data.QUIT_MENU_LIST)
+
+        print()
+        print(CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + "CALENDAR")
+        print()
+        l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
+        print()
+        l_animators.list_printer(whitespace_toggle, indent_amt=2, speed_interval=0)
+        l_animators.list_printer(whitespace_quit, indent_amt=2, speed_interval=0)
+
+
 class DayBlock:
     def __init__(self, day, dayname, date, events):
         self.day = day
@@ -660,8 +701,10 @@ class Menus:
     ACTION_MOD_DEL = "Modify / delete event"
     ACTION_SEARCH = "Search events"
     ACTION_GOTO = "Go to date / day"
-    ACTION_TOGGLE = "Toggle view ➝ "
     ACTION_HELP_MORE = "Help / More"
+
+    ACTION_TOGGLE_BASE = "Toggle view ➝ "
+    TOGGLE_DICT = {"T": ACTION_TOGGLE_BASE}
 
     ACTION_EXIT = "Exit"
     ACTION_QUIT = "Quit"
@@ -672,13 +715,10 @@ class Menus:
         ACTION_MOD_DEL,
         ACTION_SEARCH,
         ACTION_GOTO,
-        ACTION_TOGGLE,
         ACTION_HELP_MORE,
     ]
 
     MENU_BAR_1 = " :: MENU :: "
-
-    main_cal_menus = l_menus_funcs.prep_menu(MAIN_CAL_MENU)
 
 
 if __name__ == "__main__":
