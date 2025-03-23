@@ -136,7 +136,7 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_RENAME:
-                retitled_card_path = l_newcard.get_cardname_from_input()
+                retitled_card_path = l_newcard.input_to_filename()
                 print()
                 # l_animators.animate_text(f"  Card will been renamed from '{selected_card}' → '{retitled_card_path}'")
                 l_card_utils.card_renamer(curr_name=selected_card, dst_name=retitled_card_path)

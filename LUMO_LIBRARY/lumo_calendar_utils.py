@@ -382,7 +382,7 @@ class CalendarPageDay:
 
 
     def display_menu(self):
-        menu_dict, menu_list = Menus.main_cal_menu
+        menu_dict, menu_list = Menus.main_cal_menus
 
         print()
         print(CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + "CALENDAR")
@@ -678,7 +678,7 @@ class Menus:
 
     MENU_BAR_1 = " :: MENU :: "
 
-    main_cal_menu = l_menus_funcs.prep_menu(MAIN_CAL_MENU)
+    main_cal_menus = l_menus_funcs.prep_menu(MAIN_CAL_MENU)
 
 
 if __name__ == "__main__":
