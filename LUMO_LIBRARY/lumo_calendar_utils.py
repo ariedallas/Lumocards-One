@@ -166,6 +166,7 @@ def times_formatter(start, end, format):
     return formatted
 
 
+
 def military_to_standard(military_time):
     standard_converted = datetime.datetime.strptime(military_time, "%H:%M")
     standard_time_formatted = standard_converted.strftime("%I:%M%p")
@@ -196,7 +197,7 @@ def parse_brackets(var_input):
         return 0, None
 
 
-def get_nearest_monday(dt):
+def get_nearest_recent_monday(dt):
     amt = dt.weekday()
     return dt - relativedelta(days=amt)
 
@@ -209,7 +210,7 @@ def get_time_window_1(var_date, window_size_weeks):
     max_look_behind_days = max_look_behind * 7
     window_size_days = (window_size_weeks * 7) - 1
 
-    nearest_monday = get_nearest_monday(var_date)
+    nearest_monday = get_nearest_recent_monday(var_date)
     window_start = nearest_monday - relativedelta(days=max_look_behind_days)
     window_end = window_start + relativedelta(days=window_size_days)
 
@@ -219,7 +220,7 @@ def get_time_window_1(var_date, window_size_weeks):
 def get_time_window_2(var_date, window_size_weeks):
     window_size_days = (window_size_weeks * 7) - 1
 
-    window_start = get_nearest_monday(var_date)
+    window_start = get_nearest_recent_monday(var_date)
     window_end = window_start + relativedelta(days=window_size_days)
 
     return window_start, window_end
@@ -317,12 +318,16 @@ class CalendarPageDay:
 
     main_line = ("-" * content_width)
 
+    EVENT_TIME = 14
     EVENTS_SELECTOR = 10
     EVENTS_SELECTOR_SPACE = " " * EVENTS_SELECTOR
-    EVENTS_BODY = 60
+    EVENTS_BODY = EVENTS_WIDTH - EVENTS_SELECTOR - EVENT_TIME
 
-    MENU_ITEM_INDENT = " " * (EVENTS_SELECTOR + 2)
 
+    MENU_ITEM_INDENT_NUDGE = EVENTS_SELECTOR + 2
+    MENU_ITEM_INDENT_SPACE = " " * (MENU_ITEM_INDENT_NUDGE)
+
+    cursor_indent_amt = l_margin_num + MENU_ITEM_INDENT_NUDGE + 3
 
     def __init__(self, var_dayblock):
         self.header_date = CalendarPageDay._format_date_for_header(var_dayblock.date)
@@ -665,6 +670,7 @@ class CalendarPageWeek:
         l_animators.list_printer(whitespace_quit, indent_amt=2, speed_interval=0)
 
 
+
 class DayBlock:
     def __init__(self, day, dayname, date, events):
         self.day = day
@@ -720,6 +726,23 @@ class Menus:
 
     MENU_BAR_1 = " :: MENU :: "
 
+
+def validate_day_seleciton(user_input: str, var_weekblock: list[DayBlock]) -> bool:
+    valid_day_selections = [block.day for block in var_weekblock]
+
+    if not l_card_utils.test_for_int(user_input):
+        return False
+
+    input_int = int(user_input)
+
+    if len(user_input) > 2:
+        return False
+    if input_int < 1:
+        return False
+    if input_int not in valid_day_selections:
+        return False
+    else:
+        return True
 
 if __name__ == "__main__":
     print("Hello from main")

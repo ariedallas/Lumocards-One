@@ -146,8 +146,8 @@ def default_json_card_handler(filename):
 
     if is_recurring:
         sched_data = add_default_recurr_data(json_filename=json_filename,
-                                           freq=4,
-                                           unit="Day")
+                                             freq=4,
+                                             unit="Day")
 
     feedback(is_recurring, sched_data)
 
@@ -167,7 +167,7 @@ def add_default_recurr_data(json_filename, freq, unit):
 
     json_data["recurring freq"] = freq
     json_data["recurring freq time unit"] = unit
-    json_data["last occurrence"] = datetime.datetime.strftime(l_files.today, '%b %d %Y, %A')
+    json_data["last occurrence"] = datetime.datetime.strftime(l_files.today, "%b %d %Y, %A")
 
     l_json_utils.write_json(json_filename=json_filename, json_data=json_data)
 
@@ -180,7 +180,7 @@ def feedback(is_recurring=False, schedule=None, deleted=False):
         print(f"        Recurring card created with defaults: {schedule}")
     elif not deleted and not is_recurring:
         print(f"        Standard card created")
-    else: # deleted
+    else:  # deleted
         print(f"        Card deleted")
 
     print()
@@ -202,11 +202,11 @@ def clean_cards():
         for u in unique_txts:
             print(f"  {u}.txt", end=" ")
             user_input = input("——> [D]elete this or [C]reate .json file to pair it? >  ")
-            if user_input.lower() == 'd':
+            if user_input.lower() == "d":
                 card_fullpath = get_card_abspath(f"{u}.txt")
                 send2trash.send2trash(card_fullpath)
                 feedback(deleted=True)
-            elif user_input.lower() == 'c':
+            elif user_input.lower() == "c":
                 default_json_card_handler(u)
             else:
                 print("        (You skipped this card for now.)")
@@ -218,11 +218,11 @@ def clean_cards():
         for u in unique_jsons:
             print(f"  {u}.json", end=" ")
             user_input = input("——> [D]elete this or [C]reate .txt file to pair it? >  ")
-            if user_input.lower() == 'd':
+            if user_input.lower() == "d":
                 json_fullpath = l_json_utils.get_json_card_fullpath(f"{u}.json")
                 send2trash.send2trash(json_fullpath)
                 feedback(deleted=True)
-            elif user_input.lower() == 'c':
+            elif user_input.lower() == "c":
                 pass
             else:
                 print("        (You skipped this card for now.)")
@@ -404,9 +404,17 @@ def add_multiple_steps_from_card(nums):
     return passed_list
 
 
-def test_for_float(text):
+def test_for_float(text: str) -> bool:
     try:
         float(text)
+        return True
+    except ValueError:
+        return False
+
+
+def test_for_int(text: str) -> bool:
+    try:
+        int(text)
         return True
     except ValueError:
         return False
