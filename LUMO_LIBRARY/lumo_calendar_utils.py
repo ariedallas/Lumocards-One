@@ -2,8 +2,8 @@ import calendar
 import datetime
 import os
 import subprocess
+import sys
 from pprint import pprint as pp
-from string import whitespace
 
 import dateutil.tz
 from dateutil.relativedelta import relativedelta
@@ -166,7 +166,6 @@ def times_formatter(start, end, format):
     return formatted
 
 
-
 def military_to_standard(military_time):
     standard_converted = datetime.datetime.strptime(military_time, "%H:%M")
     standard_time_formatted = standard_converted.strftime("%I:%M%p")
@@ -323,11 +322,11 @@ class CalendarPageDay:
     EVENTS_SELECTOR_SPACE = " " * EVENTS_SELECTOR
     EVENTS_BODY = EVENTS_WIDTH - EVENTS_SELECTOR - EVENT_TIME
 
-
     MENU_ITEM_INDENT_NUDGE = EVENTS_SELECTOR + 2
     MENU_ITEM_INDENT_SPACE = " " * (MENU_ITEM_INDENT_NUDGE)
 
     cursor_indent_amt = l_margin_num + MENU_ITEM_INDENT_NUDGE + 3
+
 
     def __init__(self, var_dayblock):
         self.header_date = CalendarPageDay._format_date_for_header(var_dayblock.date)
@@ -366,17 +365,6 @@ class CalendarPageDay:
         print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT + selector + var_option)
 
 
-    @staticmethod
-    def add_whitespace_menu_list(var_menu):
-        whitespace_menu = []
-        for item in var_menu:
-            whitespace_menu.append(
-                CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + item
-            )
-
-        return whitespace_menu
-
-
     def display_day(self):
         start, end = (self.events[0][2], self.events[0][3]) if self.events else ("     ", "     ")
         summary = self.events[0][4] if self.events else "--- --- ---"
@@ -400,14 +388,15 @@ class CalendarPageDay:
 
     def display_menu(self):
         toggle = Menus.ACTION_TOGGLE_BASE + "Week"
-        Menus.TOGGLE_DICT["T"] = toggle
-        TOGGLE_MENU = [f"[{k}]  {v}" for k, v in Menus.TOGGLE_DICT.items()]
+        Menus.TOGGLE_MENU_DICT["T"] = toggle
+        TOGGLE_MENU = [f"[{k}]  {v}" for k, v in Menus.TOGGLE_MENU_DICT.items()]
 
         menu_dict, menu_list = l_menus_funcs.prep_menu(Menus.MAIN_CAL_MENU)
 
-        whitespace_menu = CalendarPageDay.add_whitespace_menu_list(menu_list)
-        whitespace_toggle = CalendarPageDay.add_whitespace_menu_list(TOGGLE_MENU)
-        whitespace_quit = CalendarPageDay.add_whitespace_menu_list(l_menus_data.QUIT_MENU_LIST)
+        wh_sp = CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE
+        whitespace_menu = Menus.add_whitespace_menu_list(menu_list, wh_sp)
+        whitespace_toggle = Menus.add_whitespace_menu_list(TOGGLE_MENU, wh_sp)
+        whitespace_quit = Menus.add_whitespace_menu_list(l_menus_data.QUIT_MENU_LIST, wh_sp)
 
         print()
         print(CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + "CALENDAR")
@@ -417,7 +406,7 @@ class CalendarPageDay:
         l_animators.list_printer(whitespace_toggle, indent_amt=2, speed_interval=0)
         l_animators.list_printer(whitespace_quit, indent_amt=2, speed_interval=0)
 
-        # whitespace_exit = CalendarPageDay.add_whitespace_menu_list(l_menus_data.EXIT_MENU_LIST)
+        # whitespace_exit = Menus.add_whitespace_menu_list(l_menus_data.EXIT_MENU_LIST)
         # print("\n{0:^{width}}".format(Menus.MENU_BAR_1, width=CalendarPageDay.total_width))
         # print("{0:^{width}}".format(CalendarPageDay.EVENTS_LINE, width=CalendarPageDay.total_width))
 
@@ -578,9 +567,24 @@ class CalendarPageWeek:
     def half_row_style_menu(menu_item):
         return "  {0:<{width}}".format(menu_item, width=CalendarPageWeek.COL_WIDTH - 2)
 
+    @staticmethod
+    def prep_menu_columns(menu_l, menu_r):
+        columnified = []
+
+        if len(menu_r) < len(menu_l):
+            diff = len(menu_l) - len(menu_r)
+            for _ in range(diff):
+                menu_r.append(".")
+
+        for l, r in zip(menu_l, menu_r):
+            left_col = "{0:<{width}}".format(l, width=40)
+            right_col = "{0:<{width}}".format(r, width=40)
+            columnified.append(left_col+right_col)
+
+        return columnified
 
     @staticmethod
-    def make_editor_block():
+    def make_editor_block_1():
         header = CalendarPageWeek.half_row_style_editor_header()
         summary = CalendarPageWeek.half_row_style_event([None, None, "20:00", "21:00", "Dinner with John"])
         br = CalendarPageWeek.half_row_style_line_break()
@@ -596,6 +600,24 @@ class CalendarPageWeek:
             , menu_1, menu_2, menu_3
             , br
             , menu_4
+                ]
+
+
+    @staticmethod
+    def make_editor_block_2():
+        header = CalendarPageWeek.half_row_style_editor_header()
+        summary = CalendarPageWeek.half_row_style_event([None, None, "20:00", "21:00", "Dinner with John"])
+        br = CalendarPageWeek.half_row_style_line_break()
+
+        return [br
+            , header
+            , summary
+            , br
+            , br
+            , br
+            , br
+            , br
+                , br
                 ]
 
 
@@ -634,7 +656,7 @@ class CalendarPageWeek:
 
         self.cal_header()
 
-        editor_block = CalendarPageWeek.make_editor_block()
+        editor_block = CalendarPageWeek.make_editor_block_2()
         day_block_1 = CalendarPageWeek.format_day_block(self.day_blocks[0])
         day_block_2 = CalendarPageWeek.format_day_block(self.day_blocks[1])
         day_block_3 = CalendarPageWeek.format_day_block(self.day_blocks[2])
@@ -647,21 +669,20 @@ class CalendarPageWeek:
         CalendarPageWeek.block_zipper(day_block_2, day_block_5)
         CalendarPageWeek.block_zipper(day_block_3, day_block_6)
         CalendarPageWeek.block_zipper(editor_block, day_block_7)
-        CalendarPageWeek.line_break()
 
 
     def display_menu(self):
         toggle = Menus.ACTION_TOGGLE_BASE + "Day"
-        Menus.TOGGLE_DICT["T"] = toggle
-        TOGGLE_MENU = [f"[{k}]  {v}" for k, v in Menus.TOGGLE_DICT.items()]
+        Menus.TOGGLE_MENU_DICT["T"] = toggle
+        TOGGLE_MENU = [f"[{k}]  {v}" for k, v in Menus.TOGGLE_MENU_DICT.items()]
 
         menu_dict, menu_list = l_menus_funcs.prep_menu(Menus.MAIN_CAL_MENU)
 
-        whitespace_menu = CalendarPageDay.add_whitespace_menu_list(menu_list)
-        whitespace_toggle = CalendarPageDay.add_whitespace_menu_list(TOGGLE_MENU)
-        whitespace_quit = CalendarPageDay.add_whitespace_menu_list(l_menus_data.QUIT_MENU_LIST)
+        wh_sp = CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE
+        whitespace_menu = Menus.add_whitespace_menu_list(menu_list, wh_sp)
+        whitespace_toggle = Menus.add_whitespace_menu_list(TOGGLE_MENU, wh_sp)
+        whitespace_quit = Menus.add_whitespace_menu_list(l_menus_data.QUIT_MENU_LIST, wh_sp)
 
-        print()
         print(CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + "CALENDAR")
         print()
         l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
@@ -669,7 +690,22 @@ class CalendarPageWeek:
         l_animators.list_printer(whitespace_toggle, indent_amt=2, speed_interval=0)
         l_animators.list_printer(whitespace_quit, indent_amt=2, speed_interval=0)
 
+    def display_menu_column(self):
+        toggle = Menus.ACTION_TOGGLE_BASE + "Day"
+        Menus.TOGGLE_MENU_DICT["T"] = toggle
+        TOGGLE_MENU_LIST = [f"[{k}]  {v}" for k, v in Menus.TOGGLE_MENU_DICT.items()]
 
+        _, menu_list_left = l_menus_funcs.prep_menu(Menus.MAIN_CAL_MENU)
+        menu_list_right = TOGGLE_MENU_LIST + l_menus_data.QUIT_MENU_LIST
+        menu_columns = CalendarPageWeek.prep_menu_columns(menu_l=menu_list_left,
+                                                          menu_r=menu_list_right)
+
+        wh_sp = CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE
+        whitespace_menu = Menus.add_whitespace_menu_list(menu_columns, wh_sp)
+
+        print(CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + "CALENDAR")
+        print()
+        l_animators.list_printer(whitespace_menu, speed_interval=0)
 
 class DayBlock:
     def __init__(self, day, dayname, date, events):
@@ -710,7 +746,7 @@ class Menus:
     ACTION_HELP_MORE = "Help / More"
 
     ACTION_TOGGLE_BASE = "Toggle view ➝ "
-    TOGGLE_DICT = {"T": ACTION_TOGGLE_BASE}
+    TOGGLE_MENU_DICT = {"T": ACTION_TOGGLE_BASE}
 
     ACTION_EXIT = "Exit"
     ACTION_QUIT = "Quit"
@@ -725,6 +761,17 @@ class Menus:
     ]
 
     MENU_BAR_1 = " :: MENU :: "
+
+
+    @staticmethod
+    def add_whitespace_menu_list(var_menu, space):
+        whitespace_menu = []
+        for item in var_menu:
+            whitespace_menu.append(
+                space + item
+            )
+
+        return whitespace_menu
 
 
 def validate_day_seleciton(user_input: str, var_weekblock: list[DayBlock]) -> bool:
@@ -744,8 +791,19 @@ def validate_day_seleciton(user_input: str, var_weekblock: list[DayBlock]) -> bo
     else:
         return True
 
+
 if __name__ == "__main__":
     print("Hello from main")
+
+    m = CalendarPageWeek.prep_menu_columns(["a", "b", "c", "d"], ["x"])
+    pp(m)
+
+    a = ["a"]
+    b = ["b"]
+    a.extend(b)
+    n = a.copy()
+    pp(n)
+    sys.exit(0)
     creds = get_creds()
 
     start, end = get_time_window_2(today_date, 8)

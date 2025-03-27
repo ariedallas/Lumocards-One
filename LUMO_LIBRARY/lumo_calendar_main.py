@@ -47,7 +47,7 @@ class CalendarInterface:
             curr_page.display_day()
             curr_page.display_menu()
 
-            print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE + f" {str(self.curr_day_idx)}")
+            # print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE + f" {str(self.curr_day_idx)}")
             print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE, end="  ")
 
             user_input = input(">  ")
@@ -121,9 +121,9 @@ class CalendarInterface:
         while True:
             curr_page = CalendarPageWeek(curr_week_block)
             curr_page.display_week()
-            curr_page.display_menu()
+            curr_page.display_menu_column()
 
-            print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE + f" {str(self.curr_week_idx)}")
+            # print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE + f" {str(self.curr_week_idx)}")
             print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE, end="  ")
 
             user_input = input(">  ")
