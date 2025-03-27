@@ -20,12 +20,12 @@ class CalendarInterface:
 
     def __init__(self):
         past_month = l_cal_utils.get_adjacent_month(l_cal_utils.curr_month,
-                                        l_cal_utils.curr_year,
-                                        "past", 1)
+                                                    l_cal_utils.curr_year,
+                                                    "past", 1)
 
         next_month = l_cal_utils.get_adjacent_month(l_cal_utils.curr_month,
-                                        l_cal_utils.curr_year,
-                                        "next", 1)
+                                                    l_cal_utils.curr_year,
+                                                    "next", 1)
 
         self.day_blocks_window = l_cal_utils.get_day_blocks()
         self.week_blocks_window = self.separate_by_weeks()
@@ -38,6 +38,7 @@ class CalendarInterface:
         print("lemon")
         pass
 
+
     def view_days(self):
         curr_day_block = self.day_blocks_window[self.curr_day_idx]
         menu_dict, _ = l_menus_funcs.prep_menu(Menus.MAIN_CAL_MENU)
@@ -48,6 +49,7 @@ class CalendarInterface:
             curr_page.display_menu()
 
             # print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE + f" {str(self.curr_day_idx)}")
+            print()
             print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE, end="  ")
 
             user_input = input(">  ")
@@ -112,19 +114,18 @@ class CalendarInterface:
         return curr_day_block
 
 
-
     def view_weeks(self):
         curr_week_block = self.week_blocks_window[self.curr_week_idx]
         menu_dict, _ = l_menus_funcs.prep_menu(Menus.MAIN_CAL_MENU)
 
-
         while True:
             curr_page = CalendarPageWeek(curr_week_block)
             curr_page.display_week()
-            curr_page.display_menu_column()
+            curr_page.display_menu_columns()
 
             # print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE + f" {str(self.curr_week_idx)}")
-            print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE, end="  ")
+            print()
+            print(CalendarPageWeek.l_margin_space, end="    ")
 
             user_input = input(">  ")
 
