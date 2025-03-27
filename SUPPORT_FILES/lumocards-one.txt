@@ -1,17 +1,27 @@
 :::::NEXT:::::
+	- make the menus work in display week
+	- center menu
+	- realign day menu to •
+
+	- how to gitpull lumocards_one into lumocards_arie?
+	**  put tape on my keyboard for better finding of l ctrl and alt + etc.
+	**  try epoxy instead / superglue 
 	- my main calendar is ariedallas02, move things over pls :)
-		
-:::::NEXT LVL 2:::::
-	**  put tape on my keyboard for better finding of l ctrl and alt.
-			
 	- json dict updater for all existing...	
 		- update json_dicts for existing cards (include 'google calendar info') --> in branch 'calendar_sync_basic'
+	
+		
+:::::NEXT LVL 2:::::
+			
 	- make sure the word calendar / schedule are used in a way that makes sense...
 		- mostly calendar unless you need schedule
 	- probably an event should become an object at some point... (currently it's a list)
 
-	- continue buildling out .toml file
-
+::::SMALL BUGS::::
+	- Exiting after focus completed doesn't clear() as intended when done from pomodoro
+	- Set as recurring card does not work from newcard
+	- 'reloop' after LUmo search -> recurring -> reloop
+	- l_json_utils, get cat from settings ??
 
 :::::OUTLINE BIG:::::
 	> CODE READING 
@@ -66,9 +76,12 @@
 	
 
 	- SETTINGS:
-		 custom formatting for military vs. regular and for 7:00Pm - 12:00Am to be centered vs. 7:00Pm - 8:00Pm	
+		- allow user to set menus to use capitals or lowercase for shortcuts!
+		- custom formatting for military vs. regular and for 7:00Pm - 12:00Am
+			 to be centered vs. 7:00Pm - 8:00Pm	
 
-	- MENUS / NAVIGATION / SHORTCUTS
+	- MENUS / NAVIGATION / SHORTCUTS:
+		- Type 'v' or other shortcut letter in day view to show addnl events
 		- calendar mode: d[1], w[2], m[3]
 		- select day from [a], [b], [c] or [1] [2] (the number of the day)
 		- how should I move backward and forward in days? what should be 'loaded'? how/when should loading happen?
@@ -162,6 +175,7 @@
 	ANIMATIONS:
 		- get coherent and consistent system / rules
 		- when you xsition back from a sub program to main menu, do ... loader transition
+		- center load transition on calendar
 
 	LUMO HOME MENU:
 		- integrate all routes
@@ -218,7 +232,11 @@
 
 	SEARCH:
 		--  can search support multiple terms?
-		--  cards should show their location in the menus! i.e. 
+		--  search should have fuzzy case matching
+		--  also search should have option to show more than 24 items in an 'full search mode' or etc. 
+		--  if more than 24 items, search should show previews or something
+		--  is there a way to do lumo search "NEAR FOCUS CARDS" etc. or some way to browse what cards you have?
+		--  cards should show their location in the menus! i.e. !!!
 			  P PAINTING (NEAR, SCHEDULED)
 			  (RECURRING CARD, EVERY 2 DAYS)
 			  (CHECKLIST CARD)
@@ -228,14 +246,16 @@
 		--  issue with how after you 'show full' card if you try to edit it, it won't work?
 		
 	CHECKLIST:
-	 	--  move cycler() to checklist; it's in card_utils.py right now
 	 	--  what if you have more than 24 checklists?
+	 	--  what if users want to be able to edit the Checklist_Errand of Checklist_Main card?
 		--  how does the user edit the essentials and the errands checklist card inside lumo?
 			- can this be abstracted so that they can choose if a certain card always gets asked to run?   	
 			- same thing for a card that runs each time in the begginning?
 		--  option to make a new checklist card from the checklist menu
 		--  option to edit essentials card and errands card from checklist menu
 		--  do the TODO's on that file
+		--  option for users to pair a checklist card to another, i.e. they can choose if a checklist 
+			- also prompts the essentials checklist or the outlist card. 
 		
 	NEWCARD:
 		--  should there be an option to make a newcard after making a newcard?
@@ -247,22 +267,24 @@
 		--  spend a few hours one morning going through the playsound python package
 		--  is it possible to use part of ffmpeg, ffplay, pyaudio?
 
-	INSTALLATION NEW USERS / AUTHENITCATION:
+	TESTING: 
+		- learn about tox / testing
+		- install tox
+		- write some basic tests
+
+
+	DISTRIBUTION / INSTALLATION / AUTHENTICATION / UPDATES:
+		- continue with .toml file
+
 		- 'lumo' could be installed to users home bin so that when the virtual environ
 			-ment is not loaded, it could be a script to start the virtual environment
 			- and then run the command 'lumo'. At any rate, basically you want some
 			- kind of branch that will enable users to only type 'lumo' whether or not
 			- they are in a virtual environment or
-		- demo video
+
 		- homebrew?
 		- see all the ways the micro can be installed
 		- should install be like other programs with ~/.config
-		- intro to explain settings
-		- explain to users what kinds of cards there are and how they work
-		- introduction feature to have user set up caterogires, one at a time
-		- intro to set user birthday
-		- what if the user wants to change the names of categories? 
-		- how could lumo and the entry point 'lumo' be set up to support multiple users / accounts
 
 		- Could authentication be done using a simple website? What makes the app production? What is the best 
 			- to work with the Google Auth system
@@ -272,6 +294,23 @@
 			- Chrome disable insecure content
 			- Safari ??
 		
+		-how will the app handle updates for users?
+			-say for a bug or if the json needs to change?
+
+		-how would people set this up for google api?
+
+		-can it ship with 'micro'? it auto load 'micro?' is this possible???
+	
+	NEW USERS:
+		
+		- demo video
+		- intro to explain settings
+		- explain to users what kinds of cards there are and how they work
+		- introduction feature to have user set up caterogires, one at a time
+		- intro to set user birthday
+		- what if the user wants to change the names of categories? 
+		- how could lumo and the entry point 'lumo' be set up to support multiple users / accounts
+
 		- requires python
 		- user downloads a tar or compressed folder
 		- then script installs a vitual environment +
@@ -290,12 +329,6 @@
 		- note: the user cannot then manually rename the credentials file without issue!
 		- I feel like this is still not a robust implementation
 
-		-how will the app handle updates for users?
-			-say for a bug or if the json needs to change?
-
-		-how would people set this up for google api?
-
-		-can it ship with 'micro'? it auto load 'micro?' is this possible???
 
 	SETTINGS:
 		- users can configue what is in the home 'Lumo' menu
