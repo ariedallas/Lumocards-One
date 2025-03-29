@@ -108,13 +108,13 @@ def main():
             break
         else:
             print()
-            l_animators.animate_text(" unrecognized option", finish_delay=.5)
+            l_animators.animate_text_indented("Unrecognized option", indent=2, finish_delay=.5)
             subprocess.run(["clear"], shell=True)
             print("\n\n")
 
     if status == "QUIT":
         print()
-        l_animators.animate_text("  Quit Lumo: Checklist", finish_delay=.5)
+        l_animators.animate_text_indented("Quit Lumo: Checklist", finish_delay=.5)
         return
 
     if status != "EXIT":
@@ -123,7 +123,7 @@ def main():
     main_checklist_review()
     errand_checklist_review()
     print()
-    l_animators.animate_text("  Quit Lumo: Checklist", finish_delay=.5)
+    l_animators.animate_text_indented("Quit Lumo: Checklist", finish_delay=.5)
 
 
 if __name__ == "__main__":

@@ -43,32 +43,40 @@ def test_for_local_args():
         return False
 
 
-def get_cardname_from_input():
-    print()
+def get_cardname_from_input(indent=0):
+    if indent > 0:
+        print(" " * indent, end="")
+
     cardname = input("Card Name >  ").title()
     result = cardname.replace(" ", "")
     return result
 
 
-def get_category_from_input():
-    result = input("Card Category >  ")
-    # print("{:<10}{:^10}{:>10}".format("[Aa]_ADIO", "[Pp]_PNTG", "[Rr]_MAKE", "\n"))
-    # print("{:<10}{:^10}{:>10}".format("[Ee]_ERND", ".....", "[Ff]_SOIL", "\n"))
-    # print("{:<10}{:^10}{:>10}".format("[Cc]_COMP", "[Dd]_DOMS", "[Ss]_SLFC", "\n"))
+def get_category_from_input(indent=0):
+    if indent > 0:
+        print(" " * indent, end="")
 
+    result = input("Card Category >  ")
     return category_check(result)
 
 
 def category_check(card_category):
-    if card_category.upper() not in all_card_categories:
-        l_animators.list_printer(["", "That category letter currently doesn't exist"], speed_interval=.5)
-        l_animators.list_printer(["- or -"], speed_interval=.5)
-        l_animators.list_printer(["You entered something other than one letter.", ""], speed_interval=.5)
-        l_animators.list_printer(["The system defaults the category to [Rr]_MAKE."], speed_interval=.5)
+    valid_cat = card_category.upper().strip()
+
+    if valid_cat not in all_card_categories:
+        print()
+        l_animators.list_printer([
+            "That category letter currently doesn't exist"
+            , "- or -"
+            , "You entered something other than one letter."
+            , "The system defaults the category to R — Creative Projects."]
+            , indent_amt=2
+            , speed_interval=.5)
+        print()
         return "R"
 
     else:
-        return card_category.upper()
+        return valid_cat
 
 
 def validate_from_local_parser():
@@ -116,8 +124,9 @@ def parsed_to_filename(card_category, card_title):
 
 
 def input_to_filename():
-    card_title = get_cardname_from_input()
-    card_category = get_category_from_input()
+    print()
+    card_category = get_category_from_input(indent=2)
+    card_title = get_cardname_from_input(indent=2)
     joined = "_".join((card_category, card_title))
     card_filename = f"{joined}.txt"
     return card_filename
@@ -144,9 +153,13 @@ def check_for_dupes(card_filename):
     return card_exists
 
 
-def add_custom_or_default_steps():
+def add_custom_or_default_steps(indent=0):
     scratchpad_file = os.path.join(l_files.temp_folder, "scratchpad.txt")
     print()
+
+    if indent > 0:
+        print(" " * indent, end="")
+
     if l_menus_funcs.proceed("Edit steps? >  "):
         with open(scratchpad_file, "w") as fin:
             fin.write("")
@@ -164,7 +177,8 @@ def add_custom_or_default_steps():
 
 def retry_loop_card_filename(card_filename):
     if not card_filename:
-        l_animators.animate_text("A card with this name already exists...")
+        print()
+        l_animators.animate_text_indented("A card with this name already exists...", indent=2)
         # TODO: to continue type any key but [q]; [q] for quit
         # TODO: -OR- inform user they can undo after next step and to make a dummy card
 
@@ -174,7 +188,7 @@ def retry_loop_card_filename(card_filename):
                 return retry_card_filename
             else:
                 print()
-                l_animators.animate_text("A card with this name already exists...")
+                l_animators.animate_text_indented("A card with this name already exists...", indent=2)
 
     return card_filename
 
@@ -193,60 +207,54 @@ def write_card(card_filename, card_steps):
 
     while True:
         print()
-        l_animators.animate_text(f"CREATING CARD: {card_filename}", finish_delay=.4)
+        l_animators.animate_text(f"CREATING CARD: {card_filename}", finish_delay=.5)
 
         print()
-        l_animators.list_printer(focus_menu_l, speed_interval=0)
+        l_animators.list_printer(focus_menu_l, indent_amt=2, speed_interval=0)
         print()
-        l_animators.list_printer(schedule_menu_l, speed_interval=0)
+        l_animators.list_printer(schedule_menu_l, indent_amt=2, speed_interval=0)
         print()
-        l_animators.list_printer(l_menus_data.START_OVER_MENU_LIST, speed_interval=0)
-        l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
+        l_animators.list_printer(l_menus_data.START_OVER_MENU_LIST, indent_amt=2, speed_interval=0)
+        l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, indent_amt=2, speed_interval=0)
         print()
-        user_input = input("  Select where this card should go > ")
+        user_input = input("  Select where this card should go >  ")
 
         if user_input.upper() in combined_menus_dict.keys():
 
-            if combined_menus_dict[user_input.upper()] == "Set as ➝ Near Focus":
+            if combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_NEAR:
 
                 card_abspath, json_file = write_card_and_json(card_filename,
                                                               l_files.cards_near_folder,
                                                               add_custom_steps=card_steps)
 
-                l_animators.animate_text("  Card set to ➝ Near Focus")
+                l_animators.animate_text_indented("Card set to ➝ Near Focus", indent=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
-            elif combined_menus_dict[user_input.upper()] == "Set as ➝ Middle Focus":
+            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_MIDDLE:
 
                 card_abspath, json_file = write_card_and_json(card_filename,
                                                               l_files.cards_middle_folder,
                                                               add_custom_steps=card_steps)
 
-                l_animators.animate_text("  Card set to ➝ Middle Focus")
+                l_animators.animate_text_indented("Card set to ➝ Middle Focus", indent=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
-            elif combined_menus_dict[user_input.upper()] == "Set as ➝ Dist Focus":
+            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_DIST:
 
                 card_abspath, json_file = write_card_and_json(card_filename,
                                                               l_files.cards_dist_folder,
                                                               add_custom_steps=card_steps)
 
-                l_animators.animate_text("  Card set to ➝ Distant Focus")
+                l_animators.animate_text_indented("Card set to ➝ Distant Focus", indent=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
 
             # ---- SCHEDULING MENU ---- #
 
-            elif combined_menus_dict[user_input.upper()] == "Set as ➝ Checklist Card":
+            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
+                l_animators.animate_text_indented("This function currently unavailable...", indent=2)
 
-                card_abspath, json_file = write_card_and_json(card_filename,
-                                                              l_files.checklist_cards_folder,
-                                                              add_custom_steps=card_steps)
-
-                l_animators.animate_text("  Card set to ➝ Checklist Cards")
-                return "CREATED CARD", card_abspath
-
-            elif combined_menus_dict[user_input.upper()] == "Make into ➝ Recurring Card":
+            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING:
 
                 card_title_formatted = l_card_utils.format_card_title(card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus_funcs.prep_newcard_menu(l_menus_data.RECURRING_MENU,
@@ -256,7 +264,7 @@ def write_card(card_filename, card_steps):
                 print()
                 l_animators.list_printer([card_title_formatted])
                 print()
-                l_animators.list_printer(recur_menu_l)
+                l_animators.list_printer(recur_menu_l, indent_amt=2)
 
                 recurrence_settings = l_menus_funcs.menu_recurrence_settings(recur_menu_d)
 
@@ -267,22 +275,29 @@ def write_card(card_filename, card_steps):
                 l_recurring.update_recurring_data(card_filename, recurrence_settings, initialized=True)
 
                 print()
-                l_animators.animate_text("  Card created in ➝ Recurring Cards")
+                l_animators.animate_text_indented("Card created in ➝ Recurring Cards", indent=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
-            elif combined_menus_dict[user_input.upper()] == "Schedule to ➝ Calendar":
-                l_animators.animate_text("  This function currently unavailable...")
+            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_CHECKLIST:
 
-        elif user_input.lower() == "x":
+                card_abspath, json_file = write_card_and_json(card_filename,
+                                                              l_files.checklist_cards_folder,
+                                                              add_custom_steps=card_steps)
+
+                l_animators.animate_text_indented("Card set to ➝ Checklist Cards", indent=2, finish_delay=.5)
+                return "CREATED CARD", card_abspath
+
+        elif user_input.lower() in {"x", "exit"}:
             return "RELOOP", None
 
-        elif user_input.lower() == "q":
+        elif user_input.lower() in {"q", "quit"}:
             print()
-            l_animators.animate_text("  Quit Lumo: New Card", finish_delay=.5)
+            l_animators.animate_text("Quit Lumo: New Card", finish_delay=.5)
             return "QUIT", None
 
         else:
-            l_animators.animate_text("  Options available in this context are just shortcut letters.")
+            l_animators.animate_text_indented("Options available in this context are just shortcut letters.",
+                                              indent=2, finish_delay=.5)
 
 
 def write_card_and_json(card_filename, folder, add_custom_steps=None):
@@ -318,7 +333,7 @@ def card_write_loop(card_filename, card_steps):
         else:
             possible_card_filename = validate_from_input()
             new_card_filename = retry_loop_card_filename(possible_card_filename)
-            new_card_steps = add_custom_or_default_steps()
+            new_card_steps = add_custom_or_default_steps(indent=2)
             status, possible_card_abspath = write_card(new_card_filename, new_card_steps)
 
     return status, possible_card_abspath
@@ -327,6 +342,7 @@ def card_write_loop(card_filename, card_steps):
 def card_menu_loop(result_card, result_path):
     hotkey_dict, hotkey_list = l_menus_funcs.prep_newcard_menu(l_menus_data.NEWCARD_MAIN_MENU,
                                                                l_menus_data.LETTERS_FILTERED.copy())
+
     status, return_path = l_search.cardsearch_main_options(var_card=result_card,
                                                            var_card_filename=result_path,
                                                            var_hotkey_dict=hotkey_dict,
@@ -380,8 +396,7 @@ def write_calendar_card_and_json(card_filename, folder, google_calendar_data, ad
 def program_header():
     print("NEW CARD")
     print()
-    for k, v in settings.get('card categories').items():
-        print(f"{k} — {v[1]}")
+    l_card_utils.print_card_categories()
 
 
 def main(card_category=None, card_title=None, from_lumo_menu=False):
@@ -397,7 +412,7 @@ def main(card_category=None, card_title=None, from_lumo_menu=False):
         possible_card_filename = validate_from_input()
 
     card_filename = retry_loop_card_filename(possible_card_filename)
-    card_steps = add_custom_or_default_steps()
+    card_steps = add_custom_or_default_steps(indent=2)
     status, possible_card_abspath = card_write_loop(card_filename, card_steps)
 
     if status == "QUIT" and locally_run:

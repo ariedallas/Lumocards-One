@@ -10,9 +10,13 @@ import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 
-default_card_steps = ["..."
+settings = l_files.get_json_settings()
+
+default_card_steps = [
+    "..."
     , "..."
-    , "..."]
+    , "..."
+]
 
 
 def card_header(var_card):
@@ -59,7 +63,12 @@ def steps_preview(card_steps, steps_amt, steps_idx):
     return card_steps_three
 
 
-def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
+def print_card_categories():
+    for k, v in settings.get("card categories").items():
+        print(f"  {k} — {v[1]}")
+
+
+def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False):
     curr_name_abspath = get_card_abspath(curr_name)
     curr_dir_name = pathlib.Path(str(curr_name_abspath)).parent.name
 
@@ -74,12 +83,20 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
 
     print()
     if curr_dir_name != dst_dir_name:
-        l_animators.animate_text(f"  Moving from '{curr_dir_name}' to '{dst_dir_name}' ")
+        print(f"  Moving from '{curr_dir_name}' to '{dst_dir_name}' ")
 
     elif curr_name != dst_name:
-        l_animators.animate_text(f"  Renaming from '{curr_name}' to '{dst_name}' ")
+        print(f"  Renaming from '{curr_name}' to '{dst_name}' ")
 
-    if l_menus_funcs.proceed("  Type 'cancel' to stop or press any key to continue > "):
+    if ask_confirmation:
+        if not l_menus_funcs.proceed("  Type 'no' or 'x' to cancel, otherwise press any key to continue >  "):
+            return "CANCELLED"
+        os.rename(source, dest)
+        l_json_utils.rename_json_card(src_filename=curr_name, dest_filename=dst_name)
+        l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name,
+                                           update_category=category_change)
+
+    else:
         os.rename(source, dest)
         l_json_utils.rename_json_card(src_filename=curr_name, dest_filename=dst_name)
         l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name,
@@ -87,6 +104,8 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
 
 
 def card_deleter(card_filename):
+    if not l_menus_funcs.proceed("  Type 'no' or 'x' to cancel, otherwise press any key to continue >  "):
+        return "CANCELLED"
     card_fullpath = get_card_abspath(card_filename)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
 

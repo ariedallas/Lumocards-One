@@ -74,8 +74,9 @@ class CalendarInterface:
 
 
             else:
-                l_animators.animate_text_indented("  Unrecognized option...",
-                                                  indent=CalendarPageDay.cursor_indent_amt,
+                indent = int(CalendarPageDay.cursor_indent_amt) + 2
+                l_animators.animate_text_indented("Unrecognized option...",
+                                                  indent=indent,
                                                   finish_delay=.5)
 
 
@@ -125,7 +126,7 @@ class CalendarInterface:
 
             # print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE + f" {str(self.curr_week_idx)}")
             print()
-            print(CalendarPageWeek.l_margin_space, end="    ")
+            print(CalendarPageWeek.l_margin_menu_space, end="    ")
 
             user_input = input(">  ")
 
@@ -156,8 +157,9 @@ class CalendarInterface:
 
 
             else:
-                l_animators.animate_text_indented("  Unrecognized option...",
-                                                  indent=CalendarPageDay.cursor_indent_amt,
+                indent = int(CalendarPageWeek.l_margin_menu) + 7
+                l_animators.animate_text_indented("Unrecognized option...",
+                                                  indent=indent,
                                                   finish_delay=.5)
 
 

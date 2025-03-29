@@ -121,7 +121,7 @@ def update_recurring_data(json_filename, var_settings=None, initialized=False):
         json_data["recurring freq time unit"]: None
         json_data["last occurrence"]: None
 
-        l_animators.animate_text("  Oops! Something is funky...")
+        l_animators.animate_text_indented("Oops! Something is funky...", indent=2)
         next_occurrence = today
 
     with open (json_fullpath, "w+") as fin:
