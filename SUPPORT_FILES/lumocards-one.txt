@@ -1,7 +1,6 @@
 :::::NEXT:::::
 	- make the menus work in display week
 	- center menu
-	- realign day menu to •
 
 	- how to gitpull lumocards_one into lumocards_arie?
 	**  put tape on my keyboard for better finding of l ctrl and alt + etc.
@@ -12,16 +11,26 @@
 	
 		
 :::::NEXT LVL 2:::::
-			
+
+	- newcard indentations
+	- cancel doesn't work on renaming in search cards
+	- set up a default to keep existing category in rename
+	- double check indentations for 'list_print'
+	- start type hints for whole project
 	- make sure the word calendar / schedule are used in a way that makes sense...
 		- mostly calendar unless you need schedule
 	- probably an event should become an object at some point... (currently it's a list)
+	- "heirloom" -> stand alone version of pomodoro timer for linux / mac
+		- release on linked in, reddit, github, etc. youtube video?
+	- rename card should show categories
+	
 
 ::::SMALL BUGS::::
 	- Exiting after focus completed doesn't clear() as intended when done from pomodoro
 	- Set as recurring card does not work from newcard
 	- 'reloop' after LUmo search -> recurring -> reloop
 	- l_json_utils, get cat from settings ??
+	
 
 :::::OUTLINE BIG:::::
 	> CODE READING 
@@ -213,7 +222,8 @@
 		- you could have the selected_timer return the actual elapsed time and add it to the log for more accurate logs
 		- when showing stats after a break or focus timer, it doesn't go back to pause: maybe something like, "self.show menu again?"
 		- ability to input pomodoro from argv?
-		- test all menus etc. 
+		- test all menus etc.
+		- make "heirloom" for windows 
 	
 	MENUS:
 		- menus should implement classes
@@ -248,6 +258,7 @@
 	CHECKLIST:
 	 	--  what if you have more than 24 checklists?
 	 	--  what if users want to be able to edit the Checklist_Errand of Checklist_Main card?
+	 	--  checklist settings to enable essentials, night, day etc. 
 		--  how does the user edit the essentials and the errands checklist card inside lumo?
 			- can this be abstracted so that they can choose if a certain card always gets asked to run?   	
 			- same thing for a card that runs each time in the begginning?
@@ -307,6 +318,8 @@
 		- intro to explain settings
 		- explain to users what kinds of cards there are and how they work
 		- introduction feature to have user set up caterogires, one at a time
+		- if env is not activated, have bash check and activate the environment then rerun the args or install a "global" lumo 
+		- how could lumo support multiple calendars? 
 		- intro to set user birthday
 		- what if the user wants to change the names of categories? 
 		- how could lumo and the entry point 'lumo' be set up to support multiple users / accounts
