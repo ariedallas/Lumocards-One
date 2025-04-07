@@ -22,15 +22,18 @@ def animate_text(text, speed: float = .025, finish_delay: float = 0):
 
 
 def animate_text_indented(text, speed: float = .025, indent=None, finish_delay: float = 0):
+    if not indent:
+        indent = 0
+
     text_add_space = (" " * int(indent)) + text
 
     for n in range(indent, len(text_add_space) + 1):
         print(text_add_space[:n], end="\r")
         time.sleep(speed)
 
-    print(text_add_space, end="")
-    print("", end="\r")
-    print()
+    print(text_add_space, end="\r")
+    time.sleep(speed)
+    print(text_add_space)
 
     if finish_delay:
         time.sleep(finish_delay)
