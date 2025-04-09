@@ -210,7 +210,11 @@ def root_loop(cli_parsed_args: argparse.Namespace, unknown: list[str]) -> None:
 
         if status == "RELOOP":
             print()
-            l_animators.animate_text("  unrecognized option", finish_delay=.5)
+            l_animators.animate_text_indented("unrecognized option", indent=2, finish_delay=1)
+
+        if status == "LUMO DUPLICATE":
+            print()
+            l_animators.animate_text_indented("Try typing the keyword without 'lumo' first or use a shortcut letter.", indent=2, finish_delay=1)
 
         LumoMenu.load_transition()
         if menu.name == "all":
@@ -269,14 +273,6 @@ def router(cli_input: Optional[argparse.Namespace],
 
         return None, all_menu
 
-    elif (selected_prog.lower() in {"checklist", "checklists"} or
-          cli_prog.lower() in {"checklist"} or
-          selected_prog_dict_value in {"Checklist"}):
-
-        LumoMenu.load_transition()
-        l_checklist.main()
-        return None, main_menu
-
     elif (selected_prog.lower() in {"calendar"} or
           cli_prog.lower() in {"calendar"} or
           selected_prog_dict_value in {"Calendar"}):
@@ -287,6 +283,15 @@ def router(cli_input: Optional[argparse.Namespace],
         l_calendar.main()
         return None, main_menu
 
+    elif (selected_prog.lower() in {"checklist", "checklists"} or
+          cli_prog.lower() in {"checklist"} or
+          selected_prog_dict_value in {"Checklist"}):
+
+        LumoMenu.load_transition()
+        l_checklist.main()
+        return None, main_menu
+
+
     elif (selected_prog.lower() in {"journal"} or
           cli_prog.lower() in {"journal"} or
           selected_prog_dict_value in {"Journal"}):
@@ -294,6 +299,9 @@ def router(cli_input: Optional[argparse.Namespace],
         LumoMenu.load_transition()
         l_journal.main()
         return None, main_menu
+
+    elif (selected_prog.lower() in {"lumo"}):
+        return "LUMO DUPLICATE", contextual_menu
 
     elif (selected_prog.lower() in {"new card", "newcard"} or
           cli_prog.lower() in {"newcard"} or
