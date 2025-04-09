@@ -1,35 +1,17 @@
-import argparse
-import subprocess
-import time
-import sys
-import pathlib
+import os
 
 import LUMO_LIBRARY.lumo_filehandler as l_files
 
-home = pathlib.Path.home()
+source_path = os.path.join(l_files.support_files_folder,
+                           "alphabetizer_input.txt")
+dest_path = os.path.join(l_files.support_files_folder,
+                         "alphabetizer_output.txt")
 
+with open(source_path) as fin:
+    lines = fin.readlines()
+sorted_lines = sorted(lines, key=lambda i: i.lower())
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-		'file_fullpath'
-		, action='store'
-		, metavar='Fullpath File'
-		, help="require an absolute path to a filename")
-
-parser_options = parser.parse_args()
-
-fullpath = parser_options.file_fullpath
-file = open(fullpath, 'r+')
-
-destination_file_fullpath = f'{home}/_A33A_LUMO_A33A/L3•LUMO_PROTOTYPES/LUMOGARDEN_CLI_V0.1/alphabetizer_transmit.txt'
-destination_file = open(destination_file_fullpath, 'r+')
-
-lineList = [l.rstrip('\n') for l in file]
-sortedList = sorted(lineList, key=lambda i: i.lower())
-
-destination_file.write('\n')
-destination_file.write('(ALPHABETIZED CONTENT)\n')
-for l in sortedList:
-    destination_file.write(l+'\n')
-
-time.sleep(3)
+with open(dest_path, "w+") as fout:
+    fout.write("ALPHABETIZED:\n")
+    for l in sorted_lines:
+        fout.write(l)
