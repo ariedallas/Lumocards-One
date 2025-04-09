@@ -40,6 +40,7 @@ dependencies = [
 
 [tool.setuptools]
 packages = ["LUMO_LIBRARY"]
+packages = ["SUPPORT_FILES"]
 
 [project.scripts]
 lumo = "LUMO_LIBRARY.__main__:main"
