@@ -77,7 +77,6 @@ def get_lumocards_categories():
 
 
 def get_json_settings():
-    settings_fullpath = os.path.join(rootpath, 'SUPPORT_FILES/settings.json')
     json_settings = l_json_utils.read_and_get_json_data(json_filename=None, var_fullpath=settings_fullpath,
                                                         is_json_card=False)
     return json_settings
