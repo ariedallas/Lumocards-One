@@ -8,7 +8,7 @@ echo "	Install Helper for Lumocards One"
 echo ""
 
 # Activate the virtual environment
-activate_venv() {
+lumo_activate() {
     source "$VENV_PATH/bin/activate"
 }
 
@@ -20,12 +20,11 @@ create_venv() {
 }
 
 #install_pkgs() {
-"""    activate_venv
-    echo "Installing features to make Lumocards to work, including options to"
-    echo "work with Google Calendar, and make use of safe delete"
-    pip3 install --upgrade -r $REQUIREMENTS
-}
-"""
+#   activate_venv
+#    echo "Installing features to make Lumocards to work, including options to"
+#    echo "work with Google Calendar, and make use of safe delete"
+#    pip3 install --upgrade -r $REQUIREMENTS
+#}
 
 lumo_install() {
     echo "Hello"
@@ -38,7 +37,7 @@ lumo_welcome_msg() {
 
 
 if [ -d "${VENV_PATH}" ]; then
-    activate_venv()
+    alias activate="lumo_activate"
 else
     echo "To install Lumocards type 'source ./lumo_install.sh && lumo_install()' "
 fi
