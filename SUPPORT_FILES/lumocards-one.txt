@@ -1,21 +1,13 @@
 :::::NEXT:::::
-	- make the menus work in display week
-	- center menu
-
+	- set as recurring card from newcard doesn't work
 	- how to gitpull lumocards_one into lumocards_arie?
-	**  put tape on my keyboard for better finding of l ctrl and alt + etc.
-	**  try epoxy instead / superglue 
-	- my main calendar is ariedallas02, move things over pls :)
 	- json dict updater for all existing...	
 		- update json_dicts for existing cards (include 'google calendar info') --> in branch 'calendar_sync_basic'
 	
 		
 :::::NEXT LVL 2:::::
 
-	- newcard indentations
-	- cancel doesn't work on renaming in search cards
-	- set up a default to keep existing category in rename
-	- double check indentations for 'list_print'
+
 	- start type hints for whole project
 	- make sure the word calendar / schedule are used in a way that makes sense...
 		- mostly calendar unless you need schedule
@@ -26,10 +18,14 @@
 	
 
 ::::SMALL BUGS::::
+	
 	- Exiting after focus completed doesn't clear() as intended when done from pomodoro
-	- Set as recurring card does not work from newcard
 	- 'reloop' after LUmo search -> recurring -> reloop
 	- l_json_utils, get cat from settings ??
+	- newcard indentations
+	- cancel doesn't work on renaming in search cards
+	- set up a default to keep existing category in rename
+	- double check indentations for 'list_print'
 	
 
 :::::OUTLINE BIG:::::
@@ -153,7 +149,8 @@
 
 	FUNCTIONALITY / FEATURES:
 		--  at some point accomodate .ics files?
-		-- localized times etc. 
+		--  localized times etc. 
+		--  show today in week view
 
 	TESTING / EDGE CASES:
 		- how the fuck do I test this thoroughly?

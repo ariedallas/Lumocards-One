@@ -8,10 +8,6 @@ LUMO_LIBRARY/scratch.py
 LUMO_LIBRARY/scratch_json.py
 
 
-# ETC
-.idea/
-.idea/*
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

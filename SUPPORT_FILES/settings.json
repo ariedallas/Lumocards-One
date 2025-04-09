@@ -44,11 +44,11 @@
                 5.0
             ],
             "preset_2": [
-                15.0,
-                5.0
+                20.0,
+                6.0
             ]
         },
-        "default": "preset_1",
+        "default": "preset_2",
         "test": "tomato"
     }
 }
