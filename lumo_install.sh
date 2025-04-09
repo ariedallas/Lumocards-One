@@ -16,7 +16,7 @@ lumo_activate() {
 create_venv() {
     echo "Creating Python virtual environment at $VENV_PATH..."
     mkdir -p "$VENV_PATH" && python3 -m venv "$VENV_PATH"
-    echo "Virtual environment completed and activated."
+    echo "Virtual environment completed"
 }
 
 #install_pkgs() {
@@ -35,9 +35,3 @@ lumo_welcome_msg() {
     echo "Welcome to Lumocards One"
 }
 
-
-if [ -d "${VENV_PATH}" ]; then
-    alias activate="lumo_activate"
-else
-    echo "To install Lumocards type 'source ./lumo_install.sh && lumo_install()' "
-fi
