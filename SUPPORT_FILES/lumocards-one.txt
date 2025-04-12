@@ -59,8 +59,10 @@
 
 		- Lumo keeps and updates one year of cards...otherwise it retrieves cards that are online
 
-		- should selecting an event  on the chosen day show a new screen when editing?
+		- should selecting an event on the chosen day show a new screen when editing?
 			- I think so, but we can do it both ways to see...
+
+		- what are the various options for users when making an event like the location, reminders, meeting, etc. 
 
 
 	- REPEATING EVENTS:
@@ -116,6 +118,7 @@
 			-event end? ( blank=defaul +1 ) | +1=do the math | 9a | etc. 
 			-etc...
 		- what to ask people about each event when scheduling??? Should it be the full Google Menu?
+		- what are the various options for users when making an event like the location, reminders, meeting, etc. 
 
 	- API:
 		- is there an issue with the Google API for 'primary' calendars?
@@ -282,7 +285,9 @@
 
 
 	DISTRIBUTION / INSTALLATION / AUTHENTICATION / UPDATES:
+		- work on README
 		- continue with .toml file
+		- bug with pip install -e, vs. not???
 
 		- 'lumo' could be installed to users home bin so that when the virtual environ
 			-ment is not loaded, it could be a script to start the virtual environment
