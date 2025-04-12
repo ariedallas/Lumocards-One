@@ -14,7 +14,7 @@ from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
 
 
 class CalendarInterface:
-    default_view: str = "WEEK"
+    default_view: str = "DAY"
     curr_view_mode: str | None = None
 
 
@@ -137,7 +137,7 @@ class CalendarInterface:
                 self.calendar_actions_router(user_input)
 
 
-            elif l_cal_utils.validate_day_seleciton(user_input, curr_week_block):
+            elif curr_page.valid_day_selection(user_input=user_input, var_weekblock=curr_week_block):
                 week_in_focus_day_ints = [block.day for block in curr_week_block]
                 selected_idx = week_in_focus_day_ints.index(int(user_input))
                 selected_day_block = curr_week_block[selected_idx]

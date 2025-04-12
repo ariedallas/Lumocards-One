@@ -71,6 +71,8 @@ def get_google_event_by_id(credentials, id):
 
 
 def get_google_events(credentials, time_min, time_max):
+    page_token = None
+
     try:
         service = build("calendar", "v3", credentials=credentials)
 
@@ -82,7 +84,8 @@ def get_google_events(credentials, time_min, time_max):
             timeMin=start,
             timeMax=end,
             singleEvents=True,
-            orderBy="startTime"
+            orderBy="startTime",
+            pageToken=page_token
         ).execute()
 
         events = event_result.get("items", [])
@@ -98,9 +101,40 @@ def get_google_events(credentials, time_min, time_max):
         print("An error has occurred ", error)
         return None
 
+def get_google_event_service(credentials, time_min, time_max):
+    page_token = None
+
+    try:
+        service = build("calendar", "v3", credentials=credentials)
+
+        start = datetime.datetime(year=time_min.year, month=time_min.month, day=time_min.day).isoformat() + "Z"
+        end = datetime.datetime(year=time_max.year, month=time_max.month, day=time_max.day).isoformat() + "Z"
+
+        event_result = service.events().list(
+            calendarId="primary",
+            timeMin=start,
+            timeMax=end,
+            singleEvents=True,
+            orderBy="startTime",
+            pageToken=page_token
+        ).execute()
+
+        if not event_result:
+            print("No upcoming events found.")
+            return
+
+        return event_result
+
+    except HttpError as error:
+        print("Nothing")
+        print("An error has occurred ", error)
+        return None
+
 
 def get_google_events_for_times(credentials, time_min, time_max):
-    google_month_events = get_google_events(credentials=credentials, time_min=time_min, time_max=time_max)
+    google_month_events = get_google_events(credentials=credentials,
+                                            time_min=time_min,
+                                            time_max=time_max)
 
     return google_month_events
 
@@ -153,16 +187,39 @@ def delete_calendar_card(credentials, card_filename):
     l_animators.animate_text("This Lumo card is deleted.")
 
 
-def times_formatter(start, end, format):
+def dt_to_time(dt_obj, format):
     if format == "military":
-        start = f" {start} "
-        end = f" {end} "
+        return datetime.datetime.strftime(dt_obj, "%H:%M")
+    elif format == "standard":
+        return datetime.datetime.strftime(dt_obj, "%I:%M%p")
     else:
-        # format is standard
-        start = start if len(start) == 7 else f" {start}"
-        end = end if len(end) == 7 else f" {end}"
+        return datetime.datetime.strftime(dt_obj, "%I:%M%p")
 
-    formatted = f"{start} - {end}"
+
+def times_formatter(event_obj, format):
+    if event_obj.event_type == "EMPTY EVENT":
+        space = " " * 7
+        formatted = f"{space} - {space}"
+
+
+    elif event_obj.event_type == "ALL DAY" or \
+            event_obj.event_type == "MULTI DAY":
+
+        formatted = "{0:^{width}}".format("all day", width=17)
+
+    else:  # event_type == "standard"
+        start = dt_to_time(event_obj.s, format)
+        end = dt_to_time(event_obj.e, format)
+
+        if format == "military":
+            start_format = f" {start} "
+            end_format = f" {end} "
+        else:  # standard time
+            start_format = start if len(start) == 7 else f" {start}"
+            end_format = end if len(end) == 7 else f" {end}"
+
+        formatted = f"{start_format} - {end_format}"
+
     return formatted
 
 
@@ -216,7 +273,9 @@ def get_time_window_1(var_date, window_size_weeks):
     return window_start, window_end
 
 
-def get_time_window_2(var_date, window_size_weeks):
+def get_time_window_2(var_date: datetime.date,
+                      window_size_weeks: int):
+
     window_size_days = (window_size_weeks * 7) - 1
 
     window_start = get_nearest_recent_monday(var_date)
@@ -237,19 +296,51 @@ def fill_time_window_dates(window_start, window_end):
     return time_window
 
 
-def google_event_to_local(event):
-    dt_google_start = (event["start"].get("dateTime"))
-    dt_google_end = (event["end"].get("dateTime"))
-    dt_python_start = datetime.datetime.strptime(dt_google_start, "%Y-%m-%dT%H:%M:%S%z")
-    dt_python_end = datetime.datetime.strptime(dt_google_end, "%Y-%m-%dT%H:%M:%S%z")
+def google_event_to_obj(event):
+    """Determine type of event: all-day, standard, recurring"""
 
-    date = dt_python_start.date()
-    day = dt_python_start.day
-    start_time = dt_python_start.strftime("%H:%M")
-    end_time = dt_python_end.strftime("%H:%M")
     summary = event["summary"]
 
-    return date, day, start_time, end_time, summary
+    s_dt_google = event["start"].get("dateTime")
+    s_date_google = event["start"].get("date")
+
+    e_dt_google = event["end"].get("dateTime")
+    e_date_google = event["end"].get("date")
+
+    if s_dt_google:
+        s_dt_python = datetime.datetime.strptime(s_dt_google, "%Y-%m-%dT%H:%M:%S%z")
+        e_dt_python = datetime.datetime.strptime(e_dt_google, "%Y-%m-%dT%H:%M:%S%z")
+
+        is_multi_day = e_dt_python.day > s_dt_python.day
+        if is_multi_day:
+            event_type = "MULTI DAY"
+        else:
+            event_type = "STANDARD"
+
+    elif s_date_google:
+        s_date_python = datetime.datetime.strptime(s_date_google, "%Y-%m-%d")
+        e_date_python = datetime.datetime.strptime(e_date_google, "%Y-%m-%d")
+
+        event_type = "ALL DAY"
+
+    if event_type == "STANDARD":
+        event_obj = Event.from_dt(s_dt_python,
+                                  e_dt_python,
+                                  summary,
+                                  event_type)
+
+    elif event_type == "ALL DAY":
+        event_obj = Event.from_date(s_date_python,
+                                    e_date_python,
+                                    summary,
+                                    event_type)
+
+    elif event_type == "MULTI DAY":
+        event_obj = Event.from_dt(s_dt_python,
+                                  e_dt_python,
+                                  summary,
+                                  event_type)
+    return event_obj
 
 
 def get_adjacent_month(base_month, base_year, direction, months_distance):
@@ -290,18 +381,102 @@ def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
 
     google_month_events = get_google_events(creds, time_min=window_start, time_max=window_end)
 
-    converted_events = [google_event_to_local(e) for e in google_month_events]
-    expanded_events = []
+    converted_events = [google_event_to_obj(e) for e in google_month_events]
+
+    day_blocks = []
 
     window = fill_time_window_dates(window_start, window_end)
     for date in window:
         """Transform whatever events are found from Google into a full list where every day has a placeholder
          Adds an empty list if no Google events exist for date."""
-        matched_events = [e for e in converted_events if e[0] == date]
+        matched_events = [obj for obj in converted_events if
+                          (obj.get_date() == date or obj.spans(date))]
         day_block = DayBlock.from_date(date, matched_events)
-        expanded_events.append(day_block)
+        day_blocks.append(day_block)
 
-    return expanded_events
+    return day_blocks
+
+
+class Event:
+    def __init__(self,
+                 summary,
+                 event_type):
+        self.s_date = None
+        self.e_date = None
+        self.s = None
+        self.e = None
+        self.summary = summary
+        self.event_type = event_type
+
+
+    def get_date(self):
+        if self.event_type == "ALL DAY":
+            return self.s_date
+
+        else:  # self.event_type is "multi day" or "standard"
+            return self.s.date()
+
+
+    def spans(self, var_date):
+        if self.s_date and self.e_date:
+            return self.s_date.date() <= var_date <= self.e_date.date()
+
+
+    @classmethod
+    def from_date(cls,
+                  s_date,
+                  e_date,
+                  summary,
+                  event_type):
+        event_obj = Event(summary,
+                          event_type)
+
+        event_obj.s_date = s_date
+        event_obj.e_date = e_date
+
+        return event_obj
+
+
+    @classmethod
+    def from_dt(cls,
+                s,
+                e,
+                summary,
+                event_type):
+        event_obj = Event(summary,
+                          event_type)
+
+        event_obj.s = s
+        event_obj.e = e
+
+        return event_obj
+
+
+class DayBlock:
+    def __init__(self, day, dayname, date, events):
+        self.day = day
+        self.dayname = dayname
+        self.date = date
+        self.events = events
+
+
+    @classmethod
+    def from_date(cls, var_datetime, events):
+        day = var_datetime.day
+        day_int = var_datetime.weekday()
+        dayname = calendar.Day(day_int).name
+        date = var_datetime
+
+        return DayBlock(day, dayname, date, events)
+
+
+    @staticmethod
+    def list_safe_get_item(var_list, idx):
+        if len(var_list) >= (idx + 1):
+            return var_list[idx]
+        else:
+            return Event("--- --- ---",
+                         "EMPTY EVENT")
 
 
 class CalendarPageDay:
@@ -330,7 +505,7 @@ class CalendarPageDay:
 
     def __init__(self, var_dayblock):
         self.header_date = CalendarPageDay._format_date_for_header(var_dayblock.date)
-        self.events = var_dayblock.events
+        self.day_block = var_dayblock
 
 
     @staticmethod
@@ -349,12 +524,12 @@ class CalendarPageDay:
 
 
     @staticmethod
-    def _row_style_event(var_sel, var_event, var_start_t, var_end_t):
+    def _row_style_event(var_sel, event_obj):
         selector = "{:<{width}}".format(var_sel, width=CalendarPageDay.EVENTS_SELECTOR)
-        event = "• {:<{width}}".format(var_event, width=CalendarPageDay.EVENTS_BODY)
-        time = "{} —— {}".format(var_start_t, var_end_t)
+        event = "• {:<{width}}".format(event_obj.summary, width=CalendarPageDay.EVENTS_BODY)
+        time_info = times_formatter(event_obj, "military")
 
-        group = selector + event + time
+        group = selector + event + time_info
         print("{0:^{width}}\n".format(group, width=CalendarPageDay.total_width))
 
 
@@ -366,24 +541,17 @@ class CalendarPageDay:
 
 
     def display_day(self):
-        start, end = (self.events[0][2], self.events[0][3]) if self.events else ("     ", "     ")
-        summary = self.events[0][4] if self.events else "--- --- ---"
-
         subprocess.run(["clear"], shell=True)
-
         self._row_cal_header()
-        CalendarPageDay._row_style_event("[A]", summary, start, end)
-        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_event("[A]", summary, start, end)
-        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_event("[-]", "--- --- ---", "     ", "     ")
-        CalendarPageDay._row_style_event("[A]", "something I'll do another time", start, end)
-        CalendarPageDay._row_style_event("[A]", "something I'll do soon", start, end)
+
+        empty_event = Event("--- --- ---",
+                            "EMPTY EVENT")
+
+        for idx in range(6):
+            if idx < len(self.day_block.events):
+                CalendarPageDay._row_style_event(f"[{idx+1}]", self.day_block.events[idx])
+            else:
+                CalendarPageDay._row_style_event(f"[{idx+1}]", empty_event)
 
 
     def display_menu(self):
@@ -544,14 +712,12 @@ class CalendarPageWeek:
 
 
     @staticmethod
-    def half_row_style_event(event):
+    def half_row_style_event(event_obj):
         summary_width = CalendarPageWeek.COL_WIDTH - 17
 
-        _, _, start, end, summary = event
-        # times = times_formatter(start, end)
-        times = times_formatter(start, end, format="military")
+        time_info = times_formatter(event_obj, format="military")
 
-        return "{0:<{width}}".format(summary, width=summary_width) + times
+        return "{0:<{width}}".format(event_obj.summary, width=summary_width) + time_info
 
 
     @staticmethod
@@ -608,8 +774,15 @@ class CalendarPageWeek:
 
     @staticmethod
     def make_editor_block_2():
+        test_edited_event = Event.from_dt(
+            datetime.datetime.now(),
+            datetime.datetime.now(),
+            "Dinner with Steve",
+            event_type="STANDARD"
+        )
+
         header = CalendarPageWeek.half_row_style_editor_header()
-        summary = CalendarPageWeek.half_row_style_event([None, None, "20:00", "21:00", "Dinner with John"])
+        summary = CalendarPageWeek.half_row_style_event(test_edited_event)
         br = CalendarPageWeek.half_row_style_line_break()
 
         return [br
@@ -626,17 +799,20 @@ class CalendarPageWeek:
 
     @staticmethod
     def format_day_block(day_block):
-        event_1 = DayBlock.list_safe_get_item(day_block.events, 0)
-        event_2 = DayBlock.list_safe_get_item(day_block.events, 1)
-        event_3 = DayBlock.list_safe_get_item(day_block.events, 2)
+        event_obj_1 = DayBlock.list_safe_get_item(day_block.events, 0)
+        event_obj_2 = DayBlock.list_safe_get_item(day_block.events, 1)
+        event_obj_3 = DayBlock.list_safe_get_item(day_block.events, 2)
+        addnl_event_num = len(day_block.events) - 3 if \
+                            len(day_block.events) > 3 else 0
+
 
         day = CalendarPageWeek.half_row_style_day(day_block.day)
         dayname = CalendarPageWeek.half_row_style_dayname(day_block.dayname)
         br = CalendarPageWeek.half_row_style_line_break()
-        event_1_row = CalendarPageWeek.half_row_style_event(event_1)
-        event_2_row = CalendarPageWeek.half_row_style_event(event_2)
-        event_3_row = CalendarPageWeek.half_row_style_event(event_3)
-        addl_events = CalendarPageWeek.half_row_style_addnl_events(3)
+        event_1_row = CalendarPageWeek.half_row_style_event(event_obj_1)
+        event_2_row = CalendarPageWeek.half_row_style_event(event_obj_2)
+        event_3_row = CalendarPageWeek.half_row_style_event(event_obj_3)
+        addl_events = CalendarPageWeek.half_row_style_addnl_events(addnl_event_num)
 
         return [day
             , dayname
@@ -709,37 +885,25 @@ class CalendarPageWeek:
 
         print(CalendarPageWeek.l_margin_menu_space + "CALENDAR")
         print()
-        l_animators.list_printer(whitespace_menu, indent_amt=2,  speed_interval=0)
-
-
-class DayBlock:
-    def __init__(self, day, dayname, date, events):
-        self.day = day
-        self.dayname = dayname
-        self.date = date
-        self.events = events
-
-        # self.event_1 = DayBlock.list_safe_idx_get(self.events, 0, "--- --- ---")
-        # self.event_2 = DayBlock.list_safe_idx_get(self.events, 1, "--- --- ---")
-        # self.event_3 = DayBlock.list_safe_idx_get(self.events, 2, "--- --- ---")
-
-
-    @classmethod
-    def from_date(cls, var_datetime, events):
-        day = var_datetime.day
-        day_int = var_datetime.weekday()
-        dayname = calendar.Day(day_int).name
-        date = var_datetime
-
-        return DayBlock(day, dayname, date, events)
-
+        l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
 
     @staticmethod
-    def list_safe_get_item(var_list, idx):
-        if len(var_list) >= (idx + 1):
-            return var_list[idx]
+    def valid_day_selection(user_input: str, var_weekblock: list[DayBlock]) -> bool:
+        valid_day_selections = [block.day for block in var_weekblock]
+
+        if not l_card_utils.test_for_int(user_input):
+            return False
+
+        input_int = int(user_input)
+
+        if len(user_input) > 2:
+            return False
+        if input_int < 1:
+            return False
+        if input_int not in valid_day_selections:
+            return False
         else:
-            return [None, None, "     ", "     ", "--- --- ---"]
+            return True
 
 
 class Menus:
@@ -779,57 +943,37 @@ class Menus:
         return whitespace_menu
 
 
-def validate_day_seleciton(user_input: str, var_weekblock: list[DayBlock]) -> bool:
-    valid_day_selections = [block.day for block in var_weekblock]
-
-    if not l_card_utils.test_for_int(user_input):
-        return False
-
-    input_int = int(user_input)
-
-    if len(user_input) > 2:
-        return False
-    if input_int < 1:
-        return False
-    if input_int not in valid_day_selections:
-        return False
-    else:
-        return True
-
-
 if __name__ == "__main__":
     print("Hello from main")
 
-    m = CalendarPageWeek.prep_menu_columns(["a", "b", "c", "d"], ["x"])
-    pp(m)
-
-    a = ["a"]
-    b = ["b"]
-    a.extend(b)
-    n = a.copy()
-    pp(n)
-    sys.exit(0)
     creds = get_creds()
 
-    start, end = get_time_window_2(today_date, 8)
-    get_local_calendar_cards(start, end)
+    w_start, w_end = get_time_window_2(datetime.date.today(), 2)
+    events = get_google_events_for_times(creds,w_start, w_end)
+    # pp(events)
 
+    event_obj = get_google_event_service(credentials=creds, time_min=w_start, time_max=w_end)
+    pp(event_obj.get('nextPageToken'))
+    print(event_obj.keys())
 
-    # delete_calendar_card(creds, "A_SingleEvent.txt")
+    sys.exit()
+
 
     def get_new_single_cards_from_google():
-        start, end = get_time_window_2(today_date, 2)
+        start, end = get_time_window_2(datetime.date(2025, 3, 26), 2)
         events = get_google_events(creds, start, end)
 
-        single_events = [e for e in events if not e.get("recurringEventId")]
+        single_events = [e for e in events]
         cards_to_create = []
 
-        for e in single_events[:5]:
+        for e in single_events[:10]:
             test = l_newcard.string_to_filename(e.get("summary"))
             if l_newcard.check_for_calendar_cards(test):
                 cards_to_create.append((test, e))
 
         return cards_to_create
+
+    events = get_new_single_cards_from_google()
 
 
     def sync_deleted_from_google():
