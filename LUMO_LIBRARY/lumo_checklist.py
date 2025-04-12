@@ -15,23 +15,22 @@ errand_card_path = os.path.join(l_files.internal_cards_folder, "Checklist_Errand
 errand_card = l_card_utils.fullpath_to_card(errand_card_path)
 errand_card_title, errand_card_steps = errand_card[0], errand_card[1]
 
-# checklist_cards = sorted([card for card in os.listdir(l_files.checklist_cards_folder)])
-# fetched = [l_card_utils.filename_to_card(file) for file in checklist_cards]
-# fetched_titles = [l_card_utils.format_card_title(card[0]) for card in fetched]
-# formatted_results_dict = {f"{ltr}": card for ltr, card in zip(l_menus_data.LETTERS_FILTERED, fetched)}
-# formatted_results_menu = [f"  [{ltr.upper()}]  {card_title}"
-#                           for ltr, card_title in zip(l_menus_data.LETTERS_FILTERED, fetched_titles)]
-
 
 def cycler(list_of_steps):
     for item in list_of_steps:
-        input(f"  {item} ?  ")
+        # print(repr(item))
+        if item != "\n" and item != "" and item:
+            input(f"  {item} ?  ")
+        else:
+            print()
 
 
 def display_menu(var_menu):
-    full_menu = var_menu + [""] + l_menus_data.SIMPLE_EXIT_LIST + l_menus_data.QUIT_MENU_LIST
-    for line in full_menu:
-        print(line)
+    exit_and_quit = l_menus_data.SIMPLE_EXIT_LIST + l_menus_data.QUIT_MENU_LIST
+
+    l_animators.list_printer(var_menu, indent_amt=2, speed_interval=0)
+    print()
+    l_animators.list_printer(exit_and_quit, indent_amt=2, speed_interval=0)
 
 
 def card_select(var_dict):
@@ -63,7 +62,7 @@ def display_selected_checklist(card_title, card_steps):
 
 def main_checklist_review():
     print()
-    user_input = l_menus_funcs.proceed("Would you like to review the Essentials Checklist? ")
+    user_input = l_menus_funcs.proceed("  Would you like to review the Essentials Checklist? ")
     if user_input:
         main_card_title_formatted = l_card_utils.format_card_title(main_card_title).upper()
         print()
@@ -75,7 +74,7 @@ def main_checklist_review():
 
 def errand_checklist_review():
     print()
-    user_input = l_menus_funcs.proceed("Would you like to review the Errands Checklist? ")
+    user_input = l_menus_funcs.proceed("  Would you like to review the Errands Checklist? ")
     if user_input:
         errand_card_title_formatted = l_card_utils.format_card_title(errand_card_title).upper()
         print()
@@ -95,7 +94,7 @@ def main():
     fetched = [l_card_utils.filename_to_card(file) for file in checklist_cards]
     fetched_titles = [l_card_utils.format_card_title(card[0]) for card in fetched]
     formatted_results_dict = {f"{ltr}": card for ltr, card in zip(l_menus_data.LETTERS_FILTERED, fetched)}
-    formatted_results_menu = [f"  [{ltr.upper()}]  {card_title}"
+    formatted_results_menu = [f"[{ltr.upper()}]  {card_title}"
                               for ltr, card_title in zip(l_menus_data.LETTERS_FILTERED, fetched_titles)]
 
     while True:
@@ -108,13 +107,13 @@ def main():
             break
         else:
             print()
-            l_animators.animate_text(" unrecognized option", finish_delay=.5)
+            l_animators.animate_text_indented("Unrecognized option", indent=2, finish_delay=.5)
             subprocess.run(["clear"], shell=True)
             print("\n\n")
 
     if status == "QUIT":
         print()
-        l_animators.animate_text("  Quit Lumo: Checklist", finish_delay=.5)
+        l_animators.animate_text("Quit Lumo: Checklist", finish_delay=.5)
         return
 
     if status != "EXIT":
@@ -123,7 +122,7 @@ def main():
     main_checklist_review()
     errand_checklist_review()
     print()
-    l_animators.animate_text("  Quit Lumo: Checklist", finish_delay=.5)
+    l_animators.animate_text("Quit Lumo: Checklist", finish_delay=.5)
 
 
 if __name__ == "__main__":

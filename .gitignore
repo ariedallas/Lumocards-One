@@ -1,4 +1,5 @@
 # LUMO_FILES
+.notes
 SUPPORT_FILES/LUMO_RUNTIME
 SUPPORT_FILES/TEMP/*
 SUPPORT_FILES/Z_CREDENTIALS/credentials.json
@@ -6,10 +7,6 @@ SUPPORT_FILES/Z_CREDENTIALS/token.json
 LUMO_LIBRARY/scratch.py
 LUMO_LIBRARY/scratch_json.py
 
-
-# ETC
-.idea/
-.idea/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

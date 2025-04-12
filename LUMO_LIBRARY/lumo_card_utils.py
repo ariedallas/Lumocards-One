@@ -10,9 +10,13 @@ import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 
-default_card_steps = ["..."
+settings = l_files.get_json_settings()
+
+default_card_steps = [
+    "..."
     , "..."
-    , "..."]
+    , "..."
+]
 
 
 def card_header(var_card):
@@ -59,7 +63,12 @@ def steps_preview(card_steps, steps_amt, steps_idx):
     return card_steps_three
 
 
-def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
+def print_card_categories():
+    for k, v in settings.get("card categories").items():
+        print(f"  {k} — {v[1]}")
+
+
+def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False):
     curr_name_abspath = get_card_abspath(curr_name)
     curr_dir_name = pathlib.Path(str(curr_name_abspath)).parent.name
 
@@ -74,12 +83,20 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
 
     print()
     if curr_dir_name != dst_dir_name:
-        l_animators.animate_text(f"  Moving from '{curr_dir_name}' to '{dst_dir_name}' ")
+        print(f"  Moving from '{curr_dir_name}' to '{dst_dir_name}' ")
 
     elif curr_name != dst_name:
-        l_animators.animate_text(f"  Renaming from '{curr_name}' to '{dst_name}' ")
+        print(f"  Renaming from '{curr_name}' to '{dst_name}' ")
 
-    if l_menus_funcs.proceed("  Type 'cancel' to stop or press any key to continue > "):
+    if ask_confirmation:
+        if not l_menus_funcs.proceed("  Type 'no' or 'x' to cancel, otherwise press any key to continue >  "):
+            return "CANCELLED"
+        os.rename(source, dest)
+        l_json_utils.rename_json_card(src_filename=curr_name, dest_filename=dst_name)
+        l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name,
+                                           update_category=category_change)
+
+    else:
         os.rename(source, dest)
         l_json_utils.rename_json_card(src_filename=curr_name, dest_filename=dst_name)
         l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name,
@@ -87,6 +104,8 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir"):
 
 
 def card_deleter(card_filename):
+    if not l_menus_funcs.proceed("  Type 'no' or 'x' to cancel, otherwise press any key to continue >  "):
+        return "CANCELLED"
     card_fullpath = get_card_abspath(card_filename)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
 
@@ -146,8 +165,8 @@ def default_json_card_handler(filename):
 
     if is_recurring:
         sched_data = add_default_recurr_data(json_filename=json_filename,
-                                           freq=4,
-                                           unit="Day")
+                                             freq=4,
+                                             unit="Day")
 
     feedback(is_recurring, sched_data)
 
@@ -167,7 +186,7 @@ def add_default_recurr_data(json_filename, freq, unit):
 
     json_data["recurring freq"] = freq
     json_data["recurring freq time unit"] = unit
-    json_data["last occurrence"] = datetime.datetime.strftime(l_files.today, '%b %d %Y, %A')
+    json_data["last occurrence"] = datetime.datetime.strftime(l_files.today, "%b %d %Y, %A")
 
     l_json_utils.write_json(json_filename=json_filename, json_data=json_data)
 
@@ -180,7 +199,7 @@ def feedback(is_recurring=False, schedule=None, deleted=False):
         print(f"        Recurring card created with defaults: {schedule}")
     elif not deleted and not is_recurring:
         print(f"        Standard card created")
-    else: # deleted
+    else:  # deleted
         print(f"        Card deleted")
 
     print()
@@ -202,11 +221,11 @@ def clean_cards():
         for u in unique_txts:
             print(f"  {u}.txt", end=" ")
             user_input = input("——> [D]elete this or [C]reate .json file to pair it? >  ")
-            if user_input.lower() == 'd':
+            if user_input.lower() == "d":
                 card_fullpath = get_card_abspath(f"{u}.txt")
                 send2trash.send2trash(card_fullpath)
                 feedback(deleted=True)
-            elif user_input.lower() == 'c':
+            elif user_input.lower() == "c":
                 default_json_card_handler(u)
             else:
                 print("        (You skipped this card for now.)")
@@ -218,11 +237,11 @@ def clean_cards():
         for u in unique_jsons:
             print(f"  {u}.json", end=" ")
             user_input = input("——> [D]elete this or [C]reate .txt file to pair it? >  ")
-            if user_input.lower() == 'd':
+            if user_input.lower() == "d":
                 json_fullpath = l_json_utils.get_json_card_fullpath(f"{u}.json")
                 send2trash.send2trash(json_fullpath)
                 feedback(deleted=True)
-            elif user_input.lower() == 'c':
+            elif user_input.lower() == "c":
                 pass
             else:
                 print("        (You skipped this card for now.)")
@@ -404,9 +423,17 @@ def add_multiple_steps_from_card(nums):
     return passed_list
 
 
-def test_for_float(text):
+def test_for_float(text: str) -> bool:
     try:
         float(text)
+        return True
+    except ValueError:
+        return False
+
+
+def test_for_int(text: str) -> bool:
+    try:
+        int(text)
         return True
     except ValueError:
         return False

@@ -85,20 +85,20 @@ def big_zipper(var_total_matches):
 
     print()
 
-    near_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[0]]
-    mid_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[1]]
-    dist_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[2]]
-    recurring_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[3]]
-    checklist_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[4]]
-    archived_matches_setup = [f"  [{letters_filtered_copy.pop(0)}] ({len(var_total_matches[5])})"] if len(var_total_matches[5]) > 0 else []
+    near_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[0]]
+    mid_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[1]]
+    dist_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[2]]
+    recurring_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[3]]
+    checklist_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[4]]
+    archived_matches_setup = [f"[{letters_filtered_copy.pop(0)}] ({len(var_total_matches[5])})"] if len(var_total_matches[5]) > 0 else []
 
 
-    near_matches_formatted = ["  NEAR FOCUS CARDS:"] + near_matches_setup
-    mid_matches_formatted = ["  MIDDLE FOCUS CARDS:"] + mid_matches_setup
-    dist_matches_formatted = ["  DISTANT FOCUS CARDS:"] + dist_matches_setup
-    recurring_matches_formatted = ["  RECURRING CARDS:"] + recurring_matches_setup
-    checklist_matches_formatted = ["  CHECKLIST CARDS:"] + checklist_matches_setup
-    archived_matches_formatted = ["  ARCHIVED CARDS:"] + archived_matches_setup
+    near_matches_formatted = ["NEAR FOCUS CARDS:"] + near_matches_setup
+    mid_matches_formatted = ["MIDDLE FOCUS CARDS:"] + mid_matches_setup
+    dist_matches_formatted = ["DISTANT FOCUS CARDS:"] + dist_matches_setup
+    recurring_matches_formatted = ["RECURRING CARDS:"] + recurring_matches_setup
+    checklist_matches_formatted = ["CHECKLIST CARDS:"] + checklist_matches_setup
+    archived_matches_formatted = ["ARCHIVED CARDS:"] + archived_matches_setup
 
     used_letters = [letter for letter in letters_filtered if letter not in letters_filtered_copy]
 
@@ -118,7 +118,9 @@ def select_card_from_found(searchterm):
         return None, None, False
 
     if total_amt_matches == 0:
-        l_animators.animate_text(f"No matches found for your term \'{searchterm}\'... ", finish_delay=.5)
+        l_animators.animate_text_indented(f"No matches found for your term \'{searchterm}\'... ",
+                                          indent=2, finish_delay=.4)
+        print()
         return None, None, False
 
     if len(all_matches_formatted[5]) > 1:
@@ -129,11 +131,11 @@ def select_card_from_found(searchterm):
 
     for matches_list in all_matches_formatted:
         if len(matches_list) > 1:
-            l_animators.standard_interval_printer(matches_list, speed_interval=0)
+            l_animators.list_printer(matches_list, indent_amt=2, speed_interval=0)
             print()
 
-    print(l_menus_data.EXIT_MENU_LIST[0])
-    print(l_menus_data.QUIT_MENU_LIST[0])
+    l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, indent_amt=2, speed_interval=0)
+    l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, indent_amt=2, speed_interval=0)
 
     while True:
         user_input = input("\n  > ")
@@ -171,10 +173,10 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
 
     l_card_utils.card_header(var_card)
 
-    l_animators.standard_interval_printer(var_hotkey_list, speed_interval=0)
+    l_animators.list_printer(var_hotkey_list, indent_amt=2, speed_interval=0)
     print()
-    l_animators.standard_interval_printer(l_menus_data.EXIT_MENU_LIST, speed_interval=0)
-    l_animators.standard_interval_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
+    l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, indent_amt=2, speed_interval=0)
+    l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, indent_amt=2, speed_interval=0)
 
     while True:
         user_input = input("\n  > ")
@@ -204,7 +206,8 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
 
 
             elif var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
-                l_animators.animate_text("  This feature not fully available")
+                l_animators.animate_text_indented("This feature not fully available", indent=2, finish_delay=.4)
+                print()
                 return "RELOOP", var_card_filename
 
             elif var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING_2:
@@ -213,9 +216,9 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
                                                                        l_menus_data.LETTERS_FILTERED,
                                                                        pop_letters=False)
                 print()
-                l_animators.standard_interval_printer([card_title_formatted])
+                l_animators.list_printer([card_title_formatted])
                 print()
-                l_animators.standard_interval_printer(recur_menu_l)
+                l_animators.list_printer(recur_menu_l, indent_amt=2)
 
                 recurrence_settings = l_menus_funcs.menu_recurrence_settings(var_menu=recur_menu_d)
 
@@ -273,8 +276,6 @@ def main(initial_search_from_cli=None):
                 status = "NEW SEARCH"
 
         elif status == "RELOOP":
-            print(status)
-
             card, return_path = reshow_match(return_path)
             hotkey_dict, hotkey_list = l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
             status, return_path = cardsearch_main_options(card, return_path, hotkey_dict, hotkey_list)
@@ -286,8 +287,8 @@ def main(initial_search_from_cli=None):
             print(status)
             user_input = input(
                 "\n"                
-                "                (Type 'quit' to quit)"
-                "\nEnter a single search term i.e. 'hat'  >  " )
+                "                  (Type 'quit' to quit)"
+                "\n  Enter a single search term i.e. 'hat'  >  " )
 
             if user_input == "quit":
                 status = "QUIT"

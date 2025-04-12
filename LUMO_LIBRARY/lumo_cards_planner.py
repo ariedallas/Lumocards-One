@@ -31,9 +31,9 @@ def cards_intro():
     l_animators.animate_text(f"IT'S DAY: {days_since_birth}", speed=.075)
     l_animators.animate_text(f"IT'S: {day.upper()}, {day_num} of {month.upper()}, {year}", speed=.075, finish_delay=.5)
 
-    l_animators.standard_interval_printer([f"VERSION: {l_files.parents[1].name}"], speed_interval=.5)
-    l_animators.standard_interval_printer([""], speed_interval=.5)
-    l_animators.standard_interval_printer(["RUNNING: NEAR FOCUS CARDS"], speed_interval=.5)
+    l_animators.list_printer([f"VERSION: {l_files.parents[1].name}"], speed_interval=.5)
+    l_animators.list_printer([""], speed_interval=.5)
+    l_animators.list_printer(["RUNNING: NEAR FOCUS CARDS"], speed_interval=.5)
     l_animators.animate_text(" ...", speed=.075)
 
 
@@ -79,8 +79,8 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
             hotkey_dict, hotkey_list = l_menus_funcs.prep_card_run_menu(l_menus_data.CARDS_PLANNER_MACRO_MENU)
             status, possible_card_path = cardsrun_macro_menu(card_filename=card_filename,
                                                              card=card,
-                                                             hkey_dict=hotkey_dict,
-                                                             hkey_list=hotkey_list)
+                                                             menu_dict=hotkey_dict,
+                                                             menu_list=hotkey_list)
 
             if status == "RELOOP" and possible_card_path:
                 return "RELOOP"
@@ -166,8 +166,8 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
             hotkey_dict, hotkey_list = l_menus_funcs.prep_card_run_menu(l_menus_data.CARDS_PLANNER_MACRO_MENU)
             status, possible_card_path = cardsrun_macro_menu(card_filename=card_filename,
                                                              card=card,
-                                                             hkey_dict=hotkey_dict,
-                                                             hkey_list=hotkey_list)
+                                                             menu_dict=hotkey_dict,
+                                                             menu_list=hotkey_list)
             if status == "RELOOP" and possible_card_path:
                 return "RELOOP"
 
@@ -219,27 +219,27 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
     return True
 
 
-def cardsrun_macro_menu(card_filename, card, hkey_dict, hkey_list):
+def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
     card_fullpath = l_card_utils.get_card_abspath(card_filename)
 
     l_card_utils.card_header(card)
 
-    l_animators.standard_interval_printer(hkey_list, speed_interval=0)
+    l_animators.list_printer(menu_list, speed_interval=0)
     print()
-    l_animators.standard_interval_printer(l_menus_data.EXIT_MENU_LIST, speed_interval=0)
-    l_animators.standard_interval_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
+    l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, speed_interval=0)
+    l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
 
     while True:
         user_input = input("\n  > ")
 
-        if user_input.upper() in hkey_dict.keys():
+        if user_input.upper() in menu_dict.keys():
 
-            if hkey_dict[user_input.upper()] == l_menus_data.ACTION_OPEN:
+            if menu_dict[user_input.upper()] == l_menus_data.ACTION_OPEN:
                 subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
                 return "RELOOP", card_filename
 
 
-            elif hkey_dict[user_input.upper()] == l_menus_data.ACTION_MODIFY:
+            elif menu_dict[user_input.upper()] == l_menus_data.ACTION_MODIFY:
 
                 hotkey_list, hotkey_dict = l_menus_funcs.prep_card_modify_menu(
                     actions_list=l_menus_data.CARDS_PLANNER_MODIFY_MENU.copy(),
@@ -260,19 +260,19 @@ def cardsrun_macro_menu(card_filename, card, hkey_dict, hkey_list):
                 else:
                     return "RELOOP", card_filename
 
-            elif hkey_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
+            elif menu_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
                 l_animators.animate_text("  This feature not fully available")
                 return "CARD REFOCUSED", None
 
-            elif hkey_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING_2:
+            elif menu_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING_2:
                 card_title_formatted = l_card_utils.format_card_title(card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus_funcs.prep_newcard_menu(l_menus_data.RECURRING_MENU,
                                                                        l_menus_data.LETTERS_FILTERED,
                                                                        pop_letters=False)
                 print()
-                l_animators.standard_interval_printer([card_title_formatted])
+                l_animators.list_printer([card_title_formatted])
                 print()
-                l_animators.standard_interval_printer(recur_menu_l)
+                l_animators.list_printer(recur_menu_l)
 
                 recurrence_settings = l_menus_funcs.menu_recurrence_settings(var_menu=recur_menu_d)
 
@@ -310,7 +310,7 @@ def iterate_cards(var_list_cards, mode):
 
         card = l_card_utils.filename_to_card(card_path)
 
-        l_animators.standard_interval_printer(["", card_counter_feedback_text], speed_interval=0)
+        l_animators.list_printer(["", card_counter_feedback_text], speed_interval=0)
         l_boxify.display_card(card)
 
         if mode == "main cards":
@@ -366,7 +366,7 @@ def review_and_write_recurring():
 def planner_feedback(card_title, card_step):
     formatted_output = f"{card_title}: {card_step}"
     full_message = f"Added: '{formatted_output}.' to planner."
-    l_animators.standard_interval_printer([full_message])
+    l_animators.list_printer([full_message])
     todays_cards.append(formatted_output)
 
 
@@ -374,12 +374,12 @@ def update_cards():
     print()
     if todays_cards:
         l_animators.animate_text("ADDING TO PLANNER:")
-        l_animators.standard_interval_printer(todays_cards)
+        l_animators.list_printer(todays_cards)
 
     if len(archived_cards) > 0:
         print()
         l_animators.animate_text("The system is now going to archive cards:")
-        l_animators.standard_interval_printer(archived_cards)
+        l_animators.list_printer(archived_cards)
 
         if l_menus_funcs.proceed("> "):
             for card in archived_cards:
@@ -388,7 +388,7 @@ def update_cards():
     if len(deleted_cards) > 0:
         print()
         l_animators.animate_text("The system is now going to delete cards:")
-        l_animators.standard_interval_printer(deleted_cards)
+        l_animators.list_printer(deleted_cards)
 
         if l_menus_funcs.proceed("> "):
             for card in deleted_cards:
