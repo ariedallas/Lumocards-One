@@ -1,31 +1,45 @@
 :::::NEXT:::::
-	- set as recurring card from newcard doesn't work
-	- how to gitpull lumocards_one into lumocards_arie?
+	- work on selecting and displaying single events
+	- work on basic parser to create events
+	- make sure finish delay is set to .5 almost everywhere
+	
+:::::NEXT LVL 2:::::
+
+	- use journal naming convention for planner files
+	- feature: show planner today file keyword 'agenda' or 'review today'
+		- handle error for not yet created...
+	- change menu in weeks to be fewer items
+	- rename card should show categories
+	- set up a default to keep existing category in rename
+	- in planner: move card to checklist
+	
+	- make sure the word calendar / schedule are used in a way that makes sense...
+		- mostly calendar unless you need schedule
+	- "heirloom" -> stand alone version of pomodoro timer for linux / mac
+		- release on linked in, reddit, github, etc. youtube video?
 	- json dict updater for all existing...	
 		- update json_dicts for existing cards (include 'google calendar info') --> in branch 'calendar_sync_basic'
 	
-		
-:::::NEXT LVL 2:::::
-
-
-	- start type hints for whole project
-	- make sure the word calendar / schedule are used in a way that makes sense...
-		- mostly calendar unless you need schedule
-	- probably an event should become an object at some point... (currently it's a list)
-	- "heirloom" -> stand alone version of pomodoro timer for linux / mac
-		- release on linked in, reddit, github, etc. youtube video?
-	- rename card should show categories
 	
 
-::::SMALL BUGS::::
-	
-	- Exiting after focus completed doesn't clear() as intended when done from pomodoro
+::::BUGS::::
+
+	- deleting cards in cardsrun / planner doesn't work
+	- new lines when doing search (from both cli and lumo menu)
+	- double check that animate text indent works well
+	- looping from the planner toe newcard to planner causes planner not to work properly...
+	- pip install -e . works, but pip install . doesn't :(
+	- Exiting after focus completed doesn't clear() as intended when done from pomodoro (try both ways)
 	- 'reloop' after LUmo search -> recurring -> reloop
 	- l_json_utils, get cat from settings ??
 	- newcard indentations
 	- cancel doesn't work on renaming in search cards
-	- set up a default to keep existing category in rename
 	- double check indentations for 'list_print'
+
+::::KNOWN ISSUES::::
+	- Calendar: multi day events with start and end times will only display on their start date.
+		-i.e. if the event is 24th to 28th, it only shows up on the 24th...''
+	- 2038 problem
 	
 
 :::::OUTLINE BIG:::::
@@ -256,6 +270,8 @@
 		--  issue with how after you 'show full' card if you try to edit it, it won't work?
 		
 	CHECKLIST:
+	
+		--  feature from command line 'lumo checklist night' etc. parse and fuzzy search words
 	 	--  what if you have more than 24 checklists?
 	 	--  what if users want to be able to edit the Checklist_Errand of Checklist_Main card?
 	 	--  checklist settings to enable essentials, night, day etc. 
@@ -294,6 +310,11 @@
 			- and then run the command 'lumo'. At any rate, basically you want some
 			- kind of branch that will enable users to only type 'lumo' whether or not
 			- they are in a virtual environment or
+
+		- lumo_install.sh: makes environment; makes home script for lumo_activate 
+		- lumo_activate: activates runtime for venv or 'golumo'
+		
+		- make sure that lumo_install.sh script can be used for relinking the activation script and the lumo folder
 
 		- homebrew?
 		- see all the ways the micro can be installed
