@@ -69,7 +69,7 @@ class Data:
 
 class Menu:
     def __init__(self, menu):
-        self.menus_combined = l_menus_funcs.prep_menu(menu)
+        self.menus_combined = l_menus_funcs.prep_menu_tuple(menu)
         self.dict_menu = self.menus_combined[0]
         self.list_menu = self.menus_combined[1]
 
@@ -126,7 +126,7 @@ class Menu:
 
     def menu_update_prepend(self, option, var_menu):
         updated_menu = [option] + var_menu
-        self.menus_combined = l_menus_funcs.prep_menu(updated_menu)
+        self.menus_combined = l_menus_funcs.prep_menu_tuple(updated_menu)
         self.dict_menu = self.menus_combined[0]
         self.list_menu = self.menus_combined[1]
 

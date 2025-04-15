@@ -50,7 +50,7 @@ def iterate_and_find(searchterm, folder):
 
 def reshow_match(chosen_file):
     card = l_card_utils.filename_to_card(chosen_file)
-    l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
+    l_menus_funcs.prep_menu_tuple(l_menus_data.SEARCH_MAIN_MENU)
     return card, chosen_file
 
 
@@ -268,7 +268,7 @@ def main(initial_search_from_cli=None):
             card, matched_path, user_quit = select_card_from_found(initial_search_from_cli)
 
             if card:
-                hotkey_dict, hotkey_list = l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
+                hotkey_dict, hotkey_list = l_menus_funcs.prep_menu_tuple(l_menus_data.SEARCH_MAIN_MENU)
                 status, return_path = cardsearch_main_options(card, matched_path, hotkey_dict, hotkey_list)
             elif user_quit:
                 status = "QUIT"
@@ -277,7 +277,7 @@ def main(initial_search_from_cli=None):
 
         elif status == "RELOOP":
             card, return_path = reshow_match(return_path)
-            hotkey_dict, hotkey_list = l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
+            hotkey_dict, hotkey_list = l_menus_funcs.prep_menu_tuple(l_menus_data.SEARCH_MAIN_MENU)
             status, return_path = cardsearch_main_options(card, return_path, hotkey_dict, hotkey_list)
 
         elif status == "NEW SEARCH":
@@ -297,7 +297,7 @@ def main(initial_search_from_cli=None):
             card, matched_path, user_quit = select_card_from_found(user_input)
 
             if card:
-                hotkey_dict, hotkey_list = l_menus_funcs.prep_menu(l_menus_data.SEARCH_MAIN_MENU)
+                hotkey_dict, hotkey_list = l_menus_funcs.prep_menu_tuple(l_menus_data.SEARCH_MAIN_MENU)
                 status, return_path = cardsearch_main_options(card, matched_path, hotkey_dict, hotkey_list)
             elif user_quit:
                 status = "QUIT"

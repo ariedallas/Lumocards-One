@@ -27,7 +27,7 @@ def prep_newcard_menu(var_menu, var_letters, pop_letters=False):
     return full_hotkey_set_dict, full_hotkey_set_list
 
 
-def prep_menu(var_menu):
+def prep_menu_tuple(var_menu):
     full_hotkey_set_dict = {f"{ltr}": f"{match}" for ltr, match in zip(l_menus_data.LETTERS_FILTERED, var_menu)}
 
     full_hotkey_set_list = [f"[{letter}]  {action}" for letter, action in zip(
@@ -35,6 +35,13 @@ def prep_menu(var_menu):
         full_hotkey_set_dict.values())]
 
     return full_hotkey_set_dict, full_hotkey_set_list
+
+def menu_list_from_dict(var_dict):
+    full_hotkey_set_list = [f"[{letter}]  {action}" for letter, action in zip(
+        var_dict.keys(),
+        var_dict.values())]
+
+    return full_hotkey_set_list
 
 
 def prep_card_run_menu(actions_list):
@@ -193,3 +200,6 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
             print()
             print("You entered something other than one letter.")
             print()
+
+if __name__ == "__main__":
+    print("Hello from main")
