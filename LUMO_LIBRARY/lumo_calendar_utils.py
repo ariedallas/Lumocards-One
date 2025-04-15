@@ -863,7 +863,7 @@ class CalendarPageWeek:
         if len(menu_r) < len(menu_l):
             diff = len(menu_l) - len(menu_r)
             for _ in range(diff):
-                menu_r.append(".")
+                menu_r.append(" ")
 
         for l, r in zip(menu_l, menu_r):
             left_col = "{0:<{width}}".format(l, width=36)

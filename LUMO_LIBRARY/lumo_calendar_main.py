@@ -61,7 +61,10 @@ class CalendarInterface:
     def _view_day_actions_router(self,
                                  user_input: str,
                                  actions_dict: dict[str, str]
-                                 ) -> Optional[tuple[bool, str, str]]:
+                                 ) -> Optional[tuple[bool,
+                                            Optional[str],
+                                            Optional[str]]
+                                                ]:
 
         action = actions_dict[user_input.upper()]
 
@@ -78,6 +81,14 @@ class CalendarInterface:
             old_val = action
             new_val = Menus.ACTION_LIST_ALL
             return update_menu, old_val, new_val
+
+        elif action == Menus.ACTION_MENU_LESS:
+            self.menu_size = "DAY SHORT"
+            return True, None, None
+
+        elif action == Menus.ACTION_MENU_MORE:
+            self.menu_size = "DAY LONG"
+            return True, None, None
 
 
     def _view_week_actions_router(self,
@@ -130,6 +141,7 @@ class CalendarInterface:
         while True:
             if menu_update:
                 menu_dict = self.contextualize(menu_dict, old_val, new_val, self.menu_size)
+                old_val, new_val = None, None
                 menu_update = False
 
             curr_page = CalendarPageDay(curr_day_block)
@@ -388,13 +400,17 @@ class CalendarInterface:
             return self.update_menu_item(var_dict, old_val, new_val)
 
         elif menu_size == "DAY SHORT":
-            return Menus.DAY_MENU_SHORT
+            menu_dict, _ =  l_menus_funcs.prep_menu_tuple(Menus.DAY_MENU_SHORT)
+            return menu_dict
         elif menu_size == "DAY LONG":
-            return Menus.DAY_MENU_LONG
+            menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.DAY_MENU_LONG)
+            return menu_dict
         elif menu_size == "WEEK SHORT":
-            return Menus.WEEK_MENU_SHORT
+            menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.WEEK_MENU_SHORT)
+            return menu_dict
         elif menu_size == "WEEK LONG":
-            return Menus.WEEK_MENU_LONG
+            menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.WEEK_MENU_LONG)
+            return menu_dict
 
         else:
             return var_dict
