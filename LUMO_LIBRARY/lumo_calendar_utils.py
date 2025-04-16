@@ -679,16 +679,17 @@ class CalendarPageDay:
 
 
     @staticmethod
-    def valid_event_selection(user_input: str, max_ints: int) -> bool:
+    def valid_event_selection(user_input: str,
+                              max_ints: int,
+                              curr_limit: int) -> bool:
+
         if not l_card_utils.test_for_int(user_input):
             return False
 
         input_int = int(user_input)
         valid_range = range(1, max_ints + 1)
 
-        if max_ints < input_int <= CalendarPageDay.EVENTS_DISPLAY_LIMIT:
-            return False
-        if input_int in valid_range:
+        if input_int in valid_range and input_int <= curr_limit:
             return True
         else:
             return False

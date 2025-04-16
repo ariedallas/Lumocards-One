@@ -159,7 +159,8 @@ class CalendarInterface:
                 curr_day_block = self.paginate_days(user_input)
 
             elif curr_page.valid_event_selection(user_input,
-                                                 len(curr_day_block.events)):
+                                                 len(curr_day_block.events),
+                                                 self.events_limit):
                 selection = int(user_input) - 1
                 selected_event = curr_day_block.events[selection]
 
