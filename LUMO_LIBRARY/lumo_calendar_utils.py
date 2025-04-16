@@ -509,19 +509,17 @@ class CalendarPageEvent:
 
 
     def _row_event_header(self):
-        # under_line = ("-" * len(self.event_obj.summary))
         title = f"EVENT: {self.event_obj.summary.upper()}"
 
         print()
         print("{0:^{width}}".format(title,
-                                    width=CalendarPageDay.total_width))
-        print("{0:^{width}}".format(CalendarPageDay.EVENTS_LINE,
                                     width=CalendarPageDay.total_width))
         print()
 
 
     def display_event(self):
         self._row_event_header()
+        print()
         print()
 
 
@@ -576,18 +574,21 @@ class CalendarPageDay:
 
 
     def _row_cal_header(self):
-        under_line = ("-" * len(self.header_date))
+        # under_line = ("-" * len(self.header_date))
 
         print()
         print("{0:^{width}}".format(self.header_date.upper(), width=CalendarPageDay.total_width))
-        print("{0:^{width}}".format(under_line, width=CalendarPageDay.total_width))
+        # print("{0:^{width}}".format(under_line, width=CalendarPageDay.total_width))
+        print()
         print()
 
 
     @staticmethod
     def _row_style_event(var_sel, event_obj):
+        summary_bullet = "• " + event_obj.summary
+
         selector = "{:<{width}}".format(var_sel, width=CalendarPageDay.EVENTS_SELECTOR)
-        event = "• {:<{width}}".format(event_obj.summary, width=CalendarPageDay.EVENTS_BODY)
+        event = "{:<{width}}".format(summary_bullet, width=CalendarPageDay.EVENTS_BODY)
         time_info = times_formatter(event_obj, "military")
 
         group = selector + event + time_info
@@ -595,18 +596,13 @@ class CalendarPageDay:
 
 
     @staticmethod
-    def _row_style_flexible(var_selector, var_event, var_time):
-        selector = "{:<{width}}".format(var_selector, width=CalendarPageDay.EVENTS_SELECTOR)
-        event = "{:<{width}}".format(var_event, width=CalendarPageDay.EVENTS_BODY)
-        if not var_time:
-            time_info = " " * CalendarPageDay.EVENTS_TIME
-        else:
-            time_info = "{:<{width}}".format(var_time, width=CalendarPageDay.EVENTS_TIME)
+    def _row_style_flexible(var_l, var_m, var_r):
+        selector = "{:<{width}}".format(var_l, width=CalendarPageDay.EVENTS_SELECTOR)
+        event = "{:<{width}}".format(var_m, width=CalendarPageDay.EVENTS_BODY)
+        time_info = "{:<{width}}".format(var_r, width=CalendarPageDay.EVENTS_TIME)
 
         group = selector + event + time_info
         print("{0:^{width}}\n".format(group, width=CalendarPageDay.total_width))
-
-
 
 
     @staticmethod
@@ -626,17 +622,17 @@ class CalendarPageDay:
         for idx in range(events_limit):
             if idx < len(self.day_block.events):
                 CalendarPageDay._row_style_event(f"[{idx + 1}]", self.day_block.events[idx])
-            elif len(self.day_block.events) <= idx < low :
+            elif len(self.day_block.events) <= idx < low:
                 CalendarPageDay._row_style_event(f"[{idx + 1}]", empty_event)
-
 
         total_e = len(self.day_block.events)
         remaining_e = 0 if total_e - events_limit <= 0 \
-                        else total_e - events_limit
+            else total_e - events_limit
 
         CalendarPageDay._row_style_flexible(" ",
                                             f"+ {remaining_e} more events",
                                             " ")
+        print()
 
 
     def display_menu(self):
@@ -680,6 +676,7 @@ class CalendarPageDay:
         print()
         l_animators.list_printer(whitespace_toggle, indent_amt=2, speed_interval=0)
         l_animators.list_printer(whitespace_quit, indent_amt=2, speed_interval=0)
+
 
     @staticmethod
     def valid_event_selection(user_input: str, max_ints: int) -> bool:
@@ -1116,7 +1113,8 @@ class Menus:
 
 if __name__ == "__main__":
     print("Hello from main")
-    print(CalendarPageWeek.l_margin_menu); input("???")
+    print(CalendarPageWeek.l_margin_menu);
+    input("???")
 
     event_page = CalendarPageEvent(
         Event("Hello New Event", "STANDARD")
