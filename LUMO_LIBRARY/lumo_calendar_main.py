@@ -99,17 +99,17 @@ class CalendarInterface:
         print("lemon")
 
 
-    def view_event(self, var_event_obj: Event) -> None:
-        event_page = CalendarPageEvent(var_event_obj)
+    def view_event(self, event_obj: Event) -> None:
+        event_page = CalendarPageEvent(event_obj)
         menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.MAIN_CAL_MENU)
 
         while True:
             clear()
-            event_page.display_event()
+            event_page.display_event(event_obj)
             event_page.display_menu()
             print()
-            print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE, end="  ")
 
+            print(CalendarPageEvent.cursor_indent_space, end="  ")
             user_input = input(">  ")
 
             if False:
@@ -123,9 +123,8 @@ class CalendarInterface:
                 break
 
             else:
-                indent = int(CalendarPageDay.cursor_indent_amt) + 2
                 l_animators.animate_text_indented("Unrecognized option...",
-                                                  indent=indent,
+                                                  indent=CalendarPageEvent.msg_indent_amt,
                                                   finish_delay=.5)
 
 
@@ -151,7 +150,7 @@ class CalendarInterface:
 
             # print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE + f" {str(self.curr_day_idx)}")
             print()
-            print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE, end="  ")
+            print(CalendarPageDay.l_margin_space + CalendarPageDay.DAY_MENU_SPACE, end="  ")
 
             user_input = input(">  ")
 

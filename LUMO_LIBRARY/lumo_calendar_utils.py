@@ -203,7 +203,6 @@ def times_formatter(event_obj, format):
         space = " " * 7
         formatted = f"{space} - {space}"
 
-
     elif event_obj.event_type == "ALL DAY" or \
             event_obj.event_type == "MULTI DAY":
 
@@ -485,23 +484,24 @@ class CalendarPageEvent:
     total_width = int(t_size.columns)
     content_width = percenter(70, total_width)
 
-    EVENTS_WIDTH = 86
-    EVENTS_LINE = "-" * EVENTS_WIDTH
-    l_margin_num = round((total_width - EVENTS_WIDTH) / 2) - 1
+    EVENT_WIDTH = 60
+    EVENT_FIELD = 35
+    EVENT_VALUE = 40
+    EVENT_LINE = "-" * EVENT_WIDTH
+
+    l_margin_num = round((total_width - EVENT_WIDTH) / 2)
     l_margin_space = " " * l_margin_num
     l_margin_line = "-" * l_margin_num
 
     main_line = ("-" * content_width)
 
-    EVENT_TIME = 14
-    EVENTS_SELECTOR = 10
-    EVENTS_SELECTOR_SPACE = " " * EVENTS_SELECTOR
-    EVENTS_BODY = EVENTS_WIDTH - EVENTS_SELECTOR - EVENT_TIME
+    EVENT_MENU_NUDGE = 2
+    EVENT_MENU_SPACE = " " * (EVENT_MENU_NUDGE)
 
-    MENU_ITEM_INDENT_NUDGE = EVENTS_SELECTOR + 2
-    MENU_ITEM_INDENT_SPACE = " " * (MENU_ITEM_INDENT_NUDGE)
+    cursor_indent_amt = l_margin_num + EVENT_MENU_NUDGE + 3
+    cursor_indent_space = l_margin_space + EVENT_MENU_SPACE
 
-    cursor_indent_amt = l_margin_num + MENU_ITEM_INDENT_NUDGE + 3
+    msg_indent_amt = cursor_indent_amt + 2
 
 
     def __init__(self, var_event_obj):
@@ -517,25 +517,57 @@ class CalendarPageEvent:
         print()
 
 
-    def display_event(self):
+    @staticmethod
+    def _row_event_data(col_l, col_r):
+        event_field = "{:<{width}}".format(col_l, width=CalendarPageEvent.EVENT_FIELD)
+        event_value = "{:<{width}}".format(col_r, width=CalendarPageEvent.EVENT_VALUE)
+
+        group = event_field + event_value
+        # print("{0:^{width}}\n".format(group, width=CalendarPageDay.total_width))
+        print(CalendarPageEvent.l_margin_space + group)
+        print()
+
+
+    def display_event(self, event_obj):
+        time_info = times_formatter(event_obj, "military")
+        time_info_formatted = time_info.lstrip(" ")
+
+        date_info = event_obj.s if event_obj.s else event_obj.s_date
+        date_info_formatted = CalendarPageEvent.dates_formatter(date_info, event_obj.event_type)
+
         self._row_event_header()
         print()
-        print()
+        CalendarPageEvent._row_event_data("Times:", time_info_formatted)
+        CalendarPageEvent._row_event_data("Date:", date_info_formatted)
+        CalendarPageEvent._row_event_data("Description:", "something something something")
+        CalendarPageEvent._row_event_data("Location:", "My house")
+        CalendarPageEvent._row_event_data("Reminders:", "None")
 
 
     def display_menu(self):
         menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU)
 
-        wh_sp = CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE
+        wh_sp = CalendarPageEvent.l_margin_space
         whitespace_menu = Menus.add_whitespace_menu_list(menu_list, wh_sp)
         whitespace_exit = Menus.add_whitespace_menu_list(l_menus_data.EXIT_MENU_LIST, wh_sp)
 
         print()
-        print(CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + "EVENT")
+        print(wh_sp + "EVENT")
         print()
         l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
         print()
         l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
+
+
+    @staticmethod
+    def dates_formatter(dt_obj, event_type):
+        if event_type == "STANDARD":
+            month_abbr = calendar.month_abbr[dt_obj.month]
+            return f"{dt_obj.day} of {month_abbr}, {dt_obj.year}"
+
+        else:
+            month_abbr = calendar.month_abbr[dt_obj.month]
+            return f"{dt_obj.day} of {month_abbr}, {dt_obj.year}"
 
 
 class CalendarPageDay:
@@ -543,23 +575,23 @@ class CalendarPageDay:
     total_width = int(t_size.columns)
     content_width = percenter(70, total_width)
 
-    EVENTS_WIDTH = 86
-    EVENTS_LINE = "-" * EVENTS_WIDTH
-    l_margin_num = round((total_width - EVENTS_WIDTH) / 2) - 1
+    DAY_WIDTH = 86
+    DAY_LINE = "-" * DAY_WIDTH
+    l_margin_num = int((total_width - DAY_WIDTH) / 2)
     l_margin_space = " " * l_margin_num
     l_margin_line = "-" * l_margin_num
 
     main_line = ("-" * content_width)
 
-    EVENTS_TIME = 17
-    EVENTS_SELECTOR = 10
-    EVENTS_SELECTOR_SPACE = " " * EVENTS_SELECTOR
-    EVENTS_BODY = EVENTS_WIDTH - EVENTS_SELECTOR - EVENTS_TIME
+    DAY_FIELD_SEL = 10
+    DAY_FIELD_TIME = 17
+    DAY_FIELD_EVENTS = DAY_WIDTH - DAY_FIELD_SEL - DAY_FIELD_TIME
+    SELECTOR_SPACE = " " * DAY_FIELD_SEL
 
-    MENU_ITEM_INDENT_NUDGE = EVENTS_SELECTOR + 2
-    MENU_ITEM_INDENT_SPACE = " " * (MENU_ITEM_INDENT_NUDGE)
+    DAY_MENU_NUDGE = DAY_FIELD_SEL + 2
+    DAY_MENU_SPACE = " " * (DAY_MENU_NUDGE)
 
-    cursor_indent_amt = l_margin_num + MENU_ITEM_INDENT_NUDGE + 3
+    cursor_indent_amt = l_margin_num + DAY_MENU_NUDGE + 3
 
 
     def __init__(self, var_dayblock):
@@ -567,13 +599,7 @@ class CalendarPageDay:
         self.day_block = var_dayblock
 
 
-    @staticmethod
-    def _format_date_for_header(var_date):
-        formatted = datetime.date.strftime(var_date, "%A: %B %d, %Y")
-        return formatted
-
-
-    def _row_cal_header(self):
+    def _row_day_header(self):
         # under_line = ("-" * len(self.header_date))
 
         print()
@@ -584,11 +610,11 @@ class CalendarPageDay:
 
 
     @staticmethod
-    def _row_style_event(var_sel, event_obj):
+    def _row_day_events(var_sel, event_obj):
         summary_bullet = "• " + event_obj.summary
 
-        selector = "{:<{width}}".format(var_sel, width=CalendarPageDay.EVENTS_SELECTOR)
-        event = "{:<{width}}".format(summary_bullet, width=CalendarPageDay.EVENTS_BODY)
+        selector = "{:<{width}}".format(var_sel, width=CalendarPageDay.DAY_FIELD_SEL)
+        event = "{:<{width}}".format(summary_bullet, width=CalendarPageDay.DAY_FIELD_EVENTS)
         time_info = times_formatter(event_obj, "military")
 
         group = selector + event + time_info
@@ -596,17 +622,17 @@ class CalendarPageDay:
 
 
     @staticmethod
-    def _row_style_flexible(var_l, var_m, var_r):
-        selector = "{:<{width}}".format(var_l, width=CalendarPageDay.EVENTS_SELECTOR)
-        event = "{:<{width}}".format(var_m, width=CalendarPageDay.EVENTS_BODY)
-        time_info = "{:<{width}}".format(var_r, width=CalendarPageDay.EVENTS_TIME)
+    def _row_flexible(col_l, col_m, col_r):
+        col_l = "{:<{width}}".format(col_l, width=CalendarPageDay.DAY_FIELD_SEL)
+        col_m = "{:<{width}}".format(col_m, width=CalendarPageDay.DAY_FIELD_EVENTS)
+        col_r = "{:<{width}}".format(col_r, width=CalendarPageDay.DAY_FIELD_TIME)
 
-        group = selector + event + time_info
+        group = col_l + col_m + col_r
         print("{0:^{width}}\n".format(group, width=CalendarPageDay.total_width))
 
 
     @staticmethod
-    def _row_style_menu_dict(var_sel, var_option):
+    def _row_day_menu(var_sel, var_option):
         selector = f"[{var_sel}]  "
 
         print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT + selector + var_option)
@@ -614,25 +640,30 @@ class CalendarPageDay:
 
     def display_day(self, events_limit, low):
         subprocess.run(["clear"], shell=True)
-        self._row_cal_header()
+        self._row_day_header()
 
         empty_event = Event("--- --- ---",
                             "EMPTY EVENT")
 
         for idx in range(events_limit):
             if idx < len(self.day_block.events):
-                CalendarPageDay._row_style_event(f"[{idx + 1}]", self.day_block.events[idx])
+                CalendarPageDay._row_day_events(f"[{idx + 1}]", self.day_block.events[idx])
             elif len(self.day_block.events) <= idx < low:
-                CalendarPageDay._row_style_event(f"[{idx + 1}]", empty_event)
+                CalendarPageDay._row_day_events(f"[{idx + 1}]", empty_event)
 
         total_e = len(self.day_block.events)
         remaining_e = 0 if total_e - events_limit <= 0 \
             else total_e - events_limit
 
-        CalendarPageDay._row_style_flexible(" ",
-                                            f"+ {remaining_e} more events",
-                                            " ")
+        CalendarPageDay._row_flexible(" ",
+                                      f"+ {remaining_e} more events",
+                                      " ")
         print()
+        # print(CalendarPageDay.total_width,
+        #       CalendarPageDay.total_width - CalendarPageEvent.EVENTS_WIDTH,
+        #       CalendarPageDay.l_margin_num
+        #       )
+        # print((CalendarPageDay.l_margin_num + CalendarPageDay.EVENTS_SELECTOR) * "-")
 
 
     def display_menu(self):
@@ -641,13 +672,13 @@ class CalendarPageDay:
 
         menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.MAIN_CAL_MENU)
 
-        wh_sp = CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE
+        wh_sp = CalendarPageDay.l_margin_space + CalendarPageDay.SELECTOR_SPACE
         whitespace_menu = Menus.add_whitespace_menu_list(menu_list, wh_sp)
         whitespace_toggle = Menus.add_whitespace_menu_list(TOGGLE_MENU, wh_sp)
         whitespace_quit = Menus.add_whitespace_menu_list(l_menus_data.QUIT_MENU_LIST, wh_sp)
 
         print()
-        print(CalendarPageDay.l_margin_space + CalendarPageDay.EVENTS_SELECTOR_SPACE + "CALENDAR")
+        print(wh_sp + "CALENDAR")
         print()
         l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
         print()
@@ -662,15 +693,15 @@ class CalendarPageDay:
         menu_list = l_menus_funcs.menu_list_from_dict(var_dict)
         menu_list_left = menu_list[:4]
         menu_list_right = menu_list[4:8]
-        menu_columns = CalendarPageWeek.prep_menu_columns(menu_l=menu_list_left,
-                                                          menu_r=menu_list_right)
+        menu_columns = Menus.prep_menu_columns(menu_l=menu_list_left,
+                                               menu_r=menu_list_right)
 
-        wh_sp = CalendarPageWeek.l_margin_menu_space
+        wh_sp = CalendarPageDay.l_margin_space + CalendarPageDay.SELECTOR_SPACE
         whitespace_menu = Menus.add_whitespace_menu_list(menu_columns, wh_sp)
         whitespace_toggle = Menus.add_whitespace_menu_list(TOGGLE_MENU, wh_sp)
         whitespace_quit = Menus.add_whitespace_menu_list(l_menus_data.QUIT_MENU_LIST, wh_sp)
 
-        print(CalendarPageWeek.l_margin_menu_space + "CALENDAR")
+        print(wh_sp + "CALENDAR")
         print()
         l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
         print()
@@ -695,6 +726,12 @@ class CalendarPageDay:
             return False
 
 
+    @staticmethod
+    def _format_date_for_header(var_date):
+        formatted = datetime.date.strftime(var_date, "%A: %B %d, %Y")
+        return formatted
+
+
 class CalendarPageWeek:
     t_size = os.get_terminal_size()
     total_width = int(t_size.columns)
@@ -716,31 +753,7 @@ class CalendarPageWeek:
         self.header_date = CalendarPageWeek.get_header_date(week_of_day_blocks)
 
 
-    @staticmethod
-    def get_header_date(var_week_block):
-        bucket_1 = []
-        bucket_2 = []
-
-        first, last = var_week_block[0], var_week_block[-1]
-
-        if first.date.month == last.date.month:
-            month_int = first.date.month
-
-        else:
-            for day_block in var_week_block:
-                if day_block.date.month == first.date.month:
-                    bucket_1.append(day_block.date.month)
-                else:
-                    bucket_2.append(day_block.date.month)
-
-            larger_bucket = bucket_1 if len(bucket_1) > len(bucket_2) else bucket_2
-            month_int = larger_bucket[0]
-
-        header_month = (calendar.Month(month_int).name)
-        return header_month
-
-
-    def cal_header(self):
+    def _row_week_header(self):
         print()
         # print("{0:^{width}}".format(CalendarPageDay.line, width=CalendarPageWeek.total_width))
         print("{0:^{width}}".format(self.header_date, width=CalendarPageWeek.total_width))
@@ -748,7 +761,7 @@ class CalendarPageWeek:
 
 
     @staticmethod
-    def row_style_days(dates):
+    def _row_week_days(dates):
         dt_1, dt_2 = dates
         dt_1_frmt = "{:02d}".format(dt_1)
         dt_2_frmt = "{:02d}".format(dt_2)
@@ -759,7 +772,7 @@ class CalendarPageWeek:
 
 
     @staticmethod
-    def row_style_daynames(daynames):
+    def _row_week_daynames(daynames):
         dayname_1, dayname_2 = daynames
 
         print("{0:-<{width}}".format(dayname_1, width=CalendarPageWeek.COL_WIDTH)
@@ -768,12 +781,7 @@ class CalendarPageWeek:
 
 
     @staticmethod
-    def line_break():
-        print()
-
-
-    @staticmethod
-    def row_style_event(event_1, event_2):
+    def _row_week_events(event_1, event_2):
         summary_width = CalendarPageWeek.COL_WIDTH - 17
 
         summary_1, time_1 = event_1
@@ -793,7 +801,7 @@ class CalendarPageWeek:
 
 
     @staticmethod
-    def row_style_addnl_events(addnl_events_indicators):
+    def _row_addnl_events(addnl_events_indicators):
         num_1, num_2 = addnl_events_indicators
 
         formatted_text_1 = "+ {} more events".format(num_1)
@@ -805,33 +813,26 @@ class CalendarPageWeek:
 
 
     @staticmethod
-    def half_row_style_day(day):
+    def _row_week_days_half(day):
         day_frmt = "{:02d}".format(day)
 
         return "{0:<{width}}".format(day_frmt, width=CalendarPageWeek.COL_WIDTH)
 
 
     @staticmethod
-    def half_row_style_dayname(dayname):
+    def _row_week_dnames_half(dayname):
         return "{0:-<{width}}".format(dayname, width=CalendarPageWeek.COL_WIDTH)
 
 
     @staticmethod
-    def half_row_style_addnl_events(num):
+    def _row_week_addnl_half(num):
         formatted_text = "+ {} more events".format(num)
 
         return "{0:>{width}}".format(formatted_text, width=CalendarPageWeek.COL_WIDTH)
 
 
     @staticmethod
-    def half_row_style_editor_header():
-        editor_header = ":::"
-        editor_header_formatted = "{0:-^{width}}".format(editor_header, width=CalendarPageWeek.COL_WIDTH)
-        return editor_header_formatted
-
-
-    @staticmethod
-    def half_row_style_event(event_obj):
+    def _row_week_event_half(event_obj):
         summary_width = CalendarPageWeek.COL_WIDTH - 17
 
         time_info = times_formatter(event_obj, format="military")
@@ -840,46 +841,31 @@ class CalendarPageWeek:
 
 
     @staticmethod
-    def half_row_style_line_break():
+    def _row_week_line_break():
         return "{0:<{width}}".format("", width=CalendarPageWeek.COL_WIDTH)
 
 
     @staticmethod
-    def half_row_style_line():
-        return "{0:-<{width}}".format("", width=CalendarPageWeek.COL_WIDTH)
+    def _row_week_editor_header():
+        editor_header = ":::"
+        editor_header_formatted = "{0:-^{width}}".format(editor_header, width=CalendarPageWeek.COL_WIDTH)
+        return editor_header_formatted
 
 
     @staticmethod
-    def half_row_style_menu(menu_item):
+    def _row_week_editor_menu(menu_item):
         return "  {0:<{width}}".format(menu_item, width=CalendarPageWeek.COL_WIDTH - 2)
 
 
     @staticmethod
-    def prep_menu_columns(menu_l, menu_r):
-        columnified = []
-
-        if len(menu_r) < len(menu_l):
-            diff = len(menu_l) - len(menu_r)
-            for _ in range(diff):
-                menu_r.append(" ")
-
-        for l, r in zip(menu_l, menu_r):
-            left_col = "{0:<{width}}".format(l, width=36)
-            right_col = "{0:<{width}}".format(r, width=36)
-            columnified.append(left_col + right_col)
-
-        return columnified
-
-
-    @staticmethod
     def make_editor_block_1():
-        header = CalendarPageWeek.half_row_style_editor_header()
-        summary = CalendarPageWeek.half_row_style_event([None, None, "20:00", "21:00", "Dinner with John"])
-        br = CalendarPageWeek.half_row_style_line_break()
-        menu_1 = CalendarPageWeek.half_row_style_menu("[A]  Complete card with no additional options")
-        menu_2 = CalendarPageWeek.half_row_style_menu("[B]  Set recurring features")
-        menu_3 = CalendarPageWeek.half_row_style_menu("[C]  Go back")
-        menu_4 = CalendarPageWeek.half_row_style_menu("[X]  Exit")
+        header = CalendarPageWeek._row_week_editor_header()
+        summary = CalendarPageWeek._row_week_event_half([None, None, "20:00", "21:00", "Dinner with John"])
+        br = CalendarPageWeek._row_week_line_break()
+        menu_1 = CalendarPageWeek._row_week_editor_menu("[A]  Complete card with no additional options")
+        menu_2 = CalendarPageWeek._row_week_editor_menu("[B]  Set recurring features")
+        menu_3 = CalendarPageWeek._row_week_editor_menu("[C]  Go back")
+        menu_4 = CalendarPageWeek._row_week_editor_menu("[X]  Exit")
 
         return [br
             , header
@@ -900,9 +886,9 @@ class CalendarPageWeek:
             event_type="EMPTY EVENT"
         )
 
-        header = CalendarPageWeek.half_row_style_editor_header()
-        summary = CalendarPageWeek.half_row_style_event(test_edited_event)
-        br = CalendarPageWeek.half_row_style_line_break()
+        header = CalendarPageWeek._row_week_editor_header()
+        summary = CalendarPageWeek._row_week_event_half(test_edited_event)
+        br = CalendarPageWeek._row_week_line_break()
 
         return [br
             , header
@@ -924,13 +910,13 @@ class CalendarPageWeek:
         addnl_event_num = len(day_block.events) - 3 if \
             len(day_block.events) > 3 else 0
 
-        day = CalendarPageWeek.half_row_style_day(day_block.day)
-        dayname = CalendarPageWeek.half_row_style_dayname(day_block.dayname)
-        br = CalendarPageWeek.half_row_style_line_break()
-        event_1_row = CalendarPageWeek.half_row_style_event(event_obj_1)
-        event_2_row = CalendarPageWeek.half_row_style_event(event_obj_2)
-        event_3_row = CalendarPageWeek.half_row_style_event(event_obj_3)
-        addl_events = CalendarPageWeek.half_row_style_addnl_events(addnl_event_num)
+        day = CalendarPageWeek._row_week_days_half(day_block.day)
+        dayname = CalendarPageWeek._row_week_dnames_half(day_block.dayname)
+        br = CalendarPageWeek._row_week_line_break()
+        event_1_row = CalendarPageWeek._row_week_event_half(event_obj_1)
+        event_2_row = CalendarPageWeek._row_week_event_half(event_obj_2)
+        event_3_row = CalendarPageWeek._row_week_event_half(event_obj_3)
+        addl_events = CalendarPageWeek._row_week_addnl_half(addnl_event_num)
 
         return [day
             , dayname
@@ -953,7 +939,7 @@ class CalendarPageWeek:
 
 
     def display_week(self):
-        self.cal_header()
+        self._row_week_header()
 
         editor_block = CalendarPageWeek.make_editor_block_2()
         day_block_1 = CalendarPageWeek.format_day_block(self.day_blocks[0])
@@ -996,8 +982,8 @@ class CalendarPageWeek:
         _, menu_list_short = l_menus_funcs.prep_menu_tuple(Menus.WEEK_MENU_SHORT)
         menu_list_left = menu_list_short[:3]
         menu_list_right = menu_list_short[3:4] + TOGGLE_MENU + l_menus_data.QUIT_MENU_LIST
-        menu_columns = CalendarPageWeek.prep_menu_columns(menu_l=menu_list_left,
-                                                          menu_r=menu_list_right)
+        menu_columns = Menus.prep_menu_columns(menu_l=menu_list_left,
+                                               menu_r=menu_list_right)
 
         wh_sp = CalendarPageWeek.l_margin_menu_space
         whitespace_menu = Menus.add_whitespace_menu_list(menu_columns, wh_sp)
@@ -1005,6 +991,30 @@ class CalendarPageWeek:
         print(CalendarPageWeek.l_margin_menu_space + "CALENDAR")
         print()
         l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
+
+
+    @staticmethod
+    def get_header_date(var_week_block):
+        bucket_1 = []
+        bucket_2 = []
+
+        first, last = var_week_block[0], var_week_block[-1]
+
+        if first.date.month == last.date.month:
+            month_int = first.date.month
+
+        else:
+            for day_block in var_week_block:
+                if day_block.date.month == first.date.month:
+                    bucket_1.append(day_block.date.month)
+                else:
+                    bucket_2.append(day_block.date.month)
+
+            larger_bucket = bucket_1 if len(bucket_1) > len(bucket_2) else bucket_2
+            month_int = larger_bucket[0]
+
+        header_month = (calendar.Month(month_int).name)
+        return header_month
 
 
     @staticmethod
@@ -1110,6 +1120,23 @@ class Menus:
             )
 
         return whitespace_menu
+
+
+    @staticmethod
+    def prep_menu_columns(menu_l, menu_r):
+        columnified = []
+
+        if len(menu_r) < len(menu_l):
+            diff = len(menu_l) - len(menu_r)
+            for _ in range(diff):
+                menu_r.append(" ")
+
+        for l, r in zip(menu_l, menu_r):
+            left_col = "{0:<{width}}".format(l, width=36)
+            right_col = "{0:<{width}}".format(r, width=36)
+            columnified.append(left_col + right_col)
+
+        return columnified
 
 
 if __name__ == "__main__":
