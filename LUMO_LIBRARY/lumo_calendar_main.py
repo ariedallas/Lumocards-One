@@ -46,25 +46,69 @@ class CalendarInterface:
         self.curr_day_idx = self._get_idx_for_today()
         self.curr_week_idx = self._get_idx_for_curr_week()
 
-        self.menu_size = "DAY LONG"
+        self.menu_size = None
+
         self.events_limit = CalendarInterface.EVENTS_LIMIT_LOW
 
         self.custom_error_msg = None
 
 
-    def _event_actions_router(self, user_input) -> None:
-        print(user_input)
-        print("lemon")
-        pass
+    def _event_actions_router(self,
+                              user_input,
+                              actions_dict):
+
+        action = actions_dict[user_input.upper()]
+
+        if action == Menus.ACTION_EDIT_TITLE:
+            l_animators.animate_text_indented("Edited event",
+                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              finish_delay=.5)
+            return False, None, None
+
+        elif action == Menus.ACTION_EDIT_TIMES:
+            l_animators.animate_text_indented("Edited times",
+                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              finish_delay=.5)
+            return False, None, None
+
+        elif action == Menus.ACTION_EDIT_DATE:
+            l_animators.animate_text_indented("Edited date",
+                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              finish_delay=.5)
+            return False, None, None
 
 
-    def _view_day_actions_router(self,
-                                 user_input: str,
-                                 actions_dict: dict[str, str]
-                                 ) -> Optional[tuple[bool,
-                                            Optional[str],
-                                            Optional[str]]
-                                                ]:
+        elif action == Menus.ACTION_EDIT_NOTES:
+            l_animators.animate_text_indented("Edited notes",
+                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              finish_delay=.5)
+            return False, None, None
+
+        elif action == Menus.ACTION_MENU_LESS:
+            self.menu_size = "EVENT SHORT"
+            return True, None, None
+
+        elif action == Menus.ACTION_MENU_MORE:
+            self.menu_size = "EVENT LONG"
+            return True, None, None
+
+        elif action == Menus.ACTION_EDIT_LOCATION:
+            l_animators.animate_text_indented("Edited locations",
+                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              finish_delay=.5)
+            return False, None, None
+
+        elif action == Menus.ACTION_DELETE_EVENT:
+            l_animators.animate_text_indented("Event deleted",
+                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              finish_delay=.5)
+            return False, None, None
+
+
+    def _day_actions_router(self,
+                            user_input: str,
+                            actions_dict: dict[str, str]
+                            ) -> Optional[tuple[bool, Optional[str], Optional[str]]]:
 
         action = actions_dict[user_input.upper()]
 
@@ -91,9 +135,9 @@ class CalendarInterface:
             return True, None, None
 
 
-    def _view_week_actions_router(self,
-                                  user_input: str,
-                                  actions_dict: dict[str, str]) -> None:
+    def _week_actions_router(self,
+                             user_input: str,
+                             actions_dict: dict[str, str]) -> None:
 
         print(actions_dict[user_input.upper()])
         print("lemon")
@@ -101,12 +145,24 @@ class CalendarInterface:
 
     def view_event(self, event_obj: Event) -> None:
         event_page = CalendarPageEvent(event_obj)
-        menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.MAIN_CAL_MENU)
+        menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_LONG)
+        menu_dict = self.contextualize(menu_dict,
+                                       None,
+                                       None,
+                                       self.menu_size)
+        menu_update = False
 
         while True:
+            if menu_update:
+                menu_dict = self.contextualize(menu_dict,
+                                               None,
+                                               None,
+                                               self.menu_size)
+                menu_update = False
+
             clear()
             event_page.display_event(event_obj)
-            event_page.display_menu()
+            event_page.display_menu_columns(menu_dict)
             print()
 
             print(CalendarPageEvent.cursor_indent_space, end="  ")
@@ -116,10 +172,15 @@ class CalendarInterface:
                 pass
 
             elif user_input.upper() in menu_dict.keys():
-                self._event_actions_router(user_input);
-                time.sleep(.5)
+                menu_update, _, _ = self._event_actions_router(user_input, menu_dict);
 
             elif user_input.lower() in {"x", "exit"}:
+                break
+
+            elif user_input.lower() in {"s", "save"}:
+                l_animators.animate_text_indented("Saved event",
+                                                  indent=CalendarPageEvent.msg_indent_amt,
+                                                  finish_delay=.5)
                 break
 
             else:
@@ -148,9 +209,8 @@ class CalendarInterface:
             curr_page.display_day(self.events_limit, CalendarInterface.EVENTS_LIMIT_LOW)
             curr_page.display_menu_columns(menu_dict)
 
-            # print(CalendarPageDay.l_margin_space + CalendarPageDay.MENU_ITEM_INDENT_SPACE + f" {str(self.curr_day_idx)}")
             print()
-            print(CalendarPageDay.l_margin_space + CalendarPageDay.DAY_MENU_SPACE, end="  ")
+            print(CalendarPageDay.cursor_indent_space, end="  ")
 
             user_input = input(">  ")
 
@@ -167,7 +227,7 @@ class CalendarInterface:
 
 
             elif user_input.upper() in menu_dict.keys():
-                menu_update, old_val, new_val = self._view_day_actions_router(user_input, menu_dict)
+                menu_update, old_val, new_val = self._day_actions_router(user_input, menu_dict)
 
             elif user_input.lower() in {"t", "toggle"}:
                 self.curr_view_mode = "WEEK"
@@ -182,16 +242,15 @@ class CalendarInterface:
 
 
             else:
-                indent = int(CalendarPageDay.cursor_indent_amt) + 2
                 custom_error = self.parse_for_error(user_input)
 
                 l_animators.animate_text_indented("Unrecognized option...",
-                                                  indent=indent,
+                                                  indent=CalendarPageDay.msg_indent_num,
                                                   finish_delay=.5)
 
                 if custom_error:
                     l_animators.animate_text_indented(custom_error,
-                                                      indent=indent,
+                                                      indent=CalendarPageDay.msg_indent_num,
                                                       finish_delay=.5)
 
 
@@ -255,7 +314,7 @@ class CalendarInterface:
                 curr_week_block = self.paginate_weeks(user_input)
 
             elif user_input.upper() in menu_dict.keys():
-                self._view_week_actions_router(user_input, menu_dict)
+                self._week_actions_router(user_input, menu_dict)
                 time.sleep(.5)
 
 
@@ -399,8 +458,14 @@ class CalendarInterface:
         if old_val and new_val:
             return self.update_menu_item(var_dict, old_val, new_val)
 
+        elif menu_size == "EVENT SHORT":
+            menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_SHORT)
+            return menu_dict
+        elif menu_size == "EVENT LONG":
+            menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_LONG)
+            return menu_dict
         elif menu_size == "DAY SHORT":
-            menu_dict, _ =  l_menus_funcs.prep_menu_tuple(Menus.DAY_MENU_SHORT)
+            menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.DAY_MENU_SHORT)
             return menu_dict
         elif menu_size == "DAY LONG":
             menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.DAY_MENU_LONG)

@@ -340,6 +340,12 @@ def google_event_to_obj(event):
                                   e_dt_python,
                                   summary,
                                   event_type)
+
+    event_obj._add_event_details(id=event["id"],
+                                 description=event.get("description", "(no description info)"),
+                                 location=event.get("location", "(no location info)"),
+                                 reminders=event["reminders"])
+
     return event_obj
 
 
@@ -368,8 +374,6 @@ def get_local_calendar_cards(window_start, window_end):
 
     return calendar_cards_found
 
-    # start time > specified start and start time < specified end
-
 
 def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
     creds = get_creds()
@@ -390,7 +394,7 @@ def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
         """Transform whatever events are found from Google into a full list where every day has a placeholder
          Adds an empty list if no Google events exist for date."""
         matched_events = [obj for obj in converted_events if
-                          (obj.get_date() == date or obj.spans(date))]
+                          obj.get_date() == date]
         day_block = DayBlock.from_date(date, matched_events)
         day_blocks.append(day_block)
 
@@ -408,18 +412,29 @@ class Event:
         self.summary = summary
         self.event_type = event_type
 
-
-    def get_date(self):
-        if self.event_type == "ALL DAY":
-            return self.s_date
-
-        else:  # self.event_type is "multi day" or "standard"
-            return self.s.date()
+        self.id = None
+        self.description = None
+        self.location = None
+        self.reminders = None
 
 
-    def spans(self, var_date):
-        if self.s_date and self.e_date:
-            return self.s_date.date() <= var_date <= self.e_date.date()
+    def _add_event_details(self,
+                           id,
+                           description,
+                           location,
+                           reminders):
+        self.id = id
+        self.description = description
+        self.location = location
+        self.reminders = reminders
+
+
+    def _event_description_to_list(self):
+        description_list = self.description.split("\n")
+        return description_list
+
+    # def _event_description_to_str(self):
+
 
 
     @classmethod
@@ -450,6 +465,18 @@ class Event:
         event_obj.e = e
 
         return event_obj
+
+
+    def get_date(self):
+        if self.event_type == "ALL DAY":
+            return self.s_date
+
+        else:  # self.event_type is "multi day" or "standard"
+            return self.s.date()
+
+    # def spans(self, var_date):
+    #     if self.s_date and self.e_date:
+    #         return self.s_date.date() <= var_date <= self.e_date.date()
 
 
 class DayBlock:
@@ -498,10 +525,9 @@ class CalendarPageEvent:
     EVENT_MENU_NUDGE = 2
     EVENT_MENU_SPACE = " " * (EVENT_MENU_NUDGE)
 
-    cursor_indent_amt = l_margin_num + EVENT_MENU_NUDGE + 3
     cursor_indent_space = l_margin_space + EVENT_MENU_SPACE
 
-    msg_indent_amt = cursor_indent_amt + 2
+    msg_indent_amt = l_margin_num + EVENT_MENU_NUDGE + 5
 
 
     def __init__(self, var_event_obj):
@@ -527,25 +553,39 @@ class CalendarPageEvent:
         print(CalendarPageEvent.l_margin_space + group)
         print()
 
+    @staticmethod
+    def _rows_description(field, var_list):
+        CalendarPageEvent._row_event_data(field, var_list[0])
 
-    def display_event(self, event_obj):
+
+    def display_event(self,
+                      event_obj: Event) -> None:
+
         time_info = times_formatter(event_obj, "military")
         time_info_formatted = time_info.lstrip(" ")
 
         date_info = event_obj.s if event_obj.s else event_obj.s_date
         date_info_formatted = CalendarPageEvent.dates_formatter(date_info, event_obj.event_type)
 
+        description_list = event_obj._event_description_to_list()
+        reminder_info = "Default" if event_obj.reminders["useDefault"] == True else "..."
+
         self._row_event_header()
         print()
         CalendarPageEvent._row_event_data("Times:", time_info_formatted)
         CalendarPageEvent._row_event_data("Date:", date_info_formatted)
-        CalendarPageEvent._row_event_data("Description:", "something something something")
-        CalendarPageEvent._row_event_data("Location:", "My house")
-        CalendarPageEvent._row_event_data("Reminders:", "None")
+        CalendarPageEvent._rows_description("Description:", description_list)
+        CalendarPageEvent._row_event_data("Location:", event_obj.location)
+        CalendarPageEvent._row_event_data("Reminders:", reminder_info)
+        print()
+        # print(event_obj.id)
+        # print(event_obj.description)
+        # print(event_obj.location)
+        # print(event_obj.reminders)
 
 
     def display_menu(self):
-        menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU)
+        menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_LONG)
 
         wh_sp = CalendarPageEvent.l_margin_space
         whitespace_menu = Menus.add_whitespace_menu_list(menu_list, wh_sp)
@@ -556,6 +596,26 @@ class CalendarPageEvent:
         print()
         l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
         print()
+        l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
+
+
+    def display_menu_columns(self, var_dict):
+        menu_list = l_menus_funcs.menu_list_from_dict(var_dict)
+        menu_list_left = menu_list[:5]
+        menu_list_right = menu_list[5:10]
+        menu_columns = Menus.prep_menu_columns(menu_l=menu_list_left,
+                                               menu_r=menu_list_right)
+
+        wh_sp = CalendarPageEvent.l_margin_space
+        whitespace_menu = Menus.add_whitespace_menu_list(menu_columns, wh_sp)
+        whitespace_save = Menus.add_whitespace_menu_list(l_menus_data.SAVE_LIST, wh_sp)
+        whitespace_exit = Menus.add_whitespace_menu_list(l_menus_data.EXIT_NOSAVE_LIST, wh_sp)
+
+        print(wh_sp + "CALENDAR")
+        print()
+        l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
+        print()
+        l_animators.list_printer(whitespace_save, indent_amt=2, speed_interval=0)
         l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
 
 
@@ -591,7 +651,9 @@ class CalendarPageDay:
     DAY_MENU_NUDGE = DAY_FIELD_SEL + 2
     DAY_MENU_SPACE = " " * (DAY_MENU_NUDGE)
 
-    cursor_indent_amt = l_margin_num + DAY_MENU_NUDGE + 3
+    cursor_indent_space = l_margin_space + DAY_MENU_SPACE
+
+    msg_indent_num = l_margin_num + DAY_MENU_NUDGE + 5
 
 
     def __init__(self, var_dayblock):
@@ -1037,6 +1099,14 @@ class CalendarPageWeek:
 
 
 class Menus:
+    ACTION_EDIT_DATE = "Date (edit)"
+    ACTION_EDIT_LOCATION = "Location (edit)"
+    ACTION_EDIT_NOTES = "Notes (edit description)"
+    ACTION_EDIT_TIMES = "Times (edit)"
+    ACTION_EDIT_TITLE = "Title (edit)"
+    ACTION_REPEAT_EVENT = "Repeat event"
+    ACTION_DELETE_EVENT = "Delete event"
+
     ACTION_EMPTY = "..."
     ACTION_HELP = "Help"
     ACTION_LIST_ALL = "List all events"
@@ -1078,8 +1148,6 @@ class Menus:
         ACTION_MENU_LESS,
         ACTION_GOTO,
         ACTION_LIST_ALL,
-        ACTION_EMPTY,
-        ACTION_EMPTY
     ]
 
     WEEK_MENU_SHORT = [
@@ -1096,10 +1164,22 @@ class Menus:
         ACTION_HELP_MORE
     ]
 
-    EVENT_MENU = [
-        ".",
-        "..",
-        "..."
+    EVENT_MENU_SHORT = [
+        ACTION_EDIT_TITLE,
+        ACTION_EDIT_TIMES,
+        ACTION_EDIT_DATE,
+        ACTION_EDIT_NOTES,
+        ACTION_MENU_MORE
+    ]
+
+    EVENT_MENU_LONG = [
+        ACTION_EDIT_TITLE,
+        ACTION_EDIT_TIMES,
+        ACTION_EDIT_DATE,
+        ACTION_EDIT_NOTES,
+        ACTION_MENU_LESS,
+        ACTION_EDIT_LOCATION,
+        ACTION_DELETE_EVENT
     ]
 
     NEW_EVENT_MENU = [
@@ -1141,25 +1221,21 @@ class Menus:
 
 if __name__ == "__main__":
     print("Hello from main")
-    print(CalendarPageWeek.l_margin_menu);
-    input("???")
-
-    event_page = CalendarPageEvent(
-        Event("Hello New Event", "STANDARD")
-    )
-    event_page.display_event()
-    sys.exit()
-
-    creds = get_creds()
-    w_start, w_end = get_time_window_2(datetime.date.today(), 2)
-    events = get_google_events_for_times(creds, w_start, w_end)
-    # pp(events)
+    test = Event("Empty", "EMPTY EVENT")
+    test.description = "Hello hello\nhello hello\n"
+    car = test._event_description_to_list()
+    print(car)
+    c = ("\n").join(car)
+    print(repr(c))
+    # creds = get_creds()
+    # w_start, w_end = get_time_window_2(datetime.date.today(), 2)
+    # events = get_google_events_for_times(creds, w_start, w_end)
+    # pp(events[:5])
+    sys.exit(0)
 
     event_obj = get_google_event_service(credentials=creds, time_min=w_start, time_max=w_end)
     pp(event_obj.get('nextPageToken'))
     print(event_obj.keys())
-
-    sys.exit()
 
 
     def get_new_single_cards_from_google():

@@ -24,6 +24,8 @@ ACTION_RENAME = "Rename card"
 ACTION_RENAME_2 = "Retitle + Change Category card"
 
 ACTION_EXIT_MENU = "Exit Menu"
+ACTION_EXIT_NO_SAVE = "Exit without saving"
+ACTION_SAVE_WITH_EXIT = "Save and exit"
 ACTION_SIMPLE_EXIT = "Exit"
 ACTION_START_OVER = "Start Over"
 ACTION_CANCEL = "Cancel"
@@ -62,7 +64,6 @@ for ltr, item in zip(LETTERS_FILTERED, LUMO_ALL):
 
 LUMO_MAIN_MENU.update({"Q": "Quit"})
 LUMO_ALL_MENU.update({"Q": "Quit"})
-
 
 # ---- ALL OTHER MENUS ---- #
 FOCUS_MENU = [
@@ -127,11 +128,17 @@ START_OVER_MENU_DICT = {"X": f"{ACTION_START_OVER}"}
 EXIT_MENU_LIST = [f"[X]  {ACTION_EXIT_MENU}"]
 EXIT_MENU_DICT = {"X": f"{ACTION_EXIT_MENU}"}
 
+EXIT_NOSAVE_LIST = [f"[X]  {ACTION_EXIT_NO_SAVE}"]
+EXIT_NOSAVE_DICT = {"X": f"{ACTION_EXIT_NO_SAVE}"}
+
 SIMPLE_EXIT_LIST = [f"[X]  {ACTION_SIMPLE_EXIT}"]
 SIMPLE_EXIT_DICT = {"X": f"{ACTION_SIMPLE_EXIT}"}
 
 CANCEL_MENU_LIST = [f"[X]  {ACTION_CANCEL}"]
 CANCEL_MENU_DICT = {"X": f"{ACTION_CANCEL}"}
+
+SAVE_LIST = [f"[S]  {ACTION_SAVE_WITH_EXIT}"]
+SAVE_DICT = {"S": f"{ACTION_SAVE_WITH_EXIT}"}
 
 QUIT_MENU_LIST = [f"[Q]  {ACTION_QUIT}"]
 QUIT_MENU_DICT = {"Q": f"{ACTION_QUIT}"}
@@ -183,7 +190,7 @@ CARDS_PLANNER_FEEDBACK = {
 }
 
 NEGATIVE_USER_RESPONSES = [
-      "no"
+    "no"
     , "exit"
     , "x"
     , "quit"
