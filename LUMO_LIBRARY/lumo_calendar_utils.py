@@ -586,7 +586,7 @@ class CalendarPageEvent:
             print()
 
     @staticmethod
-    def _rows_description(field, var_list):
+    def _rows_event_list_data(field, var_list):
         single_row = True if len(var_list) <= 1 else False
 
         CalendarPageEvent._row_event_data(field, var_list[0], single_row)
@@ -624,8 +624,8 @@ class CalendarPageEvent:
         print()
         CalendarPageEvent._row_event_data("Times:", time_info_formatted)
         CalendarPageEvent._row_event_data("Date:", date_info_formatted)
-        CalendarPageEvent._rows_description("Description:", desc_list_limited)
-        CalendarPageEvent._rows_description("Location:", loc_list_limited)
+        CalendarPageEvent._rows_event_list_data("Description:", desc_list_limited)
+        CalendarPageEvent._rows_event_list_data("Location:", loc_list_limited)
         CalendarPageEvent._row_event_data("Reminders:", reminder_info)
         print()
         # print(event_obj.id)
