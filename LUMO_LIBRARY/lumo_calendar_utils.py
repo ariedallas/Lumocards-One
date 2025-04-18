@@ -189,6 +189,40 @@ def delete_calendar_card(credentials, card_filename):
     l_animators.animate_text("This Lumo card is deleted.")
 
 
+def split_at_max(var_str, col_width):
+    sub_rows = []
+
+    amt_sub_rows = len(var_str) // col_width
+    if amt_sub_rows == 0:
+        sub_rows.append(var_str)
+        return sub_rows
+
+    for num in range(amt_sub_rows+1):
+        idx_start, idx_end = num * col_width, (num + 1) * col_width
+        sub_row = var_str[idx_start:idx_end]
+        sub_rows.append(sub_row)
+
+    return sub_rows
+
+def list_limiter(var_list, col_width, row_limit):
+    limited_list = []
+
+    limited_rows = var_list if len(var_list) <= row_limit else var_list[:row_limit]
+
+    for string in limited_rows:
+        sub_rows = split_at_max(string, col_width)
+
+        for sub_row in sub_rows:
+            if len(limited_list) < row_limit:
+                limited_list.append(sub_row)
+            elif len(limited_list) == row_limit:
+                break
+
+        if len(limited_list) == row_limit:
+            break
+
+    return limited_list
+
 def dt_to_time(dt_obj, format):
     if format == "military":
         return datetime.datetime.strftime(dt_obj, "%H:%M")
@@ -428,13 +462,10 @@ class Event:
         self.location = location
         self.reminders = reminders
 
-
-    def _event_description_to_list(self):
-        description_list = self.description.split("\n")
-        return description_list
-
-    # def _event_description_to_str(self):
-
+    @staticmethod
+    def _string_split_newln(string):
+        list_from_string = string.split("\n")
+        return list_from_string
 
 
     @classmethod
@@ -512,8 +543,8 @@ class CalendarPageEvent:
     content_width = percenter(70, total_width)
 
     EVENT_WIDTH = 60
-    EVENT_FIELD = 35
-    EVENT_VALUE = 40
+    EVENT_FIELD = 30
+    EVENT_VALUE = 30
     EVENT_LINE = "-" * EVENT_WIDTH
 
     l_margin_num = round((total_width - EVENT_WIDTH) / 2)
@@ -544,18 +575,28 @@ class CalendarPageEvent:
 
 
     @staticmethod
-    def _row_event_data(col_l, col_r):
+    def _row_event_data(col_l, col_r, use_new_line=True):
         event_field = "{:<{width}}".format(col_l, width=CalendarPageEvent.EVENT_FIELD)
         event_value = "{:<{width}}".format(col_r, width=CalendarPageEvent.EVENT_VALUE)
 
         group = event_field + event_value
         # print("{0:^{width}}\n".format(group, width=CalendarPageDay.total_width))
         print(CalendarPageEvent.l_margin_space + group)
-        print()
+        if use_new_line:
+            print()
 
     @staticmethod
     def _rows_description(field, var_list):
-        CalendarPageEvent._row_event_data(field, var_list[0])
+        single_row = True if len(var_list) <= 1 else False
+
+        CalendarPageEvent._row_event_data(field, var_list[0], single_row)
+
+        end = len(var_list)
+        for remaining in var_list[1:end]:
+            CalendarPageEvent._row_event_data("", remaining, False)
+
+        if not single_row:
+            print()
 
 
     def display_event(self,
@@ -567,15 +608,24 @@ class CalendarPageEvent:
         date_info = event_obj.s if event_obj.s else event_obj.s_date
         date_info_formatted = CalendarPageEvent.dates_formatter(date_info, event_obj.event_type)
 
-        description_list = event_obj._event_description_to_list()
+        desc_list = event_obj._string_split_newln(event_obj.description)
+        desc_list_limited = list_limiter(desc_list,
+                                         col_width=CalendarPageEvent.EVENT_VALUE,
+                                         row_limit=5)
+
+        location_list = event_obj._string_split_newln(event_obj.location)
+        loc_list_limited = list_limiter(location_list,
+                                         col_width=CalendarPageEvent.EVENT_VALUE,
+                                         row_limit=5)
+
         reminder_info = "Default" if event_obj.reminders["useDefault"] == True else "..."
 
         self._row_event_header()
         print()
         CalendarPageEvent._row_event_data("Times:", time_info_formatted)
         CalendarPageEvent._row_event_data("Date:", date_info_formatted)
-        CalendarPageEvent._rows_description("Description:", description_list)
-        CalendarPageEvent._row_event_data("Location:", event_obj.location)
+        CalendarPageEvent._rows_description("Description:", desc_list_limited)
+        CalendarPageEvent._rows_description("Location:", loc_list_limited)
         CalendarPageEvent._row_event_data("Reminders:", reminder_info)
         print()
         # print(event_obj.id)
@@ -1222,21 +1272,41 @@ class Menus:
 if __name__ == "__main__":
     print("Hello from main")
     test = Event("Empty", "EMPTY EVENT")
-    test.description = "Hello hello\nhello hello\n"
-    car = test._event_description_to_list()
+    test.description = "Hello hello"
+    car = test._string_split_newln()
     print(car)
-    c = ("\n").join(car)
-    print(repr(c))
+    sys.exit(0)
+
+    string = ("blah blah "
+              "blah blah blah blah blah blah blah blah blah"
+              "blah blah blah blah blah blah blah blah blah"
+              "blah blah blah blah blah blah blah blah blah"
+              "blah blah blah blah blah blah"
+              "blah blah blah blah blah blah blah blah blah blah blah blah"
+              "blah blah blah blah blah blah blah blah blah blah blah blah")
+
+    string_2 = "aaaaabbbbbcccccdddddeeeeefffffhhhhhhiiiiiijjjjjjkkkkkkklllllmmmmmnnnnnnoooooooppppppq"
+
+    samp_1 = ["a", "moon", "c"]
+    # result_1 = list_limiter(samp_1)
+
+    result = split_at_max(string_2, 10)
+    print(result)
+    result_2 = list_limiter(samp_1, 30, 5)
+    print(result_2)
+
+
+
     # creds = get_creds()
     # w_start, w_end = get_time_window_2(datetime.date.today(), 2)
     # events = get_google_events_for_times(creds, w_start, w_end)
     # pp(events[:5])
-    sys.exit(0)
 
     event_obj = get_google_event_service(credentials=creds, time_min=w_start, time_max=w_end)
     pp(event_obj.get('nextPageToken'))
     print(event_obj.keys())
 
+    creds = get_creds()
 
     def get_new_single_cards_from_google():
         start, end = get_time_window_2(datetime.date(2025, 3, 26), 2)
