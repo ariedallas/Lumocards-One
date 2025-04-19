@@ -171,7 +171,7 @@ class CalendarInterface:
                                                                event_obj)
 
                 if status == "DELETED EVENT":
-                    self.day_blocks_window = l_cal_utils.get_day_blocks()
+                    self._refresh_day_blocks()
                     break
 
 
