@@ -7,6 +7,7 @@ from typing import Optional, reveal_type
 from dateutil.relativedelta import relativedelta
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_calendar_actions as l_cal_actions
 import LUMO_LIBRARY.lumo_calendar_utils as l_cal_utils
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
@@ -29,15 +30,7 @@ class CalendarInterface:
 
 
     def __init__(self):
-        past_month = l_cal_utils.get_adjacent_month(l_cal_utils.curr_month,
-                                                    l_cal_utils.curr_year,
-                                                    "past", 1)
-
-        next_month = l_cal_utils.get_adjacent_month(l_cal_utils.curr_month,
-                                                    l_cal_utils.curr_year,
-                                                    "next", 1)
-
-        curr_view_mode: Optional[str] = None
+        curr_view_mode: None
 
         self.day_blocks_window: list[DayBlock]
         self.day_blocks_window = l_cal_utils.get_day_blocks()
@@ -52,10 +45,13 @@ class CalendarInterface:
 
         self.custom_error_msg = None
 
+    def _refresh_day_blocks(self):
+        self.day_blocks_window = l_cal_utils.get_day_blocks()
 
     def _event_actions_router(self,
                               user_input,
-                              actions_dict):
+                              actions_dict,
+                              event_obj):
 
         action = actions_dict[user_input.upper()]
 
@@ -63,46 +59,47 @@ class CalendarInterface:
             l_animators.animate_text_indented("Edited event",
                                               indent=CalendarPageEvent.msg_indent_amt,
                                               finish_delay=.5)
-            return False, None, None
+            return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_EDIT_TIMES:
             l_animators.animate_text_indented("Edited times",
                                               indent=CalendarPageEvent.msg_indent_amt,
                                               finish_delay=.5)
-            return False, None, None
+            return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_EDIT_DATE:
             l_animators.animate_text_indented("Edited date",
                                               indent=CalendarPageEvent.msg_indent_amt,
                                               finish_delay=.5)
-            return False, None, None
+            return False, None, None, "UPDATED EVENT"
 
 
         elif action == Menus.ACTION_EDIT_NOTES:
             l_animators.animate_text_indented("Edited notes",
                                               indent=CalendarPageEvent.msg_indent_amt,
                                               finish_delay=.5)
-            return False, None, None
+            return False, None, None, "UPDATED DESCRIPTION"
 
         elif action == Menus.ACTION_MENU_LESS:
             self.menu_size = "EVENT SHORT"
-            return True, None, None
+            return True, None, None, "RELOOP"
 
         elif action == Menus.ACTION_MENU_MORE:
             self.menu_size = "EVENT LONG"
-            return True, None, None
+            return True, None, None, "RELOOP"
 
         elif action == Menus.ACTION_EDIT_LOCATION:
             l_animators.animate_text_indented("Edited locations",
                                               indent=CalendarPageEvent.msg_indent_amt,
                                               finish_delay=.5)
-            return False, None, None
+            return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_DELETE_EVENT:
-            l_animators.animate_text_indented("Event deleted",
+            # l_cal_actions.delete_event(event_obj.id)
+            l_animators.animate_text_indented("Deleted event",
                                               indent=CalendarPageEvent.msg_indent_amt,
                                               finish_delay=.5)
-            return False, None, None
+            return False, None, None, "DELETED EVENT"
 
 
     def _day_actions_router(self,
@@ -168,11 +165,16 @@ class CalendarInterface:
             print(CalendarPageEvent.cursor_indent_space, end="  ")
             user_input = input(">  ")
 
-            if False:
-                pass
+            if user_input.upper() in menu_dict.keys():
+                menu_update, _, _, status = self._event_actions_router(user_input,
+                                                               menu_dict,
+                                                               event_obj)
 
-            elif user_input.upper() in menu_dict.keys():
-                menu_update, _, _ = self._event_actions_router(user_input, menu_dict);
+                if status == "DELETED EVENT":
+                    self.day_blocks_window = l_cal_utils.get_day_blocks()
+                    break
+
+
 
             elif user_input.lower() in {"x", "exit"}:
                 break

@@ -4,7 +4,6 @@ import os
 import subprocess
 import sys
 from pprint import pprint as pp
-from selectors import SelectSelector
 
 import dateutil.tz
 from dateutil.relativedelta import relativedelta
@@ -48,25 +47,20 @@ def get_creds():
             flow = InstalledAppFlow.from_client_secrets_file(creds_file, SCOPES)
             creds = flow.run_local_server(port=0)
 
-        with open(token_file, "w") as token:
-            token.write(creds.to_json())
+            with open(token_file, "w") as token:
+                token.write(creds.to_json())
 
     return creds
 
 
-def get_google_event_by_id(credentials, id):
+def get_google_service():
+    creds = get_creds()
+
     try:
-        service = build("calendar", "v3", credentials=credentials)
-
-        event_result = (service.events().get(
-            calendarId="primary"
-            , eventId=id)
-                        .execute())
-
-        return event_result
+        service = build("calendar", "v3", credentials=creds)
+        return service
 
     except HttpError as error:
-        print("Nothing")
         print("An error has occurred ", error)
         return None
 
@@ -98,7 +92,6 @@ def get_google_events(credentials, time_min, time_max):
         return events
 
     except HttpError as error:
-        print("Nothing")
         print("An error has occurred ", error)
         return None
 
@@ -141,54 +134,6 @@ def get_google_events_for_times(credentials, time_min, time_max):
     return google_month_events
 
 
-def update_event(credentials):
-    try:
-
-        service = build("calendar", "v3", credentials=credentials)
-
-        retrieved_id_from_txt = "4v39giucjk61s9q23koofhfekd"
-
-        event = service.events().get(calendarId="primary",
-                                     eventId=retrieved_id_from_txt).execute()
-        print()
-        print("FROM UPDATER FUNCTION")
-        print(f"ID {retrieved_id_from_txt} makes ->", event.get("summary"))
-
-        event["colorId"] = 1
-        # event["summary"] = "Desiree + Arie Continue to Collab on Little Ditty"
-
-        updated_event = service.events().update(calendarId="primary", eventId=event["id"], body=event).execute()
-
-        google_id = event["id"]
-        return google_id
-
-
-    except HttpError as error:
-        print("An error happened: ", error)
-
-
-def delete_event_from_google(credentials, var_id):
-    try:
-        service = build("calendar", "v3", credentials=credentials)
-        service.events().delete(calendarId="primary", eventId=var_id).execute()
-
-    except HttpError as error:
-        print("This event was (likely) already deleted.")
-        print(error)
-
-
-def delete_calendar_card(credentials, card_filename):
-    json_data = l_json_utils.read_and_get_json_data(card_filename)
-    calendar_card_id = json_data["google calendar data"]["id"]
-
-    delete_event_from_google(credentials, calendar_card_id)
-
-    l_card_utils.card_deleter(card_filename)
-
-    l_animators.animate_text("The card was deleted from the external (Google) calendar.")
-    l_animators.animate_text("This Lumo card is deleted.")
-
-
 def split_at_max(var_str, col_width):
     sub_rows = []
 
@@ -197,12 +142,13 @@ def split_at_max(var_str, col_width):
         sub_rows.append(var_str)
         return sub_rows
 
-    for num in range(amt_sub_rows+1):
+    for num in range(amt_sub_rows + 1):
         idx_start, idx_end = num * col_width, (num + 1) * col_width
         sub_row = var_str[idx_start:idx_end]
         sub_rows.append(sub_row)
 
     return sub_rows
+
 
 def list_limiter(var_list, col_width, row_limit):
     limited_list = []
@@ -222,6 +168,7 @@ def list_limiter(var_list, col_width, row_limit):
             break
 
     return limited_list
+
 
 def dt_to_time(dt_obj, format):
     if format == "military":
@@ -462,6 +409,7 @@ class Event:
         self.location = location
         self.reminders = reminders
 
+
     @staticmethod
     def _string_split_newln(string):
         list_from_string = string.split("\n")
@@ -585,6 +533,7 @@ class CalendarPageEvent:
         if use_new_line:
             print()
 
+
     @staticmethod
     def _rows_event_list_data(field, var_list):
         single_row = True if len(var_list) <= 1 else False
@@ -615,8 +564,8 @@ class CalendarPageEvent:
 
         location_list = event_obj._string_split_newln(event_obj.location)
         loc_list_limited = list_limiter(location_list,
-                                         col_width=CalendarPageEvent.EVENT_VALUE,
-                                         row_limit=5)
+                                        col_width=CalendarPageEvent.EVENT_VALUE,
+                                        row_limit=5)
 
         reminder_info = "Default" if event_obj.reminders["useDefault"] == True else "..."
 
@@ -628,10 +577,6 @@ class CalendarPageEvent:
         CalendarPageEvent._rows_event_list_data("Location:", loc_list_limited)
         CalendarPageEvent._row_event_data("Reminders:", reminder_info)
         print()
-        # print(event_obj.id)
-        # print(event_obj.description)
-        # print(event_obj.location)
-        # print(event_obj.reminders)
 
 
     def display_menu(self):
@@ -1271,42 +1216,20 @@ class Menus:
 
 if __name__ == "__main__":
     print("Hello from main")
-    test = Event("Empty", "EMPTY EVENT")
-    test.description = "Hello hello"
-    car = test._string_split_newln()
-    print(car)
-    sys.exit(0)
 
-    string = ("blah blah "
-              "blah blah blah blah blah blah blah blah blah"
-              "blah blah blah blah blah blah blah blah blah"
-              "blah blah blah blah blah blah blah blah blah"
-              "blah blah blah blah blah blah"
-              "blah blah blah blah blah blah blah blah blah blah blah blah"
-              "blah blah blah blah blah blah blah blah blah blah blah blah")
+    creds = get_creds()
+    w_start, w_end = get_time_window_2(datetime.date.today(), 2)
+    events = get_google_events_for_times(creds, w_start, w_end)
+    pp(events[:5])
 
-    string_2 = "aaaaabbbbbcccccdddddeeeeefffffhhhhhhiiiiiijjjjjjkkkkkkklllllmmmmmnnnnnnoooooooppppppq"
-
-    samp_1 = ["a", "moon", "c"]
-    # result_1 = list_limiter(samp_1)
-
-    result = split_at_max(string_2, 10)
-    print(result)
-    result_2 = list_limiter(samp_1, 30, 5)
-    print(result_2)
-
-
-
-    # creds = get_creds()
-    # w_start, w_end = get_time_window_2(datetime.date.today(), 2)
-    # events = get_google_events_for_times(creds, w_start, w_end)
-    # pp(events[:5])
+    sys.exit()
 
     event_obj = get_google_event_service(credentials=creds, time_min=w_start, time_max=w_end)
     pp(event_obj.get('nextPageToken'))
     print(event_obj.keys())
 
     creds = get_creds()
+
 
     def get_new_single_cards_from_google():
         start, end = get_time_window_2(datetime.date(2025, 3, 26), 2)
