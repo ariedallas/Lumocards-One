@@ -409,6 +409,7 @@ def update_cards():
 
 
 def program_header():
+    print()
     print("PLANNER")
     print()
 

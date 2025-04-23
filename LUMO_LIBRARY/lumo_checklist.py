@@ -61,6 +61,7 @@ def display_selected_checklist(card_title, card_steps):
 
 
 def program_header():
+    print()
     print("CHECKLIST(S)")
     print()
 

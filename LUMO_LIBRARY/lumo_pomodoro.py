@@ -82,6 +82,7 @@ class Menu:
 
     @classmethod
     def program_header(cls):
+        print()
         print("POMODORO")
         print()
 

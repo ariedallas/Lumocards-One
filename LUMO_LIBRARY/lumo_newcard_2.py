@@ -394,6 +394,7 @@ def write_calendar_card_and_json(card_filename, folder, google_calendar_data, ad
 
 
 def program_header():
+    print()
     print("NEW CARD")
     print()
     l_card_utils.print_card_categories()

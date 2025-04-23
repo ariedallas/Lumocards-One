@@ -15,6 +15,7 @@ def get_input_to_mins():
 
 
 def program_header():
+    print()
     print("TIMER / POMODORO")
     print()
 

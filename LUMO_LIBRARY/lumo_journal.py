@@ -48,6 +48,7 @@ def get_or_make_journal():
 
 
 def program_header():
+    print()
     print("JOURNAL")
     print()
     time.sleep(.5)
