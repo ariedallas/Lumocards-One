@@ -60,30 +60,6 @@ def display_selected_checklist(card_title, card_steps):
     cycler(card_steps)
 
 
-def main_checklist_review():
-    print()
-    user_input = l_menus_funcs.proceed("  Would you like to review the Essentials Checklist? ")
-    if user_input:
-        main_card_title_formatted = l_card_utils.format_card_title(main_card_title).upper()
-        print()
-        l_animators.animate_text(main_card_title_formatted)
-
-        print()
-        cycler(main_card_steps)
-
-
-def errand_checklist_review():
-    print()
-    user_input = l_menus_funcs.proceed("  Would you like to review the Errands Checklist? ")
-    if user_input:
-        errand_card_title_formatted = l_card_utils.format_card_title(errand_card_title).upper()
-        print()
-        l_animators.animate_text(errand_card_title_formatted)
-
-        print()
-        cycler(errand_card_steps)
-
-
 def program_header():
     print("CHECKLIST(S)")
     print()
@@ -119,11 +95,37 @@ def main():
     if status != "EXIT":
         display_selected_checklist(card_title=title, card_steps=steps)
 
-    main_checklist_review()
-    errand_checklist_review()
+
     print()
     l_animators.animate_text("Quit Lumo: Checklist", finish_delay=.5)
 
 
 if __name__ == "__main__":
     main()
+
+# ---- ETC. / UNUSED CODE ---- #
+# def main_checklist_review():
+#     print()
+#     user_input = l_menus_funcs.proceed("  Would you like to review the Essentials Checklist? ")
+#     if user_input:
+#         main_card_title_formatted = l_card_utils.format_card_title(main_card_title).upper()
+#         print()
+#         l_animators.animate_text(main_card_title_formatted)
+#
+#         print()
+#         cycler(main_card_steps)
+#
+#
+# def errand_checklist_review():
+#     print()
+#     user_input = l_menus_funcs.proceed("  Would you like to review the Errands Checklist? ")
+#     if user_input:
+#         errand_card_title_formatted = l_card_utils.format_card_title(errand_card_title).upper()
+#         print()
+#         l_animators.animate_text(errand_card_title_formatted)
+#
+#         print()
+#         cycler(errand_card_steps)
+
+# main_checklist_review()
+# errand_checklist_review()
