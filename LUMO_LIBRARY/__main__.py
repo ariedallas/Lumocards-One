@@ -160,8 +160,8 @@ class LumoMenu:
     @staticmethod
     def load_dots() -> None:
         print("\033[33;1m", end="")
-        l_animators.animate_text(" ...", speed=.1, finish_delay=.3)
-        print("\033[0m")
+        l_animators.animate_text(" ...", speed=.1)
+        print("\033[0m", end="")
 
 
     @staticmethod
