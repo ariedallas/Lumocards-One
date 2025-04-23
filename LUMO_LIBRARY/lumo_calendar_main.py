@@ -347,8 +347,6 @@ class CalendarInterface:
                 monday_DayBlock = curr_week_block[0]
                 target_date = monday_DayBlock.date
                 self.curr_day_idx = self._day_index_lookup(target_date)
-                print(self.curr_day_idx);
-                input("???")
 
                 return "TOGGLE"
 

@@ -3,6 +3,7 @@ import datetime
 import os
 import subprocess
 import sys
+import textwrap
 from pprint import pprint as pp
 
 import dateutil.tz
@@ -523,7 +524,8 @@ class CalendarPageEvent:
 
 
     def _row_event_header(self):
-        title = f"EVENT: {self.event_obj.summary.upper()}"
+        summary_limited = textwrap.shorten(self.event_obj.summary, width=70, placeholder="...")
+        title = f"EVENT: {summary_limited}"
 
         print()
         print("{0:^{width}}".format(title,
@@ -677,7 +679,8 @@ class CalendarPageDay:
 
     @staticmethod
     def _row_day_events(var_sel, event_obj):
-        summary_bullet = "• " + event_obj.summary
+        summary_limited = textwrap.shorten(event_obj.summary, width=35, placeholder="...")
+        summary_bullet = "• " + summary_limited
 
         selector = "{:<{width}}".format(var_sel, width=CalendarPageDay.DAY_FIELD_SEL)
         event = "{:<{width}}".format(summary_bullet, width=CalendarPageDay.DAY_FIELD_EVENTS)
@@ -900,10 +903,11 @@ class CalendarPageWeek:
     @staticmethod
     def _row_week_event_half(event_obj):
         summary_width = CalendarPageWeek.COL_WIDTH - 17
+        summary_limited = textwrap.shorten(event_obj.summary, width=35, placeholder="...")
 
         time_info = times_formatter(event_obj, format="military")
 
-        return "{0:<{width}}".format(event_obj.summary, width=summary_width) + time_info
+        return "{0:<{width}}".format(summary_limited, width=summary_width) + time_info
 
 
     @staticmethod
@@ -1228,7 +1232,7 @@ if __name__ == "__main__":
     dt = datetime.datetime.now()
     print(datetime.datetime(dt.year, dt.month, dt.day,
                             dt.hour, dt.minute, dt.second,
-        tzinfo=dateutil.tz.tzlocal()).isoformat())
+                            tzinfo=dateutil.tz.tzlocal()).isoformat())
 
     creds = get_creds()
     start = datetime.date.today() + relativedelta(days=0)
