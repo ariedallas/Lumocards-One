@@ -71,8 +71,15 @@ def get_google_events(credentials, time_min, time_max):
     try:
         service = build("calendar", "v3", credentials=credentials)
 
-        start = datetime.datetime(year=time_min.year, month=time_min.month, day=time_min.day).isoformat() + "Z"
-        end = datetime.datetime(year=time_max.year, month=time_max.month, day=time_max.day).isoformat() + "Z"
+        start = datetime.datetime(year=time_min.year, month=time_min.month, day=time_min.day
+                                  , hour=0, minute=0, second=0,
+                                  tzinfo=dateutil.tz.tzlocal()
+                                  ).isoformat()
+
+        end = datetime.datetime(year=time_max.year, month=time_max.month, day=time_max.day
+                                , hour=0, minute=0, second=0,
+                                tzinfo=dateutil.tz.tzlocal()
+                                ).isoformat()
 
         event_result = service.events().list(
             calendarId="primary",
@@ -364,7 +371,9 @@ def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
     else:
         window_start, window_end = get_time_window_1(var_date, 13)
 
-    google_month_events = get_google_events(creds, time_min=window_start, time_max=window_end)
+    google_month_events = get_google_events(creds,
+                                            time_min=window_start,
+                                            time_max=window_end)
 
     converted_events = [google_event_to_obj(e) for e in google_month_events]
 
@@ -1216,12 +1225,20 @@ class Menus:
 
 if __name__ == "__main__":
     print("Hello from main")
+    dt = datetime.datetime.now()
+    print(datetime.datetime(dt.year, dt.month, dt.day,
+                            dt.hour, dt.minute, dt.second,
+        tzinfo=dateutil.tz.tzlocal()).isoformat())
 
     creds = get_creds()
-    w_start, w_end = get_time_window_2(datetime.date.today(), 2)
-    events = get_google_events_for_times(creds, w_start, w_end)
-    pp(events[:5])
-
+    start = datetime.date.today() + relativedelta(days=0)
+    end = datetime.date.today() + relativedelta(days=1)
+    events = get_google_events(creds,
+                               start,
+                               end)
+    print(len(events))
+    for e in events:
+        print(e.get("summary"), e.get("start"))
     sys.exit()
 
     event_obj = get_google_event_service(credentials=creds, time_min=w_start, time_max=w_end)
@@ -1229,28 +1246,6 @@ if __name__ == "__main__":
     print(event_obj.keys())
 
     creds = get_creds()
-
-
-    def get_new_single_cards_from_google():
-        start, end = get_time_window_2(datetime.date(2025, 3, 26), 2)
-        events = get_google_events(creds, start, end)
-
-        single_events = [e for e in events]
-        cards_to_create = []
-
-        for e in single_events[:10]:
-            test = l_newcard.string_to_filename(e.get("summary"))
-            if l_newcard.check_for_calendar_cards(test):
-                cards_to_create.append((test, e))
-
-        return cards_to_create
-
-
-    events = get_new_single_cards_from_google()
-
-
-    def sync_deleted_from_google():
-        pass
 
 
     def create_new_local_card_w_sync(credentials, card_file, card_abspath):
@@ -1303,39 +1298,3 @@ if __name__ == "__main__":
         title = f"A_{title}"
 
         l_newcard.write_calendar_card_and_json(title, l_files.cards_calendar_folder, google_data, details_as_list)
-
-    # make_local_card_from_google()
-
-    # def instances():
-    #     page_token = None
-    #     service = build("calendar", "v3", credentials=creds)
-    #
-    #     while True:
-    #         events = service.events().instances(calendarId="primary", eventId="21fpfp3buf3qpp04qbpbjgpffb",
-    #                                             pageToken=page_token).execute()
-    #         for event in events["items"][:10]:
-    #             print(event["summary"], event["id"])
-    #         pause = input("<<< pause >>>")
-    #         page_token = events.get("nextPageToken")
-    #         if not page_token:
-    #             break
-
-    # instances()
-
-# print("21fpfp3buf3qpp04qbpbjgpffb_20250220T000000Z" == "21fpfp3buf3qpp04qbpbjgpffb_20250220T000000Z")
-# print("21fpfp3buf3qpp04qbpbjgpffb_20250220T000000Z" == "21fpfp3buf3qpp04qbpbjgpffb_20250222T000000Z")
-
-# ------------------------------------- END / MISC BELOW -------------------------------------- #
-
-# print("{:{fill}<50}".format("hello", fill="*"))
-# print("{0:{width}}{:<8}{:<}{}".format(
-# print("{:^{width}}".format(CalendarPageDay.events_line, width=CalendarPageDay.total_width))
-
-# today_block = DayBlock.from_date(var_datetime=dt_today, events=[
-#       ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
-#     , ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
-#     , ("Dinner and places with Phil", "7:00Pm - 9:30Pm")
-# ])
-
-# 2025-02-20T04:52:49.886Z
-# 2025-02-20T04:52:49.886Z

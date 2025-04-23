@@ -19,7 +19,7 @@ from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
                                               )
 
 
-def clear():
+def clear() -> None:
     subprocess.run(["clear"], shell=True)
 
 
@@ -32,30 +32,35 @@ class CalendarInterface:
     def __init__(self):
         self.curr_view_mode = CalendarInterface.default_view
 
-        self.day_blocks_window: list[DayBlock]
-        self.day_blocks_window = l_cal_utils.get_day_blocks()
-        self.week_blocks_window = self._separate_by_weeks()
+        self.day_blocks_window: list[DayBlock] = l_cal_utils.get_day_blocks()
+        self.week_blocks_window: list[list[DayBlock]] = self._separate_by_weeks()
 
-        self.curr_day_idx = self._get_idx_for_today()
-        self.curr_week_idx = self._get_idx_for_curr_week()
+        self.curr_day_idx: int = self._get_idx_for_today()
+        self.curr_week_idx: int = self._get_idx_for_curr_week()
 
-        self.menu_size = None
+        self.menu_size: Optional[str] = None
 
-        self.events_limit = CalendarInterface.EVENTS_LIMIT_LOW
+        self.events_limit: int = CalendarInterface.EVENTS_LIMIT_LOW
 
-        self.custom_error_msg = None
+        self.custom_error_msg: Optional[str] = None
 
-
-    def _refresh_day_blocks(self):
-        self.day_blocks_window = l_cal_utils.get_day_blocks()
+        self.creds = l_cal_utils.get_creds()
 
 
+    def _refresh_DayBlock(self, curr_page: CalendarPageDay) -> None:
+        curr_start = curr_page.day_block.date
+        curr_end = curr_start + relativedelta(days=1)
+
+        selected_events = l_cal_utils.get_google_events(self.creds, curr_start, curr_end)
+        refreshed_events = [l_cal_utils.google_event_to_obj(e) for
+                            e in selected_events]
+        curr_page.day_block.events = refreshed_events
 
 
     def _event_actions_router(self,
-                              user_input,
-                              actions_dict,
-                              event_obj):
+                              user_input: str,
+                              actions_dict: dict[str, str],
+                              event_obj: Event):
 
         action = actions_dict[user_input.upper()]
 
@@ -103,13 +108,16 @@ class CalendarInterface:
             l_animators.animate_text_indented("Deleted event",
                                               indent=CalendarPageEvent.msg_indent_amt,
                                               finish_delay=.5)
+
             return False, None, None, "DELETED EVENT"
 
 
     def _day_actions_router(self,
                             user_input: str,
                             actions_dict: dict[str, str]
-                            ) -> Optional[tuple[bool, Optional[str], Optional[str]]]:
+                            ) -> Optional[
+        tuple[bool, Optional[str], Optional[str]]
+    ]:
 
         action = actions_dict[user_input.upper()]
 
@@ -148,17 +156,17 @@ class CalendarInterface:
         event_page = CalendarPageEvent(event_obj)
         menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_LONG)
         menu_dict = self._contextualize(menu_dict,
-                                       None,
-                                       None,
-                                       self.menu_size)
+                                        None,
+                                        None,
+                                        self.menu_size)
         menu_update = False
 
         while True:
             if menu_update:
                 menu_dict = self._contextualize(menu_dict,
-                                               None,
-                                               None,
-                                               self.menu_size)
+                                                None,
+                                                None,
+                                                self.menu_size)
                 menu_update = False
 
             clear()
@@ -229,7 +237,7 @@ class CalendarInterface:
                 status = self.view_event(selected_event)
 
                 if status == "DELETED EVENT":
-                    self._refresh_day_blocks()
+                    self._refresh_DayBlock(curr_page)
                     break
 
 
@@ -339,7 +347,8 @@ class CalendarInterface:
                 monday_DayBlock = curr_week_block[0]
                 target_date = monday_DayBlock.date
                 self.curr_day_idx = self._day_index_lookup(target_date)
-                print(self.curr_day_idx); input("???")
+                print(self.curr_day_idx);
+                input("???")
 
                 return "TOGGLE"
 
@@ -394,6 +403,7 @@ class CalendarInterface:
 
         print(reveal_type(curr_week_block));
         return curr_week_block
+
 
     def _day_index_lookup(self, target_date):
         for idx, db in enumerate(self.day_blocks_window):
@@ -457,7 +467,6 @@ class CalendarInterface:
             idx_shift = amt_weeks - 1
 
         return idx_shift
-
 
 
     def _separate_by_weeks(self) -> list[list[DayBlock]]:
