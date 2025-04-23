@@ -280,7 +280,7 @@ def fill_time_window_dates(window_start, window_end):
 def google_event_to_obj(event):
     """Determine type of event: all-day, standard, recurring"""
 
-    summary = event["summary"]
+    summary = event.get("summary", "(no title)")
 
     s_dt_google = event["start"].get("dateTime")
     s_date_google = event["start"].get("date")

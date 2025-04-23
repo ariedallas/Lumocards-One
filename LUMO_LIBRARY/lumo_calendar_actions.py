@@ -31,7 +31,7 @@ def update_event(var_id: str) -> Optional[str]:
         # updated_event = service.events().update(calendarId="primary", eventId=event["id"], body=event).execute()
         #
         # google_id = event["id"]
-        # return google_id  
+        # return google_id
         return var_id
 
 
@@ -42,7 +42,6 @@ def delete_event(var_id: str) -> None:
     try:
         service = l_cal_utils.get_google_service()
         service.events().delete(calendarId="primary", eventId=var_id).execute()
-        print("see if event was deleted")
 
     except HttpError as error:
         print("This event was (likely) already deleted.")
@@ -52,7 +51,4 @@ def confirm_event_deleted(var_id: str) -> None:
     pass
 
 if __name__ == '__main__':
-    service = l_cal_utils.get_google_service()
-    a = update_event("11")
-    print(a)
-
+    print("Hello from main")

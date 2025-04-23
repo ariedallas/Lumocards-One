@@ -30,11 +30,11 @@ class CalendarInterface:
 
 
     def __init__(self):
-        curr_view_mode: None
+        self.curr_view_mode = CalendarInterface.default_view
 
         self.day_blocks_window: list[DayBlock]
         self.day_blocks_window = l_cal_utils.get_day_blocks()
-        self.week_blocks_window = self.separate_by_weeks()
+        self.week_blocks_window = self._separate_by_weeks()
 
         self.curr_day_idx = self._get_idx_for_today()
         self.curr_week_idx = self._get_idx_for_curr_week()
@@ -45,8 +45,12 @@ class CalendarInterface:
 
         self.custom_error_msg = None
 
+
     def _refresh_day_blocks(self):
         self.day_blocks_window = l_cal_utils.get_day_blocks()
+
+
+
 
     def _event_actions_router(self,
                               user_input,
@@ -95,7 +99,7 @@ class CalendarInterface:
             return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_DELETE_EVENT:
-            # l_cal_actions.delete_event(event_obj.id)
+            l_cal_actions.delete_event(event_obj.id)
             l_animators.animate_text_indented("Deleted event",
                                               indent=CalendarPageEvent.msg_indent_amt,
                                               finish_delay=.5)
@@ -143,7 +147,7 @@ class CalendarInterface:
     def view_event(self, event_obj: Event) -> None:
         event_page = CalendarPageEvent(event_obj)
         menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_LONG)
-        menu_dict = self.contextualize(menu_dict,
+        menu_dict = self._contextualize(menu_dict,
                                        None,
                                        None,
                                        self.menu_size)
@@ -151,7 +155,7 @@ class CalendarInterface:
 
         while True:
             if menu_update:
-                menu_dict = self.contextualize(menu_dict,
+                menu_dict = self._contextualize(menu_dict,
                                                None,
                                                None,
                                                self.menu_size)
@@ -167,13 +171,10 @@ class CalendarInterface:
 
             if user_input.upper() in menu_dict.keys():
                 menu_update, _, _, status = self._event_actions_router(user_input,
-                                                               menu_dict,
-                                                               event_obj)
-
+                                                                       menu_dict,
+                                                                       event_obj)
                 if status == "DELETED EVENT":
-                    self._refresh_day_blocks()
-                    break
-
+                    return status
 
 
             elif user_input.lower() in {"x", "exit"}:
@@ -202,7 +203,7 @@ class CalendarInterface:
 
         while True:
             if menu_update:
-                menu_dict = self.contextualize(menu_dict, old_val, new_val, self.menu_size)
+                menu_dict = self._contextualize(menu_dict, old_val, new_val, self.menu_size)
                 old_val, new_val = None, None
                 menu_update = False
 
@@ -225,7 +226,11 @@ class CalendarInterface:
                 selection = int(user_input) - 1
                 selected_event = curr_day_block.events[selection]
 
-                self.view_event(selected_event)
+                status = self.view_event(selected_event)
+
+                if status == "DELETED EVENT":
+                    self._refresh_day_blocks()
+                    break
 
 
             elif user_input.upper() in menu_dict.keys():
@@ -331,9 +336,13 @@ class CalendarInterface:
 
             elif user_input.lower() in {"t", "toggle"}:
                 self.curr_view_mode = "DAY"
-                monday_of_curr_week = curr_week_block[0]
-                self.curr_day_idx = self.day_blocks_window.index(monday_of_curr_week)
+                monday_DayBlock = curr_week_block[0]
+                target_date = monday_DayBlock.date
+                self.curr_day_idx = self._day_index_lookup(target_date)
+                print(self.curr_day_idx); input("???")
+
                 return "TOGGLE"
+
 
             elif user_input.lower() in {"q", "quit"}:
                 return "QUIT"
@@ -386,6 +395,11 @@ class CalendarInterface:
         print(reveal_type(curr_week_block));
         return curr_week_block
 
+    def _day_index_lookup(self, target_date):
+        for idx, db in enumerate(self.day_blocks_window):
+            if db.date == target_date:
+                return idx
+
 
     def _get_idx_for_today(self) -> int:
         total_weeks = len(self.week_blocks_window)
@@ -414,7 +428,7 @@ class CalendarInterface:
 
         day_blocks_to_keep = self.day_blocks_window[28:]
         self.day_blocks_window = day_blocks_to_keep + future_events
-        self.week_blocks_window = self.separate_by_weeks()
+        self.week_blocks_window = self._separate_by_weeks()
 
         if context == "DAY VIEW":
             idx_shift = len(future_events) - 1
@@ -435,7 +449,7 @@ class CalendarInterface:
 
         day_blocks_to_keep = self.day_blocks_window[:-28]
         self.day_blocks_window = past_events + day_blocks_to_keep
-        self.week_blocks_window = self.separate_by_weeks()
+        self.week_blocks_window = self._separate_by_weeks()
 
         if context == "DAY VIEW":
             idx_shift = len(past_events) - 1
@@ -445,7 +459,8 @@ class CalendarInterface:
         return idx_shift
 
 
-    def separate_by_weeks(self) -> list[list[DayBlock]]:
+
+    def _separate_by_weeks(self) -> list[list[DayBlock]]:
         separated_weeks = []
         num_weeks = round(len(self.day_blocks_window) / 7)
         for x in range(num_weeks):
@@ -456,9 +471,9 @@ class CalendarInterface:
         return separated_weeks
 
 
-    def contextualize(self, var_dict, old_val, new_val, menu_size):
+    def _contextualize(self, var_dict, old_val, new_val, menu_size):
         if old_val and new_val:
-            return self.update_menu_item(var_dict, old_val, new_val)
+            return self._update_menu_item(var_dict, old_val, new_val)
 
         elif menu_size == "EVENT SHORT":
             menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_SHORT)
@@ -483,7 +498,7 @@ class CalendarInterface:
             return var_dict
 
 
-    def update_menu_item(self, var_dict, old_val, new_val):
+    def _update_menu_item(self, var_dict, old_val, new_val):
         keys = [k for k, v in var_dict.items() if v == old_val]
         key = keys[0]
         var_dict.update({key: new_val})
@@ -497,7 +512,6 @@ class CalendarInterface:
 
 def main() -> None:
     cal_interface = CalendarInterface()
-    cal_interface.curr_view_mode = CalendarInterface.default_view
     status = None
 
     while True:
