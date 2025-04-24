@@ -331,8 +331,8 @@ def google_event_to_obj(event):
                                   event_type)
 
     event_obj._add_event_details(id=event["id"],
-                                 description=event.get("description", "(no description info)"),
-                                 location=event.get("location", "(no location info)"),
+                                 description=event.get("description", "..."),
+                                 location=event.get("location", "..."),
                                  reminders=event["reminders"])
 
     return event_obj
@@ -404,8 +404,8 @@ class Event:
         self.event_type = event_type
 
         self.id = None
-        self.description = None
-        self.location = None
+        self.description = "..."
+        self.location = "..."
         self.reminders = None
 
 
@@ -562,11 +562,20 @@ class CalendarPageEvent:
     def display_event(self,
                       event_obj: Event) -> None:
 
-        time_info = times_formatter(event_obj, "military")
-        time_info_formatted = time_info.lstrip(" ")
+        if not event_obj.s:
+            time_info_formatted = "..."
 
-        date_info = event_obj.s if event_obj.s else event_obj.s_date
-        date_info_formatted = CalendarPageEvent.dates_formatter(date_info, event_obj.event_type)
+        else:
+            time_info = times_formatter(event_obj, "military")
+            time_info_formatted = time_info.lstrip(" ")
+
+        if not event_obj.s and not event_obj.s_date:
+            date_info_formatted = "..."
+
+        else:
+            date_info = event_obj.s if event_obj.s else event_obj.s_date
+            date_info_formatted = CalendarPageEvent.dates_formatter(date_info,
+                                                                    event_obj.event_type)
 
         desc_list = event_obj._string_split_newln(event_obj.description)
         desc_list_limited = list_limiter(desc_list,
@@ -578,7 +587,10 @@ class CalendarPageEvent:
                                         col_width=CalendarPageEvent.EVENT_VALUE,
                                         row_limit=5)
 
-        reminder_info = "Default" if event_obj.reminders["useDefault"] == True else "..."
+        if not event_obj.reminders:
+            reminder_info = "..."
+        else:
+            reminder_info = "Default" if event_obj.reminders["useDefault"] == True else "..."
 
         self._row_event_header()
         print()
@@ -623,6 +635,13 @@ class CalendarPageEvent:
         print()
         l_animators.list_printer(whitespace_save, indent_amt=2, speed_interval=0)
         l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
+
+
+    def display_new_event_header(self):
+        wh_sp = CalendarPageEvent.l_margin_space
+        date_in_focus = "April 23, 2025"
+        date_formatted = f"        (current focus ➝ {date_in_focus})"
+        print(wh_sp + "NEW CALENDAR EVENT" + date_formatted)
 
 
     @staticmethod
@@ -1112,35 +1131,64 @@ class Menus:
     ACTION_EDIT_NOTES = "Notes (edit description)"
     ACTION_EDIT_TIMES = "Times (edit)"
     ACTION_EDIT_TITLE = "Title (edit)"
-    ACTION_REPEAT_EVENT = "Repeat event"
-    ACTION_DELETE_EVENT = "Delete event"
+    ACTION_REPEAT_EVENT = "Repeat: event"
+    ACTION_DELETE_EVENT = "Delete: event"
 
     ACTION_EMPTY = "..."
+    ACTION_GOTO = "Go to: date / day"
     ACTION_HELP = "Help"
-    ACTION_LIST_ALL = "List all events"
-    ACTION_LIST_FEW = "List fewer events"
+    ACTION_HELP_KEYWORDS = "Help / Keywords"
+    ACTION_HELP_MORE = "Help / More"
+    ACTION_LIST_ALL = "All: list all events"
+    ACTION_LIST_FEW = "Few: list fewer events"
     ACTION_MENU_LESS = "Menu: show less"
     ACTION_MENU_MORE = "Menu: show more"
-    ACTION_GOTO = "Go to date / day"
-    ACTION_HELP_MORE = "Help / More"
     ACTION_MOD_DEL = "Modify / delete event"
-    ACTION_NEW_EVENT = "New event"
-    ACTION_NEW_QUICK = "New quick event"
-    ACTION_SEARCH = "Search events"
+    ACTION_NEW_EVENT = "New: event"
+    ACTION_NEW_QUICK = "Quick: event"
+    ACTION_SEARCH = "Search: events"
 
     ACTION_TOGGLE_DAY = "Toggle view ➝ Day"
     ACTION_TOGGLE_WEEK = "Toggle view ➝ Week"
     ACTION_EXIT = "Exit"
     ACTION_QUIT = "Quit"
 
-    MAIN_CAL_MENU = [
-        ACTION_NEW_EVENT,
-        ACTION_NEW_QUICK,
-        ACTION_SEARCH,
-        ACTION_GOTO,
-        ACTION_MOD_DEL,
-        ACTION_HELP_MORE,
+    PROMPT_TITLE = "Title:"
+    PROMPT_S_TIME = "Start time:"
+    PROMPT_E_TIME = "End time ( ➝ +30 mins):"
+    PROMPT_S_DATE = "Start date ( ➝ 13, mon):"
+    PROMPT_E_DATE = "End date ( ➝ 13, mon):"
+    PROMPT_DESCRIPTION = "Edit description? ( ➝ no):"
+    PROMPT_LOCATION = "Edit location? ( ➝ no):"
+
+    EVENT_MENU_SHORT = [
+        ACTION_EDIT_TITLE,
+        ACTION_EDIT_TIMES,
+        ACTION_EDIT_DATE,
+        ACTION_EDIT_NOTES,
+        ACTION_MENU_MORE
     ]
+
+    EVENT_MENU_LONG = [
+        ACTION_EDIT_TITLE,
+        ACTION_EDIT_TIMES,
+        ACTION_EDIT_DATE,
+        ACTION_EDIT_NOTES,
+        ACTION_MENU_LESS,
+
+        ACTION_EDIT_LOCATION,
+        ACTION_DELETE_EVENT
+    ]
+
+    NEW_EVENT_PROMPTS = {
+        "title": PROMPT_TITLE,
+        "s_time": PROMPT_S_TIME,
+        "e_time": PROMPT_E_TIME,
+        "s_date": PROMPT_S_DATE,
+        "e_date": PROMPT_E_DATE,
+        "descn": PROMPT_DESCRIPTION,
+        "loctn": PROMPT_LOCATION
+    }
 
     DAY_MENU_SHORT = [
         ACTION_NEW_EVENT,
@@ -1154,8 +1202,11 @@ class Menus:
         ACTION_NEW_QUICK,
         ACTION_SEARCH,
         ACTION_MENU_LESS,
+
         ACTION_GOTO,
         ACTION_LIST_ALL,
+        ACTION_HELP_MORE,
+        ACTION_DELETE_EVENT
     ]
 
     WEEK_MENU_SHORT = [
@@ -1172,31 +1223,16 @@ class Menus:
         ACTION_HELP_MORE
     ]
 
-    EVENT_MENU_SHORT = [
-        ACTION_EDIT_TITLE,
-        ACTION_EDIT_TIMES,
-        ACTION_EDIT_DATE,
-        ACTION_EDIT_NOTES,
-        ACTION_MENU_MORE
-    ]
-
-    EVENT_MENU_LONG = [
-        ACTION_EDIT_TITLE,
-        ACTION_EDIT_TIMES,
-        ACTION_EDIT_DATE,
-        ACTION_EDIT_NOTES,
-        ACTION_MENU_LESS,
-        ACTION_EDIT_LOCATION,
-        ACTION_DELETE_EVENT
-    ]
-
-    NEW_EVENT_MENU = [
-        ".",
-        "..",
-        "..."
-    ]
-
     MENU_BAR_1 = " :: MENU :: "
+
+    MAIN_CAL_MENU = [
+        ACTION_NEW_EVENT,
+        ACTION_NEW_QUICK,
+        ACTION_SEARCH,
+        ACTION_GOTO,
+        ACTION_MOD_DEL,
+        ACTION_HELP_MORE,
+    ]
 
 
     @staticmethod
@@ -1289,16 +1325,3 @@ if __name__ == "__main__":
         except HttpError as error:
             print("Here's the error that has occurred: ", error)
             return None
-
-
-    def make_local_card_from_google():
-        cards_to_create = get_new_single_cards_from_google()
-        pp(cards_to_create)
-        title, google_data = cards_to_create[2]
-        # pp(google_data)
-
-        details = google_data["description"] if google_data.get("description") else "...\n...\n...\n"
-        details_as_list = [f"{d}\n" for d in details.split("\n")]
-        title = f"A_{title}"
-
-        l_newcard.write_calendar_card_and_json(title, l_files.cards_calendar_folder, google_data, details_as_list)

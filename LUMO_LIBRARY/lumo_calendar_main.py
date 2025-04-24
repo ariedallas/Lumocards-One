@@ -121,19 +121,21 @@ class CalendarInterface:
 
         action = actions_dict[user_input.upper()]
 
-        if action == Menus.ACTION_LIST_ALL:
+        if action == Menus.ACTION_NEW_EVENT:
+            self.new_event()
+            return False, None, None
+
+        elif action == Menus.ACTION_LIST_ALL:
             self.events_limit = CalendarInterface.EVENTS_LIMIT_HIGH
-            update_menu = True
             old_val = action
             new_val = Menus.ACTION_LIST_FEW
-            return update_menu, old_val, new_val
+            return True, old_val, new_val
 
         elif action == Menus.ACTION_LIST_FEW:
             self.events_limit = CalendarInterface.EVENTS_LIMIT_LOW
-            update_menu = True
             old_val = action
             new_val = Menus.ACTION_LIST_ALL
-            return update_menu, old_val, new_val
+            return True, old_val, new_val
 
         elif action == Menus.ACTION_MENU_LESS:
             self.menu_size = "DAY SHORT"
@@ -402,6 +404,67 @@ class CalendarInterface:
         print(reveal_type(curr_week_block));
         return curr_week_block
 
+    def new_event(self):
+        event_obj = Event("(no title)",
+                         "EMPTY EVENT")
+        event_page = CalendarPageEvent(event_obj)
+
+        while True:
+
+            # clear()
+            event_page.display_event(event_obj)
+            event_page.display_new_event_header()
+            print()
+            self.new_event_prompter()
+            input("???")
+
+    # new event line indicator
+
+    # done to complete with defaults
+    # when 'done', change view to standard event view
+
+    # 1: parse on each turn, update object
+    # when complete:
+        # loop back to day in focus
+        # day with event
+        # show event in focus
+    # or update dict after each data update
+
+    # 2: parse, then ask user for corrections
+    # parse the dictionary
+    # either it passes or fails
+
+    # if it passes, create object, create event, refresh, display
+    # if it fails display errors, use dictionary for updates, prompt
+
+    # how do atomic updates show fails?
+
+    def new_event_prompter(self):
+        new_event_data = {}
+        wh_sp = l_cal_utils.CalendarPageEvent.l_margin_space + "  "
+
+
+        for key, prompt in Menus.NEW_EVENT_PROMPTS.items():
+            full_prompt = wh_sp + prompt + "  "
+
+            if prompt.startswith("Start time"):
+                print()
+            elif prompt.startswith("Edit description"):
+                print()
+
+            user_input = input(full_prompt)
+            new_event_data[key] = user_input
+
+        pp(new_event_data)
+
+    def get_default_action(self):
+        pass
+
+    def update_default_action(self):
+        pass
+    # you'll need to parse previous inputs
+    # to update the default context action
+    # if the parsing breaks the default action is (???)
 
     def _day_index_lookup(self, target_date):
         for idx, db in enumerate(self.day_blocks_window):
