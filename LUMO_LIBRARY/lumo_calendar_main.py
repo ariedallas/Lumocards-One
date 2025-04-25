@@ -1,7 +1,7 @@
 import math
 import subprocess
 import time
-from pprint import pprint as pp
+from itertools import chain
 from typing import Optional, reveal_type
 
 from dateutil.relativedelta import relativedelta
@@ -9,14 +9,10 @@ from dateutil.relativedelta import relativedelta
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_calendar_actions as l_cal_actions
 import LUMO_LIBRARY.lumo_calendar_utils as l_cal_utils
+import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
-from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
-                                              CalendarPageWeek,
-                                              CalendarPageEvent,
-                                              DayBlock,
-                                              Event,
-                                              Menus
-                                              )
+from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay, CalendarPageEvent, CalendarPageWeek, DayBlock, Event,
+                                              Menus)
 
 
 def clear() -> None:
@@ -122,7 +118,7 @@ class CalendarInterface:
         action = actions_dict[user_input.upper()]
 
         if action == Menus.ACTION_NEW_EVENT:
-            self.new_event()
+            self.make_new_event()
             return False, None, None
 
         elif action == Menus.ACTION_LIST_ALL:
@@ -404,64 +400,130 @@ class CalendarInterface:
         print(reveal_type(curr_week_block));
         return curr_week_block
 
-    def new_event(self):
-        event_obj = Event("(no title)",
-                         "EMPTY EVENT")
-        event_page = CalendarPageEvent(event_obj)
 
-        while True:
+    def make_new_event(self):
 
-            # clear()
-            event_page.display_event(event_obj)
-            event_page.display_new_event_header()
-            print()
-            self.new_event_prompter()
-            input("???")
+        # parsed = parse_result(result)
+        # if it's valid update the object,
+        # if it's not reloop
 
-    # new event line indicator
+        # done to complete with defaults
+        # when 'done', change view to standard event view
+        # when 'done', change event type to proper type
 
-    # done to complete with defaults
-    # when 'done', change view to standard event view
-
-    # 1: parse on each turn, update object
-    # when complete:
+        # 1: parse on each turn, update object
+        # when complete:
         # loop back to day in focus
         # day with event
         # show event in focus
-    # or update dict after each data update
+        # or update dict after each data update
 
-    # 2: parse, then ask user for corrections
-    # parse the dictionary
-    # either it passes or fails
+        # 2: parse, then ask user for corrections
+        # parse the dictionary
+        # either it passes or fails
 
-    # if it passes, create object, create event, refresh, display
-    # if it fails display errors, use dictionary for updates, prompt
+        # if it passes, create object, create event, refresh, display
+        # if it fails display errors, use dictionary for updates, prompt
 
-    # how do atomic updates show fails?
+        # how do atomic updates show fails?
 
-    def new_event_prompter(self):
-        new_event_data = {}
+        new_event_dict = {}
+        event_page = CalendarPageEvent(None)
+        event_created = False
+
+        while not event_created:
+            continue_forLoop = False
+            end_idx = len(Menus.NEW_EVENT_CATEGORIES) - 1
+
+            clear()
+            event_page.display_new_event(new_event_dict)
+            event_page.display_prompts_subheader()
+            print()
+
+            for idx, prompt_set in enumerate(Menus.NEW_EVENT_CATEGORIES):
+                keys_iter = chain.from_iterable(d.keys() for d in prompt_set)
+                keys = list(keys_iter)
+
+                if continue_forLoop:
+                    continue
+
+                if idx == end_idx:
+                    key = keys[0]
+                    value = new_event_dict.get(key)
+                    event_created = True
+
+                single_prompt = False if len(prompt_set) > 1 else True
+
+                if single_prompt:
+                    key = keys[0]
+                    value = new_event_dict.get(key)
+                    if value:
+                        continue
+                else:
+                    key_a, key_b = keys
+                    value_a, value_b = (new_event_dict.get(key_a),
+                                        new_event_dict.get(key_b))
+
+                    if value_a and value_b:
+                        continue
+
+                if single_prompt:
+                    prompt = prompt_set[0].get(key)
+                    result = self.prompter_single(prompt)
+                    new_event_dict[key] = result
+                    continue_forLoop = True
+                else:
+                    prompt_one = prompt_set[0].get(key_a)
+                    prompt_two = prompt_set[1].get(key_b)
+                    result_a, result_b = self.prompter_double(prompt_one, prompt_two)
+
+                    new_event_dict[key_a] = result_a
+                    new_event_dict[key_b] = result_b
+                    continue_forLoop = True
+
+        print(new_event_dict); input("???")
+
+
+    def prompter_single(self, prompt):
         wh_sp = l_cal_utils.CalendarPageEvent.l_margin_space + "  "
+        full_prompt = wh_sp + prompt + "  "
+
+        user_input = input(full_prompt)
+
+        if prompt == Menus.P_DESCRIPTION:
+            if (user_input.lower()
+                    in l_menus_data.NEGATIVE_USER_RESPONSES
+                    or user_input == ""):
+                user_input = "none"
+
+        elif prompt == Menus.P_LOCATION:
+            if (user_input.lower()
+                    in l_menus_data.NEGATIVE_USER_RESPONSES
+                    or user_input == ""):
+                user_input = "none"
+
+        return user_input
 
 
-        for key, prompt in Menus.NEW_EVENT_PROMPTS.items():
-            full_prompt = wh_sp + prompt + "  "
+    def prompter_dateTime(self, prompt, date_or_time):
+        pass
 
-            if prompt.startswith("Start time"):
-                print()
-            elif prompt.startswith("Edit description"):
-                print()
 
-            user_input = input(full_prompt)
-            new_event_data[key] = user_input
+    def prompter_double(self, prompt_one, prompt_two):
+        user_input_one = self.prompter_single(prompt_one)
+        user_input_two = self.prompter_single(prompt_two)
 
-        pp(new_event_data)
+        return user_input_one, user_input_two
+
 
     def get_default_action(self):
         pass
 
+
     def update_default_action(self):
         pass
+
+
     # you'll need to parse previous inputs
     # to update the default context action
     # if the parsing breaks the default action is (???)

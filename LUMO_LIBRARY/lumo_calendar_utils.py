@@ -331,9 +331,10 @@ def google_event_to_obj(event):
                                   event_type)
 
     event_obj._add_event_details(id=event["id"],
-                                 description=event.get("description", "..."),
-                                 location=event.get("location", "..."),
-                                 reminders=event["reminders"])
+                                 description=event.get("description"),
+                                 location=event.get("location"),
+                                 reminders=event.get("reminders")
+                                 )
 
     return event_obj
 
@@ -396,16 +397,16 @@ class Event:
     def __init__(self,
                  summary,
                  event_type):
-        self.s_date = None
-        self.e_date = None
         self.s = None
         self.e = None
+        self.s_date = None
+        self.e_date = None
         self.summary = summary
         self.event_type = event_type
 
         self.id = None
-        self.description = "..."
-        self.location = "..."
+        self.description = None
+        self.location = None
         self.reminders = None
 
 
@@ -524,12 +525,29 @@ class CalendarPageEvent:
 
 
     def _row_event_header(self):
-        summary_limited = textwrap.shorten(self.event_obj.summary, width=70, placeholder="...")
+        if not self.event_obj.summary:
+            summary_limited = "(no title)"
+        else:
+            summary_limited = textwrap.shorten(self.event_obj.summary, width=70, placeholder="...")
+
         title = f"EVENT: {summary_limited}"
 
         print()
         print("{0:^{width}}".format(title,
-                                    width=CalendarPageDay.total_width))
+                                    width=CalendarPageEvent.total_width))
+        print()
+
+
+    def _row_new_event_header(self, summary):
+        summary_limited = textwrap.shorten(summary, width=70, placeholder="...")
+
+        title = f"NEW EVENT: {summary_limited}"
+
+        print()
+        print("{0:^{width}}".format(title,
+                                    width=CalendarPageEvent.total_width))
+        print("{0:^{width}}".format(CalendarPageEvent.EVENT_LINE,
+                                    width=CalendarPageEvent.total_width))
         print()
 
 
@@ -559,8 +577,7 @@ class CalendarPageEvent:
             print()
 
 
-    def display_event(self,
-                      event_obj: Event) -> None:
+    def display_event(self, event_obj: Event) -> None:
 
         if not event_obj.s:
             time_info_formatted = "..."
@@ -577,20 +594,26 @@ class CalendarPageEvent:
             date_info_formatted = CalendarPageEvent.dates_formatter(date_info,
                                                                     event_obj.event_type)
 
-        desc_list = event_obj._string_split_newln(event_obj.description)
-        desc_list_limited = list_limiter(desc_list,
-                                         col_width=CalendarPageEvent.EVENT_VALUE,
-                                         row_limit=5)
-
-        location_list = event_obj._string_split_newln(event_obj.location)
-        loc_list_limited = list_limiter(location_list,
-                                        col_width=CalendarPageEvent.EVENT_VALUE,
-                                        row_limit=5)
+        if not event_obj.description:
+            desc_list_limited = ["..."]
+        else:
+            desc_list = event_obj._string_split_newln(event_obj.description)
+            desc_list_limited = list_limiter(desc_list,
+                                             col_width=CalendarPageEvent.EVENT_VALUE,
+                                             row_limit=5)
+        if not event_obj.location:
+            loc_list_limited = ["..."]
+        else:
+            location_list = event_obj._string_split_newln(event_obj.location)
+            loc_list_limited = list_limiter(location_list,
+                                            col_width=CalendarPageEvent.EVENT_VALUE,
+                                            row_limit=5)
 
         if not event_obj.reminders:
             reminder_info = "..."
         else:
             reminder_info = "Default" if event_obj.reminders["useDefault"] == True else "..."
+
 
         self._row_event_header()
         print()
@@ -599,6 +622,45 @@ class CalendarPageEvent:
         CalendarPageEvent._rows_event_list_data("Description:", desc_list_limited)
         CalendarPageEvent._rows_event_list_data("Location:", loc_list_limited)
         CalendarPageEvent._row_event_data("Reminders:", reminder_info)
+        print()
+
+    def display_new_event(self, event_dict):
+        summary = event_dict.get("summary", "(no title)")
+        s_time = event_dict.get("s")
+        e_time = event_dict.get("e")
+        s_date = event_dict.get("s_date")
+        e_date = event_dict.get("e_date")
+
+        description = event_dict.get("description", "none")
+        location = event_dict.get("location", "none")
+        # reminders = event_dict.get("reminders", "...")
+
+        if not s_time and not e_time:
+            time_info_formatted = "..."
+
+        elif s_time == "all day":
+            time_info_formatted = s_time
+
+        else:
+            time_info_formatted = f"{s_time} - {e_time}"
+
+        if not s_date and not e_date:
+            date_info_formatted = "..."
+
+        else:
+            date_info_formatted = f"{s_date} - {e_date}"
+
+        desc_list_limited = [description] if description != "none" else ["..."]
+        loc_list_limited = [location] if location != "none" else ["..."]
+        # reminder_info = reminders
+
+        self._row_new_event_header(summary)
+        print()
+        CalendarPageEvent._row_event_data("Times:", time_info_formatted)
+        CalendarPageEvent._row_event_data("Date:", date_info_formatted)
+        CalendarPageEvent._rows_event_list_data("Description:", desc_list_limited)
+        CalendarPageEvent._rows_event_list_data("Location:", loc_list_limited)
+        # CalendarPageEvent._row_event_data("Reminders:", reminder_info)
         print()
 
 
@@ -637,7 +699,7 @@ class CalendarPageEvent:
         l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
 
 
-    def display_new_event_header(self):
+    def display_prompts_subheader(self):
         wh_sp = CalendarPageEvent.l_margin_space
         date_in_focus = "April 23, 2025"
         date_formatted = f"        (current focus ➝ {date_in_focus})"
@@ -1153,13 +1215,13 @@ class Menus:
     ACTION_EXIT = "Exit"
     ACTION_QUIT = "Quit"
 
-    PROMPT_TITLE = "Title:"
-    PROMPT_S_TIME = "Start time:"
-    PROMPT_E_TIME = "End time ( ➝ +30 mins):"
-    PROMPT_S_DATE = "Start date ( ➝ 13, mon):"
-    PROMPT_E_DATE = "End date ( ➝ 13, mon):"
-    PROMPT_DESCRIPTION = "Edit description? ( ➝ no):"
-    PROMPT_LOCATION = "Edit location? ( ➝ no):"
+    P_TITLE = "Title:"
+    P_S_TIME = "Start time: ( ➝ all day)"
+    P_E_TIME = "End time ( ➝ +30 mins):"
+    P_S_DATE = "Start date ( ➝ 13, mon):"
+    P_E_DATE = "End date ( ➝ 13, mon):"
+    P_DESCRIPTION = "Edit description? ( ➝ no):"
+    P_LOCATION = "Edit location? ( ➝ no):"
 
     EVENT_MENU_SHORT = [
         ACTION_EDIT_TITLE,
@@ -1180,15 +1242,21 @@ class Menus:
         ACTION_DELETE_EVENT
     ]
 
-    NEW_EVENT_PROMPTS = {
-        "title": PROMPT_TITLE,
-        "s_time": PROMPT_S_TIME,
-        "e_time": PROMPT_E_TIME,
-        "s_date": PROMPT_S_DATE,
-        "e_date": PROMPT_E_DATE,
-        "descn": PROMPT_DESCRIPTION,
-        "loctn": PROMPT_LOCATION
-    }
+    PROMPT_TITLE = {"summary": P_TITLE}
+    PROMPT_S_TIME = {"s": P_S_TIME}
+    PROMPT_E_TIME = {"e": P_E_TIME}
+    PROMPT_S_DATE = {"s_date": P_S_DATE}
+    PROMPT_E_DATE = {"e_date": P_E_DATE}
+    PROMPT_DESCRIPTION = {"description": P_DESCRIPTION}
+    PROMPT_LOCATION = {"location": P_LOCATION}
+
+    NEW_EVENT_CATEGORIES = [
+        [PROMPT_TITLE],
+        [PROMPT_S_TIME, PROMPT_E_TIME],
+        [PROMPT_S_DATE, PROMPT_E_DATE],
+        [PROMPT_DESCRIPTION],
+        [PROMPT_LOCATION]
+    ]
 
     DAY_MENU_SHORT = [
         ACTION_NEW_EVENT,
