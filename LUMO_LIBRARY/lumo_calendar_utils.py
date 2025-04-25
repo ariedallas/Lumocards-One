@@ -20,7 +20,6 @@ import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
-import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 creds_file = os.path.join(l_files.credentials_folder, "credentials.json")
@@ -562,6 +561,14 @@ class CalendarPageEvent:
         if use_new_line:
             print()
 
+    @staticmethod
+    def _row_prompt_subheader(col_l, col_lw, col_r, col_rw):
+        subheader = "{:<{width}}".format(col_l, width=col_lw)
+        context_date = "{:>{width}}".format(col_r, width=col_rw)
+
+        group = subheader + context_date
+        # print("{0:^{width}}\n".format(group, width=CalendarPageDay.total_width))
+        print(CalendarPageEvent.l_margin_space + group)
 
     @staticmethod
     def _rows_event_list_data(field, var_list):
@@ -614,7 +621,6 @@ class CalendarPageEvent:
         else:
             reminder_info = "Default" if event_obj.reminders["useDefault"] == True else "..."
 
-
         self._row_event_header()
         print()
         CalendarPageEvent._row_event_data("Times:", time_info_formatted)
@@ -624,8 +630,9 @@ class CalendarPageEvent:
         CalendarPageEvent._row_event_data("Reminders:", reminder_info)
         print()
 
+
     def display_new_event(self, event_dict):
-        summary = event_dict.get("summary", "(no title)")
+        summary = event_dict.get("summary", "")
         s_time = event_dict.get("s")
         e_time = event_dict.get("e")
         s_date = event_dict.get("s_date")
@@ -650,8 +657,20 @@ class CalendarPageEvent:
         else:
             date_info_formatted = f"{s_date} - {e_date}"
 
-        desc_list_limited = [description] if description != "none" else ["..."]
-        loc_list_limited = [location] if location != "none" else ["..."]
+
+        if description == "none":
+            desc_list_limited = ["..."]
+        else:
+            desc_list_limited = list_limiter([description],
+                                             col_width=CalendarPageEvent.EVENT_VALUE,
+                                             row_limit=5)
+
+        if location == "none":
+            loc_list_limited = ["..."]
+        else:
+            loc_list_limited = list_limiter([location],
+                                             col_width=CalendarPageEvent.EVENT_VALUE,
+                                             row_limit=5)
         # reminder_info = reminders
 
         self._row_new_event_header(summary)
@@ -699,11 +718,13 @@ class CalendarPageEvent:
         l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
 
 
-    def display_prompts_subheader(self):
-        wh_sp = CalendarPageEvent.l_margin_space
-        date_in_focus = "April 23, 2025"
-        date_formatted = f"        (current focus ➝ {date_in_focus})"
-        print(wh_sp + "NEW CALENDAR EVENT" + date_formatted)
+    def display_prompts_subheader(self, date_in_focus: datetime.datetime):
+        date_in_focus_formatted = date_in_focus.strftime("%d of %b (%a) %Y ")
+        date_formatted = f"IN FOCUS: {date_in_focus_formatted}"
+
+        self._row_prompt_subheader("NEW CALENDAR EVENT", 20,
+                                   date_formatted, 40)
+        # print(wh_sp + "NEW CALENDAR EVENT" + date_formatted)
 
 
     @staticmethod
@@ -820,7 +841,7 @@ class CalendarPageDay:
         TOGGLE_DICT = {"T": Menus.ACTION_TOGGLE_DAY}
         TOGGLE_MENU = [f"[{k}]  {v}" for k, v in TOGGLE_DICT.items()]
 
-        menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.MAIN_CAL_MENU)
+        menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.DAY_MENU_LONG)
 
         wh_sp = CalendarPageDay.l_margin_space + CalendarPageDay.SELECTOR_SPACE
         whitespace_menu = Menus.add_whitespace_menu_list(menu_list, wh_sp)
@@ -1111,7 +1132,7 @@ class CalendarPageWeek:
         TOGGLE_DICT = {"T": Menus.ACTION_TOGGLE_DAY}
         TOGGLE_MENU = [f"[{k}]  {v}" for k, v in TOGGLE_DICT.items()]
 
-        menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.MAIN_CAL_MENU)
+        menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.WEEK_MENU_SHORT)
 
         wh_sp = CalendarPageWeek.l_margin_menu_space
         whitespace_menu = Menus.add_whitespace_menu_list(menu_list, wh_sp)
@@ -1216,12 +1237,12 @@ class Menus:
     ACTION_QUIT = "Quit"
 
     P_TITLE = "Title:"
-    P_S_TIME = "Start time: ( ➝ all day)"
-    P_E_TIME = "End time ( ➝ +30 mins):"
-    P_S_DATE = "Start date ( ➝ 13, mon):"
-    P_E_DATE = "End date ( ➝ 13, mon):"
-    P_DESCRIPTION = "Edit description? ( ➝ no):"
-    P_LOCATION = "Edit location? ( ➝ no):"
+    P_S_TIME = "Start time ( ➝ all day) :"
+    P_E_TIME = "End time"
+    P_S_DATE = "Start date"
+    P_E_DATE = "End date"
+    P_DESCRIPTION = "Edit description? ( ➝ no) :"
+    P_LOCATION = "Edit location? ( ➝ no) :"
 
     EVENT_MENU_SHORT = [
         ACTION_EDIT_TITLE,
@@ -1292,15 +1313,6 @@ class Menus:
     ]
 
     MENU_BAR_1 = " :: MENU :: "
-
-    MAIN_CAL_MENU = [
-        ACTION_NEW_EVENT,
-        ACTION_NEW_QUICK,
-        ACTION_SEARCH,
-        ACTION_GOTO,
-        ACTION_MOD_DEL,
-        ACTION_HELP_MORE,
-    ]
 
 
     @staticmethod

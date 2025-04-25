@@ -1,9 +1,10 @@
+import datetime
 import math
 import subprocess
-import time
 from itertools import chain
 from typing import Optional, reveal_type
 
+import dateutil.tz
 from dateutil.relativedelta import relativedelta
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
@@ -20,7 +21,7 @@ def clear() -> None:
 
 
 class CalendarInterface:
-    default_view: str = "DAY"
+    default_view: str = "WEEK"
     EVENTS_LIMIT_LOW: int = 6
     EVENTS_LIMIT_HIGH: int = 40
 
@@ -33,6 +34,9 @@ class CalendarInterface:
 
         self.curr_day_idx: int = self._get_idx_for_today()
         self.curr_week_idx: int = self._get_idx_for_curr_week()
+        self.today = datetime.datetime.now(
+            dateutil.tz.tzlocal()).replace(
+            minute=0, second=0, microsecond=0)
 
         self.menu_size: Optional[str] = None
 
@@ -146,8 +150,12 @@ class CalendarInterface:
                              user_input: str,
                              actions_dict: dict[str, str]) -> None:
 
-        print(actions_dict[user_input.upper()])
-        print("lemon")
+        status = None
+        action = actions_dict[user_input.upper()]
+
+        if action == Menus.ACTION_NEW_EVENT:
+            self.make_new_event(default_use_today=True)
+            return status
 
 
     def view_event(self, event_obj: Event) -> None:
@@ -309,7 +317,7 @@ class CalendarInterface:
         curr_week_block: list[DayBlock]
 
         curr_week_block = self.week_blocks_window[self.curr_week_idx]
-        menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.MAIN_CAL_MENU)
+        menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.WEEK_MENU_SHORT)
 
         while True:
             curr_page = CalendarPageWeek(curr_week_block)
@@ -327,8 +335,7 @@ class CalendarInterface:
                 curr_week_block = self.paginate_weeks(user_input)
 
             elif user_input.upper() in menu_dict.keys():
-                self._week_actions_router(user_input, menu_dict)
-                time.sleep(.5)
+                status = self._week_actions_router(user_input, menu_dict)
 
 
             elif curr_page.valid_day_selection(user_input=user_input, var_weekblock=curr_week_block):
@@ -401,8 +408,7 @@ class CalendarInterface:
         return curr_week_block
 
 
-    def make_new_event(self):
-
+    def make_new_event(self, default_use_today=False):
         # parsed = parse_result(result)
         # if it's valid update the object,
         # if it's not reloop
@@ -426,6 +432,11 @@ class CalendarInterface:
         # if it fails display errors, use dictionary for updates, prompt
 
         # how do atomic updates show fails?
+        if not default_use_today:
+            curr_day_block = self.day_blocks_window[self.curr_day_idx]
+            date_in_focus = curr_day_block.date
+        else:
+            date_in_focus = self.today
 
         new_event_dict = {}
         event_page = CalendarPageEvent(None)
@@ -437,7 +448,7 @@ class CalendarInterface:
 
             clear()
             event_page.display_new_event(new_event_dict)
-            event_page.display_prompts_subheader()
+            event_page.display_prompts_subheader(date_in_focus)
             print()
 
             for idx, prompt_set in enumerate(Menus.NEW_EVENT_CATEGORIES):
@@ -476,7 +487,9 @@ class CalendarInterface:
                 else:
                     prompt_one = prompt_set[0].get(key_a)
                     prompt_two = prompt_set[1].get(key_b)
-                    result_a, result_b = self.prompter_double(prompt_one, prompt_two)
+                    result_a, result_b = self.prompter_double(prompt_one,
+                                                              prompt_two,
+                                                              date_in_focus)
 
                     new_event_dict[key_a] = result_a
                     new_event_dict[key_b] = result_b
@@ -491,30 +504,79 @@ class CalendarInterface:
 
         user_input = input(full_prompt)
 
-        if prompt == Menus.P_DESCRIPTION:
+        if prompt == Menus.P_TITLE:
+            user_input_validated = "(no title)" if user_input == "" else user_input
+            # animators use error msg
+
+        elif prompt == Menus.P_DESCRIPTION:
             if (user_input.lower()
                     in l_menus_data.NEGATIVE_USER_RESPONSES
                     or user_input == ""):
-                user_input = "none"
+                user_input_validated = "none"
+
+            else:
+                user_input_validated = user_input
 
         elif prompt == Menus.P_LOCATION:
             if (user_input.lower()
                     in l_menus_data.NEGATIVE_USER_RESPONSES
                     or user_input == ""):
-                user_input = "none"
+                user_input_validated = "none"
 
-        return user_input
-
-
-    def prompter_dateTime(self, prompt, date_or_time):
-        pass
+            else:
+                user_input_validated = user_input
 
 
-    def prompter_double(self, prompt_one, prompt_two):
-        user_input_one = self.prompter_single(prompt_one)
-        user_input_two = self.prompter_single(prompt_two)
+        return user_input_validated
+
+
+    def prompter_dateTime(self, prompt, prev_context, date_in_focus):
+        prompt_with_context = self._contextualize_prompt(prompt, prev_context, date_in_focus)
+        wh_sp = l_cal_utils.CalendarPageEvent.l_margin_space + "  "
+        full_prompt = wh_sp + prompt_with_context + "  "
+
+        user_input = input(full_prompt)
+
+        if prompt == Menus.P_S_TIME:
+            if user_input == "" or user_input.strip().lower() == "all day":
+                user_input_validated = "all day"
+            else:
+                user_input_validated = user_input
+
+        else:
+            user_input_validated = user_input
+
+        return user_input_validated
+
+
+    def prompter_double(self, prompt_one, prompt_two, date_in_focus):
+        user_input_one = self.prompter_dateTime(prompt_one, None, date_in_focus)
+        user_input_two = self.prompter_dateTime(prompt_two, user_input_one, None)
 
         return user_input_one, user_input_two
+
+    def _contextualize_prompt(self, prompt, prev_context, date_in_focus):
+        if prompt == Menus.P_S_TIME:
+            prompt_with_context = prompt
+
+        elif prompt == Menus.P_E_TIME:
+            if prev_context == "all day":
+                prompt_with_context = f"{prompt} ( ➝ same day) :"
+            else:
+                prompt_with_context = f"{prompt} ( + 30 mins) :"
+
+        elif prompt == Menus.P_S_DATE:
+            default_date = date_in_focus.strftime("( ➝ in focus)")
+            prompt_with_context = f"{prompt}  {default_date} :"
+
+        elif prompt == Menus.P_E_DATE:
+            default_date = "( ➝ etc.)"
+            prompt_with_context = f"{prompt}  {default_date} :"
+
+        else:
+            prompt_with_context = prompt
+
+        return prompt_with_context
 
 
     def get_default_action(self):
