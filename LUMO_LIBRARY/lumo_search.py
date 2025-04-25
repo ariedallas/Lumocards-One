@@ -262,6 +262,7 @@ def main(initial_search_from_cli=None):
     status = "INITIAL SEARCH" if initial_search_from_cli else "NEW SEARCH"
     return_path = None
 
+    print()
     while True:
         if status == "INITIAL SEARCH":
             print(f"{status}: '{initial_search_from_cli}'")
