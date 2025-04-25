@@ -413,9 +413,9 @@ class CalendarInterface:
 
         # 1: parse on each turn, update object
         # when complete:
-        # loop back to day in focus
-        # day with event
-        # show event in focus
+            # loop back to day in focus
+            # day with event
+            # show event in focus
         # or update dict after each data update
 
         # 2: parse, then ask user for corrections
@@ -450,7 +450,8 @@ class CalendarInterface:
                 if idx == end_idx:
                     key = keys[0]
                     value = new_event_dict.get(key)
-                    event_created = True
+                    if value:
+                        event_created = True
 
                 single_prompt = False if len(prompt_set) > 1 else True
 
