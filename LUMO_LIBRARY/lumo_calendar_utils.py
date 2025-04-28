@@ -197,7 +197,7 @@ def times_formatter(event_obj, format):
         formatted = "{0:^{width}}".format("all day", width=17)
 
     else:  # event_type == "standard"
-        start = dt_to_time(event_obj.s, format)
+        start = dt_to_time(event_obj.s_1, format)
         end = dt_to_time(event_obj.e, format)
 
         if format == "military":

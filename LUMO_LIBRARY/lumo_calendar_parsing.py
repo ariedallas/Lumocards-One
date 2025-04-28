@@ -1,17 +1,28 @@
 import datetime
+from collections import namedtuple
+
 from dateutil.relativedelta import relativedelta
+
+ParseResult = namedtuple("ParseResult",
+                         [
+                             "type",
+                             "hour",
+                             "increment",
+                             "error"])
 
 
 class CalendarDTParser:
-    def __init__(self, string_1):
-        self.s = string_1
-        self.string = self.s.strip().lower()
+
+    def __init__(self, string_1, string_2):
+        self.string_1 = string_1.strip().lower() if string_1 else None
+        self.string_2 = string_2.strip().lower() if string_2 else None
 
 
-    def get_basic_type(self):
-        if self.string[0].isdigit() \
-                and self.string[-1].isalpha() \
-                and 2 <= len(self.string) <= 4:
+    @staticmethod
+    def get_basic_type(string):
+        if string[0].isdigit() \
+                and string[-1].isalpha() \
+                and 2 <= len(string) <= 4:
             dt_type = "TIME, STANDARD"
 
         else:
@@ -20,54 +31,58 @@ class CalendarDTParser:
         return dt_type
 
 
-    def parse_type(self):
-        dt_type = self.get_basic_type()
+    @staticmethod
+    def parse_type(string):
+        dt_type = CalendarDTParser.get_basic_type(string)
 
         if dt_type == "TIME, STANDARD":
-            parsed = self.parse_startTime_stnd()
+            hour, error = CalendarDTParser.parse_time_stnd(string)
+            increment = None
 
         elif dt_type == "UNKNOWN":
-            parsed = "Unknown input"
+            hour = None
+            increment = None
+            error = "Unknown input"
 
-        return dt_type, parsed
+        Parsed = ParseResult(dt_type, hour, increment, error)
+        return Parsed
 
 
-    def parse_startTime_stnd(self):
+    @staticmethod
+    def parse_time_stnd(string):
         num = None
         add = None
         error = "Please see example times"
 
-        if len(self.string) == 4 and \
-                self.string[:2].isdigit() and \
-                self.string[2:4].isalpha():
+        if len(string) == 4 and \
+                string[:2].isdigit() and \
+                string[2:4].isalpha():
 
-            prefix = self.string[:2]
-            suffix = self.string[-2:]
+            prefix = string[:2]
+            suffix = string[-2:]
 
             if prefix in {"10", "11", "12"} and \
                     suffix in {"am", "pm"}:
                 valid = True
                 num = int(prefix)
-                add = 0 if suffix == "am" else 12
-                dt_frmt = num + add
-
+                dt_frmt = CalendarDTParser.am_pm_addition(num, suffix)
 
             else:
                 error = f"The digits don't make sense with '{suffix}'"
                 valid = False
 
 
-        elif len(self.string) == 3:
+        elif len(string) == 3:
 
-            if self.string[:2].isdigit() and \
-                    self.string[-1] in {"a", "p"}:
+            if string[:2].isdigit() and \
+                    string[-1] in {"a", "p"}:
 
-                num = int(self.string[:2])
-
+                num = int(string[:2])
+                suffix = string[-1]
                 if num in range(9, 13):
                     valid = True
-                    add = 0 if self.string[-1] == "a" else 12
-                    dt_frmt = num + add
+                    dt_frmt = CalendarDTParser.am_pm_addition(num, suffix)
+
 
 
                 else:
@@ -76,14 +91,15 @@ class CalendarDTParser:
 
 
 
-            elif self.string[0].isdigit() and \
-                    self.string[-2:] in {"am", "pm"}:
+            elif string[0].isdigit() and \
+                    string[-2:] in {"am", "pm"}:
 
-                num = int(self.string[0])
+                num = int(string[0])
+                suffix = string[-2:]
                 if num in range(1, 10):
                     valid = True
-                    add = 0 if self.string[-2:] == "am" else 12
-                    dt_frmt = num + add
+                    dt_frmt = CalendarDTParser.am_pm_addition(num, suffix)
+
 
 
                 else:
@@ -94,14 +110,14 @@ class CalendarDTParser:
                 valid = False
 
 
-        elif len(self.string) == 2 and \
-                self.string[-1] in {"a", "p"}:
+        elif len(string) == 2 and \
+                string[-1] in {"a", "p"}:
 
-            num = int(self.string[0])
+            num = int(string[0])
+            suffix = string[-1]
             if num in range(1, 10):
                 valid = True
-                add = 0 if self.string[-1] == "a" else 12
-                dt_frmt = num + add
+                dt_frmt = CalendarDTParser.am_pm_addition(num, suffix)
 
 
             else:
@@ -112,16 +128,37 @@ class CalendarDTParser:
         else:
             valid = False
 
-
         if valid:
-            return self.string, num, add, dt_frmt
+            error = None
+            return dt_frmt, error
         else:
-            return f"Unknown input: {error}"
+            return None, f"Unknown input: {error}"
 
 
-    @classmethod
-    def parse_for_am_pm(ltr):
-        return True if ltr in {"a", "p"} else False
+    def compare_time_data(self):
+        Parse_1 = CalendarDTParser.parse_type(self.string_1)
+        Parse_2 = CalendarDTParser.parse_type(self.string_2)
+
+        if Parse_1.type == "TIME, STANDARD" and \
+                Parse_2.type == "TIME, STANDARD":
+            time_obj_1 = datetime.time(hour=Parse_1.hour)
+            time_obj_2 = datetime.time(hour=Parse_2.hour)
+
+
+        print(Parse_1, Parse_2)
+        print(time_obj_1, time_obj_2)
+
+
+    @staticmethod
+    def am_pm_addition(num, suffix):
+        if num == 12 and suffix in {"a", "am"}:
+            return 0
+        elif num == 12 and suffix in {"p", "pm"}:
+            return 12
+        else:
+            add = 0 if suffix in {"a", "am"} else 12
+            dt_num = num + add
+            return dt_num
 
 
     def parse_endTime(self):
@@ -136,5 +173,5 @@ class CalendarDTParser:
         pass
 
 
-parser = CalendarDTParser('1pm')
-print(parser.parse_type())
+parser = CalendarDTParser("12a", "2am")
+parser.compare_time_data()
