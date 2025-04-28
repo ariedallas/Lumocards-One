@@ -136,5 +136,5 @@ class CalendarDTParser:
         pass
 
 
-parser = CalendarDTParser('1pm', '2pm')
+parser = CalendarDTParser('1pm')
 print(parser.parse_type())
