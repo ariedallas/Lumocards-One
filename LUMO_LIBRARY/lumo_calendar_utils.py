@@ -516,7 +516,8 @@ class CalendarPageEvent:
 
     cursor_indent_space = l_margin_space + EVENT_MENU_SPACE
 
-    msg_indent_amt = l_margin_num + EVENT_MENU_NUDGE + 5
+    msg_indent_1 = l_margin_num + EVENT_MENU_NUDGE + 5
+    msg_indent_2 = l_margin_num + EVENT_MENU_NUDGE
 
 
     def __init__(self, var_event_obj):

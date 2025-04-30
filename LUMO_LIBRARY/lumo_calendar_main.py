@@ -4,12 +4,13 @@ import subprocess
 from itertools import chain
 from typing import Optional, reveal_type
 
-import dateutil.tz
+from dateutil.tz import tzlocal
 from dateutil.relativedelta import relativedelta
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_calendar_actions as l_cal_actions
 import LUMO_LIBRARY.lumo_calendar_utils as l_cal_utils
+import LUMO_LIBRARY.lumo_calendar_parsing as l_cal_parse
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay, CalendarPageEvent, CalendarPageWeek, DayBlock, Event,
@@ -35,7 +36,7 @@ class CalendarInterface:
         self.curr_day_idx: int = self._get_idx_for_today()
         self.curr_week_idx: int = self._get_idx_for_curr_week()
         self.today = datetime.datetime.now(
-            dateutil.tz.tzlocal()).replace(
+            tzlocal()).replace(
             minute=0, second=0, microsecond=0)
 
         self.menu_size: Optional[str] = None
@@ -66,26 +67,26 @@ class CalendarInterface:
 
         if action == Menus.ACTION_EDIT_TITLE:
             l_animators.animate_text_indented("Edited event",
-                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              indent=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
             return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_EDIT_TIMES:
             l_animators.animate_text_indented("Edited times",
-                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              indent=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
             return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_EDIT_DATE:
             l_animators.animate_text_indented("Edited date",
-                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              indent=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
             return False, None, None, "UPDATED EVENT"
 
 
         elif action == Menus.ACTION_EDIT_NOTES:
             l_animators.animate_text_indented("Edited notes",
-                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              indent=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
             return False, None, None, "UPDATED DESCRIPTION"
 
@@ -99,14 +100,14 @@ class CalendarInterface:
 
         elif action == Menus.ACTION_EDIT_LOCATION:
             l_animators.animate_text_indented("Edited locations",
-                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              indent=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
             return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_DELETE_EVENT:
             l_cal_actions.delete_event(event_obj.id)
             l_animators.animate_text_indented("Deleted event",
-                                              indent=CalendarPageEvent.msg_indent_amt,
+                                              indent=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
 
             return False, None, None, "DELETED EVENT"
@@ -196,13 +197,13 @@ class CalendarInterface:
 
             elif user_input.lower() in {"s", "save"}:
                 l_animators.animate_text_indented("Saved event",
-                                                  indent=CalendarPageEvent.msg_indent_amt,
+                                                  indent=CalendarPageEvent.msg_indent_1,
                                                   finish_delay=.5)
                 break
 
             else:
                 l_animators.animate_text_indented("Unrecognized option...",
-                                                  indent=CalendarPageEvent.msg_indent_amt,
+                                                  indent=CalendarPageEvent.msg_indent_1,
                                                   finish_delay=.5)
 
 
@@ -409,21 +410,6 @@ class CalendarInterface:
 
 
     def make_new_event(self, default_use_today=False):
-        # parsed = parse_result(result)
-        # if it's valid update the object,
-        # if it's not reloop
-
-        # done to complete with defaults
-        # when 'done', change view to standard event view
-        # when 'done', change event type to proper type
-
-        # 1: parse on each turn, update object
-        # when complete:
-            # loop back to day in focus
-            # day with event
-            # show event in focus
-        # or update dict after each data update
-
         # 2: parse, then ask user for corrections
         # parse the dictionary
         # either it passes or fails
@@ -440,6 +426,7 @@ class CalendarInterface:
 
         new_event_dict = {}
         event_page = CalendarPageEvent(None)
+        dt_parser = l_cal_parse.NewEventParser()
         event_created = False
 
         while not event_created:
@@ -487,15 +474,39 @@ class CalendarInterface:
                 else:
                     prompt_one = prompt_set[0].get(key_a)
                     prompt_two = prompt_set[1].get(key_b)
+
+                    target_1, target_2 = ("start time", "end time") \
+                        if prompt_one == Menus.P_S_TIME \
+                        else ("start date", "end date")
+
                     result_a, result_b = self.prompter_double(prompt_one,
                                                               prompt_two,
                                                               date_in_focus)
 
-                    new_event_dict[key_a] = result_a
-                    new_event_dict[key_b] = result_b
-                    continue_forLoop = True
 
-        print(new_event_dict); input("???")
+                    dt_parser.parse_type(result_a, target_1)
+                    dt_parser.parse_type(result_b, target_2)
+
+                    if dt_parser.extrapolate_time_data() and \
+                            not dt_parser.extrapolate_date_data():
+                        new_event_dict[key_a] = dt_parser.start_time.display
+
+                        new_event_dict[key_b] = dt_parser.end_time.display
+
+                        continue_forLoop = True
+
+                    elif dt_parser.extrapolate_date_data() and \
+                            dt_parser.extrapolate_date_data():
+                        new_event_dict[key_a] = result_a
+                        new_event_dict[key_b] = result_b
+                        continue_forLoop = True
+
+                    else:
+                        continue_forLoop = True
+                        continue
+
+        print(new_event_dict);
+        input("???")
 
 
     def prompter_single(self, prompt):
@@ -526,27 +537,23 @@ class CalendarInterface:
             else:
                 user_input_validated = user_input
 
-
         return user_input_validated
 
 
     def prompter_dateTime(self, prompt, prev_context, date_in_focus):
         prompt_with_context = self._contextualize_prompt(prompt, prev_context, date_in_focus)
         wh_sp = l_cal_utils.CalendarPageEvent.l_margin_space + "  "
+        wh_sp_num = l_cal_utils.CalendarPageEvent.msg_indent_2
         full_prompt = wh_sp + prompt_with_context + "  "
 
+        if prompt == Menus.P_E_TIME:
+            if prev_context == "":
+                return ""
+            elif prev_context == "all day":
+                return "all day"
+
         user_input = input(full_prompt)
-
-        if prompt == Menus.P_S_TIME:
-            if user_input == "" or user_input.strip().lower() == "all day":
-                user_input_validated = "all day"
-            else:
-                user_input_validated = user_input
-
-        else:
-            user_input_validated = user_input
-
-        return user_input_validated
+        return user_input
 
 
     def prompter_double(self, prompt_one, prompt_two, date_in_focus):
@@ -555,12 +562,13 @@ class CalendarInterface:
 
         return user_input_one, user_input_two
 
+
     def _contextualize_prompt(self, prompt, prev_context, date_in_focus):
         if prompt == Menus.P_S_TIME:
             prompt_with_context = prompt
 
         elif prompt == Menus.P_E_TIME:
-            if prev_context == "all day":
+            if prev_context == "all day" or prev_context == "":
                 prompt_with_context = f"{prompt} ( ➝ same day) :"
             else:
                 prompt_with_context = f"{prompt} ( + 30 mins) :"

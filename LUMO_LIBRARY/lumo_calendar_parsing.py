@@ -1,29 +1,50 @@
 import datetime
 from collections import namedtuple
 
+from dateutil.tz import tzlocal
 from dateutil.relativedelta import relativedelta
+
+from LUMO_LIBRARY.lumo_card_utils import test_for_float
 
 ParseResult = namedtuple("ParseResult",
                          [
                              "type",
                              "hour",
                              "increment",
+                             "dt_obj",
+                             "display",
                              "error"])
 
 
-class CalendarDTParser:
+class NewEventParser:
 
-    def __init__(self, string_1, string_2):
-        self.string_1 = string_1.strip().lower() if string_1 else None
-        self.string_2 = string_2.strip().lower() if string_2 else None
+    def __init__(self):
+        self.start_time = None
+        self.end_time = None
 
 
     @staticmethod
-    def get_basic_type(string):
-        if string[0].isdigit() \
+    def get_basic_type(string, target):
+        if string == "":
+            dt_type = "DEFAULT"
+
+        elif test_for_float(string[0:-1]) and \
+            string[-1] == "m" and \
+                target == "end time":
+            dt_type = "TIME, INCREMENT"
+
+        elif test_for_float(string[0:-1]) and \
+            string[-1] == "h" and \
+            target == "end time":
+            dt_type = "TIME, INCREMENT"
+
+        elif string[0].isdigit() \
                 and string[-1].isalpha() \
                 and 2 <= len(string) <= 4:
             dt_type = "TIME, STANDARD"
+
+        elif string == "all day":
+            dt_type = "TIME, ALL DAY"
 
         else:
             dt_type = "UNKNOWN"
@@ -31,21 +52,57 @@ class CalendarDTParser:
         return dt_type
 
 
-    @staticmethod
-    def parse_type(string):
-        dt_type = CalendarDTParser.get_basic_type(string)
+    def parse_type(self, input_string, target):
+        string = input_string.strip().lower()
 
-        if dt_type == "TIME, STANDARD":
-            hour, error = CalendarDTParser.parse_time_stnd(string)
-            increment = None
+        hour = None
+        increment = None
+        dt_obj = None
+        display = None
+        error = None
+
+        dt_type = NewEventParser.get_basic_type(string, target)
+
+        if dt_type == "DEFAULT" and target == "start time":
+            display = "all day"
+
+        elif dt_type == "DEFAULT" and target == "end time":
+            dt_obj = self.start_time.dt_obj + relativedelta(minutes=30)
+            display = dt_obj.time().strftime("%I:%M %p").lower()
+            dt_type = "TIME, INCREMENT"
+
+        elif dt_type == "TIME, STANDARD":
+            hour, error = NewEventParser.parse_time_stnd(string)
+            if not error:
+                dt_obj = datetime.datetime.now().replace(hour=hour,
+                                                         minute=0,
+                                                         second=0,
+                                                         microsecond=0)
+                display = dt_obj.time().strftime("%I:%M %p").lower()
+            else:
+                dt_type = "UNKNOWN"
+
+        elif dt_type == "TIME, ALL DAY" and \
+                (target == "start time" or target == "end time"):
+            display = "all day"
+
+        elif dt_type == "TIME, INCREMENT":
+            min_add, error = NewEventParser.parse_time_increment(string)
+            if not error:
+                dt_obj = self.start_time.dt_obj + relativedelta(minutes=min_add)
+                display = dt_obj.time().strftime("%I:%M %p").lower()
+            else:
+                dt_type = "UNKNOWN"
 
         elif dt_type == "UNKNOWN":
-            hour = None
-            increment = None
             error = "Unknown input"
 
-        Parsed = ParseResult(dt_type, hour, increment, error)
-        return Parsed
+        Parsed = ParseResult(dt_type, hour, increment, dt_obj, display, error)
+
+        if target == "start time":
+            self.start_time = Parsed
+        elif target == "end time":
+            self.end_time = Parsed
 
 
     @staticmethod
@@ -65,7 +122,7 @@ class CalendarDTParser:
                     suffix in {"am", "pm"}:
                 valid = True
                 num = int(prefix)
-                dt_frmt = CalendarDTParser.am_pm_addition(num, suffix)
+                dt_frmt = NewEventParser.am_pm_addition(num, suffix)
 
             else:
                 error = f"The digits don't make sense with '{suffix}'"
@@ -81,15 +138,11 @@ class CalendarDTParser:
                 suffix = string[-1]
                 if num in range(9, 13):
                     valid = True
-                    dt_frmt = CalendarDTParser.am_pm_addition(num, suffix)
-
-
+                    dt_frmt = NewEventParser.am_pm_addition(num, suffix)
 
                 else:
                     valid = False
                     error = "These digits aren't 10, 11, or 12"
-
-
 
             elif string[0].isdigit() and \
                     string[-2:] in {"am", "pm"}:
@@ -98,9 +151,7 @@ class CalendarDTParser:
                 suffix = string[-2:]
                 if num in range(1, 10):
                     valid = True
-                    dt_frmt = CalendarDTParser.am_pm_addition(num, suffix)
-
-
+                    dt_frmt = NewEventParser.am_pm_addition(num, suffix)
 
                 else:
                     valid = False
@@ -117,13 +168,11 @@ class CalendarDTParser:
             suffix = string[-1]
             if num in range(1, 10):
                 valid = True
-                dt_frmt = CalendarDTParser.am_pm_addition(num, suffix)
-
+                dt_frmt = NewEventParser.am_pm_addition(num, suffix)
 
             else:
                 valid = False
                 error = "The number 0 doesn't work here"
-
 
         else:
             valid = False
@@ -134,19 +183,93 @@ class CalendarDTParser:
         else:
             return None, f"Unknown input: {error}"
 
+    @staticmethod
+    def parse_time_increment(string):
+        increment = None
+        error = ("Example durations:\n"
+                 "'5h' = 5 hours\n"
+                 "'2.5h' = 2 hours 30 minutes"
+                 "'30m' = 30 minutes")
 
-    def compare_time_data(self):
-        Parse_1 = CalendarDTParser.parse_type(self.string_1)
-        Parse_2 = CalendarDTParser.parse_type(self.string_2)
+        increment = float(string[0:-1])
+        suffix = string[-1]
 
-        if Parse_1.type == "TIME, STANDARD" and \
-                Parse_2.type == "TIME, STANDARD":
-            time_obj_1 = datetime.time(hour=Parse_1.hour)
-            time_obj_2 = datetime.time(hour=Parse_2.hour)
+        time_notation = "minute" if suffix == "m" else "hour"
+
+        if increment < 5 and time_notation == "minute":
+            valid = False
+            error = "Cannot make events shorter than 5 minutes."
+
+        elif increment < .1 and time_notation == "hour":
+            valid = False
+            error = "Cannot make events shorter than .1 hours."
+
+        elif increment >= 24 and time_notation == "hour":
+            valid = False
+            error = "Cannot set duration greater than 23.99 hours"
+
+        elif increment >= 1440 and time_notation == "minute":
+            valid = False
+            error = "Cannot set duration greater than 1439 minutes"
+
+        elif increment == 0:
+            valid = False
+            error = "Cannot set duration of 0"
+
+        else:
+            valid = True
+
+        if time_notation == "hour":
+            minutes = round(increment * 60)
+        else:
+            minutes = int(increment)
+
+        if valid:
+            error = None
+            return minutes, error
+        else:
+            return None, f"Error: {error}."
 
 
-        print(Parse_1, Parse_2)
-        print(time_obj_1, time_obj_2)
+    def extrapolate_time_data(self):
+
+        if self.start_time.type == "TIME, STANDARD" and \
+                self.end_time.type == "TIME, STANDARD":
+            start = self.start_time.dt_obj
+            end = self.end_time.dt_obj
+
+            if start < end:
+                return True
+            else:
+                return False
+
+        if self.start_time.type == "TIME, STANDARD" and \
+            self.end_time.type == "TIME, INCREMENT":
+
+            start = self.start_time.dt_obj
+            end = self.end_time.dt_obj
+
+            if start.day == end.day:
+                return True
+            else:
+                comparison_error = ("Can only set duration"
+                                       "up to the end of the day")
+                return False
+
+        elif self.start_time.type == "DEFAULT" and \
+                self.end_time.type == "DEFAULT":
+            return True
+
+        elif self.start_time.type == "TIME, ALL DAY" and \
+                self.end_time.type == "TIME, ALL DAY":
+            return True
+
+        else:
+            return False
+
+
+    def extrapolate_date_data(self):
+        return False
 
 
     @staticmethod
@@ -161,10 +284,6 @@ class CalendarDTParser:
             return dt_num
 
 
-    def parse_endTime(self):
-        pass
-
-
     def parse_startDate(self):
         pass
 
@@ -173,5 +292,18 @@ class CalendarDTParser:
         pass
 
 
-parser = CalendarDTParser("12a", "2am")
-parser.compare_time_data()
+if __name__ == "__main__":
+    test = "0.1"
+    test_b = "12"
+    test_c = ".5"
+    test_d = "0.1.2"
+
+    print()
+
+    parser = NewEventParser()
+    parser.parse_type("2pm", "start time")
+    print(parser.start_time)
+    parser.parse_type("9h", "end time")
+    print(parser.end_time)
+
+    print(parser.extrapolate_time_data())
