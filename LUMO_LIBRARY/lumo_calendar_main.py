@@ -426,7 +426,7 @@ class CalendarInterface:
 
         new_event_dict = {}
         event_page = CalendarPageEvent(None)
-        dt_parser = l_cal_parse.NewEventParser()
+        dt_parser = l_cal_parse.NewEventParser(date_in_focus)
         event_created = False
 
         while not event_created:
@@ -479,6 +479,9 @@ class CalendarInterface:
                         if prompt_one == Menus.P_S_TIME \
                         else ("start date", "end date")
 
+                    # I think you need to split this up so that you can handle
+                    # errors/and confirmations in dates as it's own function
+                    # OR, try it first with prompter_dateTime
                     result_a, result_b = self.prompter_double(prompt_one,
                                                               prompt_two,
                                                               date_in_focus)
@@ -486,6 +489,8 @@ class CalendarInterface:
 
                     dt_parser.parse_type(result_a, target_1)
                     dt_parser.parse_type(result_b, target_2)
+
+                    print(dt_parser.start_date, dt_parser.end_date); input("???")
 
                     if dt_parser.extrapolate_time_data() and \
                             not dt_parser.extrapolate_date_data():
@@ -497,8 +502,8 @@ class CalendarInterface:
 
                     elif dt_parser.extrapolate_date_data() and \
                             dt_parser.extrapolate_date_data():
-                        new_event_dict[key_a] = result_a
-                        new_event_dict[key_b] = result_b
+                        new_event_dict[key_a] = dt_parser.end_date.display
+                        new_event_dict[key_b] = dt_parser.start_date.display
                         continue_forLoop = True
 
                     else:

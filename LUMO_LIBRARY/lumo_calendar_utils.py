@@ -572,10 +572,10 @@ class CalendarPageEvent:
         print(CalendarPageEvent.l_margin_space + group)
 
     @staticmethod
-    def _rows_event_list_data(field, var_list):
+    def _rows_event_list_data(col_l, var_list):
         single_row = True if len(var_list) <= 1 else False
 
-        CalendarPageEvent._row_event_data(field, var_list[0], single_row)
+        CalendarPageEvent._row_event_data(col_l, var_list[0], single_row)
 
         end = len(var_list)
         for remaining in var_list[1:end]:
@@ -644,19 +644,21 @@ class CalendarPageEvent:
         # reminders = event_dict.get("reminders", "...")
 
         if not s_time and not e_time:
-            time_info_formatted = "..."
+            time_info_f = "..."
 
         elif s_time == "all day":
-            time_info_formatted = s_time
+            time_info_f = s_time
 
         else:
-            time_info_formatted = f"{s_time} - {e_time}"
+            time_info_f = f"{s_time} - {e_time}"
 
         if not s_date and not e_date:
-            date_info_formatted = "..."
+            start_date_f = "..."
+            end_date_f = "..."
 
         else:
-            date_info_formatted = f"{s_date} - {e_date}"
+            start_date_f = s_date
+            end_date_f = e_date
 
 
         if description == "none":
@@ -676,8 +678,9 @@ class CalendarPageEvent:
 
         self._row_new_event_header(summary)
         print()
-        CalendarPageEvent._row_event_data("Times:", time_info_formatted)
-        CalendarPageEvent._row_event_data("Date:", date_info_formatted)
+        CalendarPageEvent._row_event_data("Times:", time_info_f)
+        CalendarPageEvent._row_event_data("Start Date:", start_date_f)
+        CalendarPageEvent._row_event_data("End Date:", end_date_f)
         CalendarPageEvent._rows_event_list_data("Description:", desc_list_limited)
         CalendarPageEvent._rows_event_list_data("Location:", loc_list_limited)
         # CalendarPageEvent._row_event_data("Reminders:", reminder_info)
@@ -725,7 +728,6 @@ class CalendarPageEvent:
 
         self._row_prompt_subheader("NEW CALENDAR EVENT", 20,
                                    date_formatted, 40)
-        # print(wh_sp + "NEW CALENDAR EVENT" + date_formatted)
 
 
     @staticmethod
