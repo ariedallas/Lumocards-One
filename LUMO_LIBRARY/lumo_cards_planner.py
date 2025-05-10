@@ -28,13 +28,12 @@ day, day_num, month, year = l_files.isolate_date_units()
 def cards_intro():
     print()
 
-    l_animators.animate_text(f"IT'S DAY: {days_since_birth}", speed=.075)
-    l_animators.animate_text(f"IT'S: {day.upper()}, {day_num} of {month.upper()}, {year}", speed=.075, finish_delay=.5)
-
-    l_animators.list_printer([f"VERSION: {l_files.parents[1].name}"], speed_interval=.5)
-    l_animators.list_printer([""], speed_interval=.5)
-    l_animators.list_printer(["RUNNING: NEAR FOCUS CARDS"], speed_interval=.5)
-    l_animators.animate_text(" ...", speed=.075)
+    l_animators.list_printer([
+        f"IT'S DAY: {days_since_birth}",
+        f"IT'S: {day.upper()}, {day_num} of {month.upper()}, {year}",
+        f"VERSION: {l_files.parents[1].name}",
+        "",
+        "RUNNING: NEAR FOCUS CARDS"])
 
 
 def add_step_via_integers(card_steps, card_title, user_input):
@@ -246,8 +245,8 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
                     card_filename=card_filename)
 
                 status, possible_returned_card = l_menus_funcs.menu_modify_card(selected_card=card_filename,
-                                                                          var_hotkey_list=hotkey_list,
-                                                                          var_hotkey_dict=hotkey_dict)
+                                                                                var_hotkey_list=hotkey_list,
+                                                                                var_hotkey_dict=hotkey_dict)
                 if possible_returned_card:
                     return "RELOOP", possible_returned_card
 
@@ -267,8 +266,8 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
             elif menu_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING_2:
                 card_title_formatted = l_card_utils.format_card_title(card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus_funcs.prep_newcard_menu(l_menus_data.RECURRING_MENU,
-                                                                       l_menus_data.LETTERS_FILTERED,
-                                                                       pop_letters=False)
+                                                                             l_menus_data.LETTERS_FILTERED,
+                                                                             pop_letters=False)
                 print()
                 l_animators.list_printer([card_title_formatted])
                 print()
@@ -434,8 +433,6 @@ def main():
             review_and_write_recurring()
 
     update_cards()
-
-
 
 
 if __name__ == "__main__":
