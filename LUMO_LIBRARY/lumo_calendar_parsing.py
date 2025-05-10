@@ -3,6 +3,7 @@ import datetime
 import sys
 from collections import namedtuple
 
+import dateutil.parser
 from dateutil.tz import tzlocal
 from dateutil.relativedelta import relativedelta
 
@@ -36,11 +37,13 @@ class NewEventParser:
 
         elif test_for_float(string[0:-1]) and \
                 string[-1] == "m" and \
+                (not "a" in string and not "p" in string) and \
                 target == "end time":
             dt_type = "TIME, INCREMENT"
 
         elif test_for_float(string[0:-1]) and \
                 string[-1] == "h" and \
+                (not "a" in string and not "p" in string) and \
                 target == "end time":
             dt_type = "TIME, INCREMENT"
 
@@ -336,16 +339,6 @@ class DateSpacedParser:
 
     def parse_date_spaced(self):
         """
-        Check that of the items, there is always a two-digit number that is 1 - 31
-
-        If there is and there are two items:
-            - make sure that the second item is the month
-
-        Elif there is and there are three items:
-            -make sure that the other two follow format
-            -year format
-            -month format
-
         if they are all valid and the combination is valid,
         make sure that the date is actually a valid calendar date
         else: error
@@ -354,10 +347,8 @@ class DateSpacedParser:
         and give it back to extrapolate_date_data
 
         If the day is given alone, infer from the date in focus the
-
-        maybe make a sub function for test_day, test_month, test_year_format
-
         """
+
         valid = True
         error = None
         str_elements = self.string.split()
@@ -374,12 +365,18 @@ class DateSpacedParser:
             valid = False
             error = "Error, please see example formats."
 
+        if Elements:
+            DateSpacedParser._test_valid_date(Elements)
+
         if valid:
             print(Elements, error)
             return Elements, error
         else:
             print(self.string, error)
 
+    @staticmethod
+    def _test_valid_date(Elements):
+        print(Elements)
 
     def test_type(self):
         pass
@@ -445,17 +442,7 @@ class DateSpacedParser:
         error = None
 
         if len(elements) == 3:
-            day = month = year = None
-            for e in elements:
-                if DateSpacedParser._possible_day(e):
-                    day = int(e)
-                elif DateSpacedParser._possible_month(e):
-                    e_slice = e[:3]
-                    month = DateSpacedParser.month_to_int_dict[e_slice]
-                elif DateSpacedParser._possible_year(e):
-                    year = int(e)
-
-            Elements = self.Elements(day, month, year)
+            Elements = self._fill_Elements(elements)
 
             if all(Elements):
                 return Elements, error
@@ -463,18 +450,8 @@ class DateSpacedParser:
                 error = "Error, please see example formats."
                 return None, error
 
-        else:  # len(var_list) == 2:
-            day = month = year = None
-            for e in elements:
-                if DateSpacedParser._possible_day(e):
-                    day = int(e)
-                elif DateSpacedParser._possible_month(e):
-                    e_slice = e[:3]
-                    month = DateSpacedParser.month_to_int_dict[e_slice]
-                elif DateSpacedParser._possible_year(e):
-                    year = int(e)
-
-            Elements = self.Elements(day, month, year)
+        else:  # len(var_list) == 2
+            Elements = self._fill_Elements(elements)
 
             if Elements.day and Elements.month:
                 return Elements, error
@@ -482,9 +459,26 @@ class DateSpacedParser:
                 error = "Error, please see example formats."
                 return None, error
 
+    def _fill_Elements(self, elements):
+        day = month = year = None
+        for e in elements:
+            if DateSpacedParser._possible_day(e):
+                day = int(e)
+            elif DateSpacedParser._possible_month(e):
+                e_slice = e[:3]
+                month = DateSpacedParser.month_to_int_dict[e_slice]
+            elif DateSpacedParser._possible_year(e):
+                year = int(e)
+
+        Elements = self.Elements(day, month, year)
+        return Elements
 
 if __name__ == "__main__":
-    date_parser = DateSpacedParser("  30 septem")
+    DEFAULT = datetime.datetime(2025, 9, 25)
+    a = dateutil.parser.parse("11:30a")
+    print(a)
+
+    date_parser = DateSpacedParser(" septem 30 ")
     date_parser.parse_date_spaced()
 
     sys.exit()
