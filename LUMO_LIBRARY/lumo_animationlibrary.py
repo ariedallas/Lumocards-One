@@ -1,4 +1,5 @@
 import time
+import subprocess
 from typing import Optional
 
 
@@ -50,6 +51,15 @@ def list_printer(text_list: Optional[list[str]] = None,
         else:
             print(item)
         time.sleep(speed_interval)
+
+def clear() -> None:
+    subprocess.run(["clear"], shell=True)
+
+
+def load_dots() -> None:
+    print("\033[33;1m", end="")
+    animate_text(" ...", speed=.1)
+    print("\033[0m", end="")
 
 
 if __name__ == "__main__":

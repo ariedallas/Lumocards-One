@@ -11,6 +11,8 @@ import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 
+import LUMO_LIBRARY.lumo_calendar_main as l_cal
+
 settings = l_files.get_json_settings()
 
 reviewed_cards = []
@@ -23,6 +25,8 @@ archived_cards = []
 deleted_cards = []
 days_since_birth = l_files.get_days_from_date(1988, 6, 12)
 day, day_num, month, year = l_files.isolate_date_units()
+
+cal_interface = l_cal.CalendarInterface()
 
 
 def cards_intro():
@@ -148,7 +152,7 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
         reviewed_recurring_cards.append(card_filename)
 
     elif user_input_filtered in l_menus_data.NEGATIVE_USER_RESPONSES:  # I.E. QUIT
-        l_animators.animate_text(text="Quitted card review.", speed=.075)
+        l_animators.animate_text(text="Quitted card review.")
         return False
 
     elif user_input_filtered[0].isnumeric():
@@ -260,7 +264,14 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
                     return "RELOOP", card_filename
 
             elif menu_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
-                l_animators.animate_text("  This feature not fully available")
+                l_animators.clear()
+                l_animators.load_dots()
+
+                cal_interface.make_new_event()
+
+                l_animators.clear()
+                l_animators.load_dots()
+
                 return "CARD REFOCUSED", None
 
             elif menu_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING_2:

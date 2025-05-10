@@ -39,7 +39,7 @@ def get_argument_parser() -> argparse.ArgumentParser:
         , description="The calendar can be used to schedule events and sync them to Google Calendar."
     )
     sub_parser.add_parser(
-        "cardsrun"
+        "cards"
         , help="Alternate shortcut name to run Lumocards."
         , description="Alternate shortcut to run Lumocards."
     )
@@ -318,7 +318,7 @@ def router(cli_input: Optional[argparse.Namespace],
         return None, main_menu
 
     elif (selected_prog.lower() in {"planner", "cards planner", "cards"} or
-          cli_prog.lower() in {"planner"} or
+          cli_prog.lower() in {"planner", "cards"} or
           selected_prog_dict_value in {"Cards Planner"}):
 
         LumoMenu.load_transition()
