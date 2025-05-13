@@ -280,8 +280,6 @@ class NewEventParser:
             if start.day == end.day:
                 return True
             else:
-                comparison_error = ("Can only set duration"
-                                    "up to the end of the day")
                 return False
 
         elif self.start_time.type == "DEFAULT" and \
@@ -475,7 +473,7 @@ class DateSpacedParser:
 
 if __name__ == "__main__":
     DEFAULT = datetime.datetime(2025, 9, 25)
-    a = dateutil.parser.parse("11:30a")
+    a = dateutil.parser.parse("")
     print(a)
 
     date_parser = DateSpacedParser(" septem 30 ")

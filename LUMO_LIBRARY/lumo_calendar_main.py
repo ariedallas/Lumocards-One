@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_calendar_actions as l_cal_actions
 import LUMO_LIBRARY.lumo_calendar_utils as l_cal_utils
-import LUMO_LIBRARY.lumo_calendar_parsing as l_cal_parse
+import LUMO_LIBRARY.lumo_calendar_parsing_2 as l_cal_parse
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay, CalendarPageEvent, CalendarPageWeek, DayBlock, Event,
@@ -475,7 +475,7 @@ class CalendarInterface:
                     prompt_one = prompt_set[0].get(key_a)
                     prompt_two = prompt_set[1].get(key_b)
 
-                    target_1, target_2 = ("start time", "end time") \
+                    target_a, target_b = ("start time", "end time") \
                         if prompt_one == Menus.P_S_TIME \
                         else ("start date", "end date")
 
@@ -487,28 +487,36 @@ class CalendarInterface:
                                                               date_in_focus)
 
 
-                    dt_parser.parse_type(result_a, target_1)
-                    dt_parser.parse_type(result_b, target_2)
+                    dt_parser.parse_type(result_a, target_a)
+                    dt_parser.parse_type(result_b, target_b)
 
-                    print(dt_parser.start_date, dt_parser.end_date); input("???")
+                    print(dt_parser.start_time.error, dt_parser.start_time.type,
+                          dt_parser.end_time.error, dt_parser.end_time.type); input("???")
+                    valid_time, _ = dt_parser.extrapolate_time_data()
+                    valid_date, _ = dt_parser.extrapolate_date_data()
 
-                    if dt_parser.extrapolate_time_data() and \
-                            not dt_parser.extrapolate_date_data():
+                    if valid_time and not valid_date:
+
                         new_event_dict[key_a] = dt_parser.start_time.display
-
                         new_event_dict[key_b] = dt_parser.end_time.display
 
                         continue_forLoop = True
 
-                    elif dt_parser.extrapolate_date_data() and \
-                            dt_parser.extrapolate_date_data():
+                    elif valid_time and valid_date:
+
                         new_event_dict[key_a] = dt_parser.end_date.display
                         new_event_dict[key_b] = dt_parser.start_date.display
+
                         continue_forLoop = True
 
                     else:
+                        error = dt_parser.get_error()
+                        print()
+                        l_animators.animate_text_indented(error,
+                                                          indent=CalendarPageEvent.msg_indent_2,
+                                                          finish_delay=1)
+
                         continue_forLoop = True
-                        continue
 
         print(new_event_dict);
         input("???")
@@ -548,7 +556,6 @@ class CalendarInterface:
     def prompter_dateTime(self, prompt, prev_context, date_in_focus):
         prompt_with_context = self._contextualize_prompt(prompt, prev_context, date_in_focus)
         wh_sp = l_cal_utils.CalendarPageEvent.l_margin_space + "  "
-        wh_sp_num = l_cal_utils.CalendarPageEvent.msg_indent_2
         full_prompt = wh_sp + prompt_with_context + "  "
 
         if prompt == Menus.P_E_TIME:
