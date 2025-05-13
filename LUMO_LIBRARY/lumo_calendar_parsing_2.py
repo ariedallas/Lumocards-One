@@ -105,8 +105,10 @@ class NewEventParser:
 
             if parsed:
                 dt_obj = parsed
+                display = dt_obj.strftime("%d of %b, %Y")
             else:
                 dt_type = "UNKNOWN"
+                error = f"Not valid here: {string}"
 
         elif dt_type == "TIME, INCREMENT" and \
               self.start_time.type != "UNKNOWN":
@@ -165,10 +167,14 @@ class NewEventParser:
 
 
     def extrapolate_date_data(self):
-        if self.start_date and self.end_date:
-            return True, "No Error"
-        else:
+        if not self.start_date or not self.end_date:
+            return False, "_"
+
+        elif self.start_date.type == "UNKNOWN" or \
+                self.end_date.type == "UNKNOWN":
             return False, "Date Error"
+        else:
+            return True, "No Error"
 
 
     # TODO: fix this broken membership testing
@@ -302,11 +308,12 @@ class NewEventParser:
 
 
 if __name__ == "__main__":
-    a = dateutil.parser.parse("12h")
-    print(a)
-
     parser = NewEventParser(datetime.datetime.now(tzlocal()))
     parser.parse_type("12a", "start time")
     print(parser.start_time)
     parser.parse_type("2p", "end time")
     print(parser.end_time)
+    parser.parse_type("may 21", "start date")
+    print(parser.start_date)
+    parser.parse_type("may 22", "end date")
+    print(parser.end_date)

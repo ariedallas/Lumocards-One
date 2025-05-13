@@ -425,9 +425,17 @@ class CalendarInterface:
             date_in_focus = self.today
 
         new_event_dict = {}
+
         event_page = CalendarPageEvent(None)
         dt_parser = l_cal_parse.NewEventParser(date_in_focus)
         event_created = False
+
+        # TESTING TEMP
+        new_event_dict['summary'] = "Test"
+        # new_event_dict['s'] = "2p"
+        # new_event_dict['e'] = "3p"
+        # dt_parser.parse_type("2p", "start time")
+        # dt_parser.parse_type("3p", "end time")
 
         while not event_created:
             continue_forLoop = False
@@ -479,47 +487,66 @@ class CalendarInterface:
                         if prompt_one == Menus.P_S_TIME \
                         else ("start date", "end date")
 
-                    # I think you need to split this up so that you can handle
-                    # errors/and confirmations in dates as it's own function
-                    # OR, try it first with prompter_dateTime
+                    valid_times = (new_event_dict.get("s") != "all day" and
+                                   new_event_dict.get("s") is not None)
+
                     result_a, result_b = self.prompter_double(prompt_one,
                                                               prompt_two,
-                                                              date_in_focus)
+                                                              date_in_focus,
+                                                              valid_times)
+
+                    dt_info_a, dt_info_b = self.parse_datetime_info(dt_parser,
+                                                              result_a,
+                                                              result_b,
+                                                              target_a,
+                                                              target_b)
+
+                    if dt_info_a and dt_info_b:
+                        new_event_dict[key_a] = dt_info_a
+                        new_event_dict[key_b] = dt_info_b
+
+                    continue_forLoop = True
+
+        print(new_event_dict); input("???")
 
 
-                    dt_parser.parse_type(result_a, target_a)
-                    dt_parser.parse_type(result_b, target_b)
+    def parse_datetime_info(self,
+                            dt_parser,
+                            result_a,
+                            result_b,
+                            target_a,
+                            target_b
+                            ):
 
-                    print(dt_parser.start_time.error, dt_parser.start_time.type,
-                          dt_parser.end_time.error, dt_parser.end_time.type); input("???")
-                    valid_time, _ = dt_parser.extrapolate_time_data()
-                    valid_date, _ = dt_parser.extrapolate_date_data()
+        dt_parser.parse_type(result_a, target_a)
+        dt_parser.parse_type(result_b, target_b)
 
-                    if valid_time and not valid_date:
+        if dt_parser.start_date:
+            print(dt_parser.start_date.error, dt_parser.start_date.type,
+                  dt_parser.end_date.error, dt_parser.end_date.type);
+            input("???")
 
-                        new_event_dict[key_a] = dt_parser.start_time.display
-                        new_event_dict[key_b] = dt_parser.end_time.display
+        valid_time, _ = dt_parser.extrapolate_time_data()
+        valid_date, _ = dt_parser.extrapolate_date_data()
 
-                        continue_forLoop = True
+        # We need to include "target_a" == "start time"
+        # so that it will only use the right key value
+        # at the right time
+        if valid_time and not valid_date and \
+                target_a == "start time":
+            return dt_parser.start_time.display, dt_parser.end_time.display
 
-                    elif valid_time and valid_date:
+        elif valid_time and valid_date:
+            return dt_parser.start_date.display, dt_parser.end_date.display
 
-                        new_event_dict[key_a] = dt_parser.end_date.display
-                        new_event_dict[key_b] = dt_parser.start_date.display
+        else:
+            error = dt_parser.get_error()
+            print()
+            l_animators.animate_text_indented(error,
+                                              indent=CalendarPageEvent.msg_indent_2,
+                                              finish_delay=1)
 
-                        continue_forLoop = True
-
-                    else:
-                        error = dt_parser.get_error()
-                        print()
-                        l_animators.animate_text_indented(error,
-                                                          indent=CalendarPageEvent.msg_indent_2,
-                                                          finish_delay=1)
-
-                        continue_forLoop = True
-
-        print(new_event_dict);
-        input("???")
+            return None, None
 
 
     def prompter_single(self, prompt):
@@ -553,7 +580,7 @@ class CalendarInterface:
         return user_input_validated
 
 
-    def prompter_dateTime(self, prompt, prev_context, date_in_focus):
+    def prompter_dateTime(self, prompt, prev_context, date_in_focus, valid_times):
         prompt_with_context = self._contextualize_prompt(prompt, prev_context, date_in_focus)
         wh_sp = l_cal_utils.CalendarPageEvent.l_margin_space + "  "
         full_prompt = wh_sp + prompt_with_context + "  "
@@ -564,13 +591,16 @@ class CalendarInterface:
             elif prev_context == "all day":
                 return "all day"
 
+        elif prompt == Menus.P_E_DATE and valid_times:
+            return ""
+
         user_input = input(full_prompt)
         return user_input
 
 
-    def prompter_double(self, prompt_one, prompt_two, date_in_focus):
-        user_input_one = self.prompter_dateTime(prompt_one, None, date_in_focus)
-        user_input_two = self.prompter_dateTime(prompt_two, user_input_one, None)
+    def prompter_double(self, prompt_one, prompt_two, date_in_focus, valid_times):
+        user_input_one = self.prompter_dateTime(prompt_one, None, date_in_focus, valid_times)
+        user_input_two = self.prompter_dateTime(prompt_two, user_input_one, None, valid_times)
 
         return user_input_one, user_input_two
 
