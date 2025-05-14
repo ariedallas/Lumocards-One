@@ -140,6 +140,14 @@ def get_google_events_for_times(credentials, time_min, time_max):
 
     return google_month_events
 
+def get_google_setting(setting_id):
+    service = get_google_service()
+    try:
+        result = service.settings().get(setting=setting_id).execute()
+        return result.get("value")
+    except:
+        return None
+
 
 def split_at_max(var_str, col_width):
     sub_rows = []
@@ -1348,6 +1356,7 @@ class Menus:
 
 if __name__ == "__main__":
     print("Hello from main")
+
     dt = datetime.datetime.now()
     print(datetime.datetime(dt.year, dt.month, dt.day,
                             dt.hour, dt.minute, dt.second,
@@ -1361,14 +1370,13 @@ if __name__ == "__main__":
                                end)
     print(len(events))
     for e in events:
-        print(e.get("summary"), e.get("start"))
+        print(e.get("summary"), repr(e.get("description")), e.get("location"))
     sys.exit()
 
     event_obj = get_google_event_service(credentials=creds, time_min=w_start, time_max=w_end)
     pp(event_obj.get('nextPageToken'))
     print(event_obj.keys())
 
-    creds = get_creds()
 
 
     def create_new_local_card_w_sync(credentials, card_file, card_abspath):

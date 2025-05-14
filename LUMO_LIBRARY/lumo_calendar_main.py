@@ -1,6 +1,7 @@
 import datetime
 import math
 import subprocess
+import textwrap
 from itertools import chain
 from typing import Optional, reveal_type
 
@@ -13,8 +14,13 @@ import LUMO_LIBRARY.lumo_calendar_utils as l_cal_utils
 import LUMO_LIBRARY.lumo_calendar_parsing_2 as l_cal_parse
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
-from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay, CalendarPageEvent, CalendarPageWeek, DayBlock, Event,
-                                              Menus)
+from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
+                                              CalendarPageEvent,
+                                              CalendarPageWeek,
+                                              DayBlock,
+                                              Event,
+                                              get_google_setting,
+                                              Menus )
 
 
 def clear() -> None:
@@ -123,7 +129,7 @@ class CalendarInterface:
         action = actions_dict[user_input.upper()]
 
         if action == Menus.ACTION_NEW_EVENT:
-            self.make_new_event()
+            self.create_new_event()
             return False, None, None
 
         elif action == Menus.ACTION_LIST_ALL:
@@ -155,7 +161,7 @@ class CalendarInterface:
         action = actions_dict[user_input.upper()]
 
         if action == Menus.ACTION_NEW_EVENT:
-            self.make_new_event(default_use_today=True)
+            self.create_new_event(default_use_today=True)
             return status
 
 
@@ -226,7 +232,6 @@ class CalendarInterface:
             clear()
             curr_page.display_day(self.events_limit, CalendarInterface.EVENTS_LIMIT_LOW)
             curr_page.display_menu_columns(menu_dict)
-
             print()
             print(CalendarPageDay.cursor_indent_space, end="  ")
 
@@ -405,19 +410,10 @@ class CalendarInterface:
             print("Use one or more brackets '[' or ']' to navigate.")
             curr_week_block = self.week_blocks_window[self.curr_week_idx]
 
-        print(reveal_type(curr_week_block));
         return curr_week_block
 
 
-    def make_new_event(self, default_use_today=False):
-        # 2: parse, then ask user for corrections
-        # parse the dictionary
-        # either it passes or fails
-
-        # if it passes, create object, create event, refresh, display
-        # if it fails display errors, use dictionary for updates, prompt
-
-        # how do atomic updates show fails?
+    def create_new_event(self, default_use_today=False):
         if not default_use_today:
             curr_day_block = self.day_blocks_window[self.curr_day_idx]
             date_in_focus = curr_day_block.date
@@ -428,16 +424,16 @@ class CalendarInterface:
 
         event_page = CalendarPageEvent(None)
         dt_parser = l_cal_parse.NewEventParser(date_in_focus)
-        event_created = False
+        event_ready = False
 
         # TESTING TEMP
-        new_event_dict['summary'] = "Test"
+        # new_event_dict['summary'] = "Test"
         # new_event_dict['s'] = "2p"
         # new_event_dict['e'] = "3p"
         # dt_parser.parse_type("2p", "start time")
         # dt_parser.parse_type("3p", "end time")
 
-        while not event_created:
+        while not event_ready:
             continue_forLoop = False
             end_idx = len(Menus.NEW_EVENT_CATEGORIES) - 1
 
@@ -457,7 +453,7 @@ class CalendarInterface:
                     key = keys[0]
                     value = new_event_dict.get(key)
                     if value:
-                        event_created = True
+                        event_ready = True
 
                 single_prompt = False if len(prompt_set) > 1 else True
 
@@ -496,10 +492,10 @@ class CalendarInterface:
                                                               valid_times)
 
                     dt_info_a, dt_info_b = self.parse_datetime_info(dt_parser,
-                                                              result_a,
-                                                              result_b,
-                                                              target_a,
-                                                              target_b)
+                                                                    result_a,
+                                                                    result_b,
+                                                                    target_a,
+                                                                    target_b)
 
                     if dt_info_a and dt_info_b:
                         new_event_dict[key_a] = dt_info_a
@@ -507,7 +503,31 @@ class CalendarInterface:
 
                     continue_forLoop = True
 
-        print(new_event_dict); input("???")
+        time_zone = get_google_setting("timezone")
+        dt_parser.format_data_for_sync(time_zone)
+        outcome = l_cal_actions.create_event(new_event_dict, dt_parser)
+
+        if outcome:
+            summary = new_event_dict.get("summary")
+            summary_short = textwrap.shorten(summary, 10)
+            feedback = f"Created event: {summary_short}"
+
+
+            l_animators.animate_text_indented(feedback,
+                                              indent=CalendarPageEvent.l_margin_num,
+                                              finish_delay=1)
+
+            dt_parser.format_data_for_search()
+            page_to_update = self._find_DayBlock_from_dt(dt_parser.search_format)
+            if page_to_update:
+                self._refresh_DayBlock(CalendarPageDay(page_to_update))
+
+
+        else:
+            feedback = "The event failed when syncing to Google, try again?"
+            l_animators.animate_text_indented(feedback,
+                                              indent=CalendarPageEvent.l_margin_num,
+                                              finish_delay=1)
 
 
     def parse_datetime_info(self,
@@ -521,10 +541,10 @@ class CalendarInterface:
         dt_parser.parse_type(result_a, target_a)
         dt_parser.parse_type(result_b, target_b)
 
-        if dt_parser.start_date:
-            print(dt_parser.start_date.error, dt_parser.start_date.type,
-                  dt_parser.end_date.error, dt_parser.end_date.type);
-            input("???")
+        # if dt_parser.start_date:
+        #     print(dt_parser.start_date.error, dt_parser.start_date.type,
+        #           dt_parser.end_date.error, dt_parser.end_date.type);
+        #     input("???")
 
         valid_time, _ = dt_parser.extrapolate_time_data()
         valid_date, _ = dt_parser.extrapolate_date_data()
@@ -749,6 +769,13 @@ class CalendarInterface:
         var_dict.update({key: new_val})
 
         return var_dict
+
+
+    def _find_DayBlock_from_dt(self, dt):
+        for d in self.day_blocks_window:
+            match = d.date.strftime("%Y-%m-%d")
+            if match == dt:
+                return d
 
 
     def parse_for_error(self, user_input: str) -> Optional[str]:

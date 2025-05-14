@@ -29,6 +29,11 @@ class NewEventParser:
         self.start_date = None
         self.end_date = None
 
+        self.start_G_format = None
+        self.end_G_format = None
+
+        self.search_format = None
+
 
     @staticmethod
     def get_basic_type(string, target):
@@ -68,11 +73,13 @@ class NewEventParser:
         dt_type = NewEventParser.get_basic_type(string, target)
 
         if dt_type == "DEFAULT" and target == "start time":
+            dt_type = "TIME, ALL DAY"
             display = "all day"
 
         elif dt_type == "DEFAULT" and target == "end time" and \
                 self.start_time.type != "UNKNOWN":
-            if self.start_time.display == "all day":
+            if self.start_time.type == "TIME, ALL DAY":
+                dt_type = "TIME, ALL DAY"
                 display = "all day"
 
             else:
@@ -111,7 +118,7 @@ class NewEventParser:
                 error = f"Not valid here: {string}"
 
         elif dt_type == "TIME, INCREMENT" and \
-              self.start_time.type != "UNKNOWN":
+                self.start_time.type != "UNKNOWN":
 
             min_add, error = self.parse_time_increment(string)
             if not error:
@@ -177,7 +184,6 @@ class NewEventParser:
             return True, "No Error"
 
 
-    # TODO: fix this broken membership testing
     @staticmethod
     def parse_time(string):
         time_obj = dateutil.parser.parse(string)
@@ -196,6 +202,32 @@ class NewEventParser:
             return None
 
         return time_obj
+
+
+    def format_data_for_sync(self, time_zone):
+        if self.start_time.type == "TIME, ALL DAY":
+            s_date = self.start_date.dt_obj.strftime("%Y-%m-%d")
+            e_date = self.end_date.dt_obj.strftime("%Y-%m-%d")
+
+            self.start_G_format = {"date": s_date}
+            self.end_G_format = {"date": e_date}
+
+        else:
+            combined_dt_start = self.start_date.dt_obj.replace(hour=self.start_time.dt_obj.hour,
+                                                               minute=self.start_time.dt_obj.minute).isoformat()
+
+            combined_dt_end = self.end_date.dt_obj.replace(hour=self.end_time.dt_obj.hour,
+                                                           minute=self.end_time.dt_obj.minute).isoformat()
+
+            self.start_G_format = {"dateTime": combined_dt_start,
+                                   "timeZone": time_zone}
+
+            self.end_G_format = {"dateTime": combined_dt_end,
+                                 "timeZone": time_zone}
+
+    def format_data_for_search(self):
+        s_date = self.start_date.dt_obj.strftime("%Y-%m-%d")
+        self.search_format = s_date
 
 
     @staticmethod
@@ -317,3 +349,11 @@ if __name__ == "__main__":
     print(parser.start_date)
     parser.parse_type("may 22", "end date")
     print(parser.end_date)
+
+    a = dateutil.parser.parse("30 may")
+    # a.replace(tzinfo=tzlocal())
+    # print(a.tzinfo)
+
+    parser.format_data_for_search()
+    print(parser.search_format)
+
