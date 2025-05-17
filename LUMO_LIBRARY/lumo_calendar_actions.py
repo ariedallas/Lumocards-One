@@ -25,10 +25,10 @@ def create_event(dict_event, dt_parser):
     new_event["start"] = dt_parser.start_G_format
     new_event["end"] = dt_parser.end_G_format
 
-    if dict_event.get("description"):
+    if dict_event["description"] != "none":
         new_event["description"] = dict_event["description"]
 
-    if dict_event.get("location"):
+    if dict_event["location"] != "none":
         new_event["location"] = dict_event["location"]
 
     try:

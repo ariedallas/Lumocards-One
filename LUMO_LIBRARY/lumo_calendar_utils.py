@@ -489,6 +489,7 @@ class Event:
 
         return editing_event
 
+
 class DayBlock:
     def __init__(self, day, dayname, date, events):
         self.day = day
@@ -564,7 +565,7 @@ class CalendarPageEvent:
 
         if header == "EDIT":
             title = f"EDITING EVENT: {summary_limited}"
-        else: # header == "NEW"
+        else:  # header == "NEW"
             title = f"NEW EVENT: {summary_limited}"
 
         print()
@@ -586,6 +587,7 @@ class CalendarPageEvent:
         if use_new_line:
             print()
 
+
     @staticmethod
     def _row_prompt_subheader(col_l, col_lw, col_r, col_rw):
         subheader = "{:<{width}}".format(col_l, width=col_lw)
@@ -594,6 +596,7 @@ class CalendarPageEvent:
         group = subheader + context_date
         # print("{0:^{width}}\n".format(group, width=CalendarPageDay.total_width))
         print(CalendarPageEvent.l_margin_space + group)
+
 
     @staticmethod
     def _rows_event_list_data(col_l, var_list):
@@ -657,13 +660,14 @@ class CalendarPageEvent:
 
     def display_editing_event(self, event_dict, header):
         summary = event_dict.get("summary", "")
-        s_time = event_dict.get("s")
-        e_time = event_dict.get("e")
+
+        s_time = event_dict.get("e")
+        e_time = event_dict.get("s")
         s_date = event_dict.get("s_date")
         e_date = event_dict.get("e_date")
 
-        description = event_dict.get("description", "none")
-        location = event_dict.get("location", "none")
+        description = event_dict.get("description")
+        location = event_dict.get("location")
 
         if not s_time and not e_time:
             time_info_f = "..."
@@ -682,20 +686,19 @@ class CalendarPageEvent:
             start_date_f = s_date
             end_date_f = e_date
 
-
-        if description == "none":
+        if not description:
             desc_list_limited = ["..."]
         else:
             desc_list_limited = list_limiter([description],
                                              col_width=CalendarPageEvent.EVENT_VALUE,
                                              row_limit=5)
 
-        if location == "none":
+        if not location:
             loc_list_limited = ["..."]
         else:
             loc_list_limited = list_limiter([location],
-                                             col_width=CalendarPageEvent.EVENT_VALUE,
-                                             row_limit=5)
+                                            col_width=CalendarPageEvent.EVENT_VALUE,
+                                            row_limit=5)
 
         self._row_editing_event_header(summary, header)
         print()
@@ -742,11 +745,26 @@ class CalendarPageEvent:
         l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
 
 
-    def display_prompts_subheader(self, date_in_focus: datetime.datetime):
+    def display_menu_confirmation(self):
+        menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.EDITING_EVENT_CONFIRMATION)
+
+        l_animators.list_printer(menu_list,
+                                 indent_amt=CalendarPageEvent.msg_indent_2,
+                                 speed_interval=0)
+
+        l_animators.list_printer(l_menus_data.EXIT_NOSAVE_LIST,
+                                 indent_amt=CalendarPageEvent.msg_indent_2,
+                                 speed_interval=0)
+
+
+    def display_prompts_subheader(self,
+                                  subheader_name,
+                                  date_in_focus: datetime.datetime):
+
         date_in_focus_formatted = date_in_focus.strftime("%d of %b (%a) %Y ")
         date_formatted = f"IN FOCUS: {date_in_focus_formatted}"
 
-        self._row_prompt_subheader("NEW CALENDAR EVENT", 20,
+        self._row_prompt_subheader(subheader_name, 20,
                                    date_formatted, 40)
 
 
@@ -1234,7 +1252,7 @@ class CalendarPageWeek:
 class Menus:
     ACTION_EDIT_DATE = "Date (edit)"
     ACTION_EDIT_LOCATION = "Location (edit)"
-    ACTION_EDIT_NOTES = "Notes (edit description)"
+    ACTION_EDIT_DESCRIPTION = "Notes (edit description)"
     ACTION_EDIT_TIMES = "Times (edit)"
     ACTION_EDIT_TITLE = "Title (edit)"
     ACTION_REPEAT_EVENT = "Repeat: event"
@@ -1259,7 +1277,11 @@ class Menus:
     ACTION_EXIT = "Exit"
     ACTION_QUIT = "Quit"
 
-    P_TITLE = "Title:"
+    ACTION_SAVE = "Save ➝ (Default action)"
+    ACTION_TRY_AGAIN = "Try again?"
+    ACTION_EXIT_NO_SAVE = "Exit without saving"
+
+    P_TITLE = "Title ( ➝ no title) :"
     P_S_TIME = "Start time ( ➝ all day) :"
     P_E_TIME = "End time"
     P_S_DATE = "Start date"
@@ -1271,7 +1293,7 @@ class Menus:
         ACTION_EDIT_TITLE,
         ACTION_EDIT_TIMES,
         ACTION_EDIT_DATE,
-        ACTION_EDIT_NOTES,
+        ACTION_EDIT_DESCRIPTION,
         ACTION_MENU_MORE
     ]
 
@@ -1279,7 +1301,7 @@ class Menus:
         ACTION_EDIT_TITLE,
         ACTION_EDIT_TIMES,
         ACTION_EDIT_DATE,
-        ACTION_EDIT_NOTES,
+        ACTION_EDIT_DESCRIPTION,
         ACTION_MENU_LESS,
 
         ACTION_EDIT_LOCATION,
@@ -1300,6 +1322,11 @@ class Menus:
         [PROMPT_S_DATE, PROMPT_E_DATE],
         [PROMPT_DESCRIPTION],
         [PROMPT_LOCATION]
+    ]
+
+    EDITING_EVENT_CONFIRMATION = [
+        ACTION_SAVE,
+        ACTION_TRY_AGAIN,
     ]
 
     DAY_MENU_SHORT = [
@@ -1373,3 +1400,4 @@ if __name__ == "__main__":
     print(datetime.datetime(dt.year, dt.month, dt.day,
                             dt.hour, dt.minute, dt.second,
                             tzinfo=dateutil.tz.tzlocal()).isoformat())
+

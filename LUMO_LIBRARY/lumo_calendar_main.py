@@ -81,15 +81,10 @@ class CalendarInterface:
                                 start,
                                 event_obj.id)
 
-            l_animators.animate_text_indented("Edited event",
-                                              indent=CalendarPageEvent.msg_indent_1,
-                                              finish_delay=.5)
             return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_EDIT_TIMES:
-            l_animators.animate_text_indented("Edited times",
-                                              indent=CalendarPageEvent.msg_indent_1,
-                                              finish_delay=.5)
+
             return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_EDIT_DATE:
@@ -99,11 +94,16 @@ class CalendarInterface:
             return False, None, None, "UPDATED EVENT"
 
 
-        elif action == Menus.ACTION_EDIT_NOTES:
-            l_animators.animate_text_indented("Edited notes",
-                                              indent=CalendarPageEvent.msg_indent_1,
-                                              finish_delay=.5)
-            return False, None, None, "UPDATED DESCRIPTION"
+        elif action == Menus.ACTION_EDIT_DESCRIPTION:
+            start = event_obj.s if event_obj.s else event_obj.s_date
+
+            self.update_event_1(event_obj,
+                                "description",
+                                "description",
+                                start,
+                                event_obj.id)
+
+            return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_MENU_LESS:
             self.menu_size = "EVENT SHORT"
@@ -114,9 +114,14 @@ class CalendarInterface:
             return True, None, None, "RELOOP"
 
         elif action == Menus.ACTION_EDIT_LOCATION:
-            l_animators.animate_text_indented("Edited locations",
-                                              indent=CalendarPageEvent.msg_indent_1,
-                                              finish_delay=.5)
+            start = event_obj.s if event_obj.s else event_obj.s_date
+
+            self.update_event_1(event_obj,
+                                "location",
+                                "location",
+                                start,
+                                event_obj.id)
+
             return False, None, None, "UPDATED EVENT"
 
         elif action == Menus.ACTION_DELETE_EVENT:
@@ -449,7 +454,7 @@ class CalendarInterface:
 
             clear()
             event_page.display_editing_event(new_event_dict, "NEW")
-            event_page.display_prompts_subheader(date_in_focus)
+            event_page.display_prompts_subheader("NEW CALENDAR EVENT", date_in_focus)
             print()
 
             for idx, prompt_set in enumerate(Menus.NEW_EVENT_CATEGORIES):
@@ -539,6 +544,7 @@ class CalendarInterface:
                                               indent=CalendarPageEvent.l_margin_num,
                                               finish_delay=1)
 
+
     def update_event_1(self,
                        existing_event,
                        target_key,
@@ -552,29 +558,69 @@ class CalendarInterface:
         event_page = CalendarPageEvent(None)
         event_ready = False
         initial_round = True
+        confirm_menu_dict, confirm_menu_list = l_menus_funcs.prep_menu_tuple(
+            Menus.EDITING_EVENT_CONFIRMATION
+        )
 
-        print(editing_event); input("???")
-
-        # TODO: Commit, then work on proper indentations
         # TODO: fill out each of the single updates
         # TODO: work on the options for 'save', 'cancel' and 'try again'
         # TODO: work on the time updater
         while not event_ready:
             clear()
             event_page.display_editing_event(editing_event, "EDIT")
-            event_page.display_prompts_subheader(date_in_focus)
+            event_page.display_prompts_subheader("EDIT CALENDAR EVENT", date_in_focus)
             print()
 
             if initial_round:
-                result = input(f"Enter a new {target_name}:")
-                editing_event[target_key] = result
+                wh_sp = l_cal_utils.CalendarPageEvent.cursor_indent_space
+                prompt = f"Enter a new {target_name}:"
+                full_prompt = wh_sp + prompt + "  "
+
+                user_input = input(full_prompt)
+
+                # val = user_input if user
+
+                editing_event[target_key] = user_input
                 initial_round = False
 
             else:
-                print("Save")
-                print("Exit without saving")
-                print("Try again?")
-                result = input("  >  ")
+                event_page.display_menu_confirmation()
+                print()
+                print(CalendarPageEvent.cursor_indent_space, end="  ")
+                user_input = input(">  ")
+
+                val = user_input.strip().lower()
+
+                if val == "a" or val in {"save"} or \
+                        val == "":
+                    print()
+                    l_animators.animate_text_indented("Saved event",
+                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      finish_delay=.5
+                                                      )
+
+                elif val == "b" or val in {"try again",
+                                           "again",
+                                           "try"}:
+                    print()
+                    l_animators.animate_text_indented("Trying again",
+                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      finish_delay=.5
+                                                      )
+
+                elif val == "x" or val in {"exit"}:
+                    print()
+                    l_animators.animate_text_indented("Back to un-edited event",
+                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      finish_delay=.5
+                                                      )
+
+                else:
+                    print()
+                    l_animators.animate_text_indented("Unrecognized option",
+                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      finish_delay=.5
+                                                      )
 
         # outcome = l_cal_actions.update_event(editing_event, event_id)
         #
@@ -641,32 +687,30 @@ class CalendarInterface:
 
 
     def prompter_single(self, prompt):
-        wh_sp = l_cal_utils.CalendarPageEvent.l_margin_space + "  "
+        wh_sp = l_cal_utils.CalendarPageEvent.cursor_indent_space
         full_prompt = wh_sp + prompt + "  "
 
         user_input = input(full_prompt)
+        val = user_input.strip().lower()
 
         if prompt == Menus.P_TITLE:
-            user_input_validated = "(no title)" if user_input == "" else user_input
-            # animators use error msg
+            user_input_validated = "(no title)" if val == "" else val
 
         elif prompt == Menus.P_DESCRIPTION:
-            if (user_input.lower()
-                    in l_menus_data.NEGATIVE_USER_RESPONSES
-                    or user_input == ""):
+            if (val in l_menus_data.NEGATIVE_USER_RESPONSES
+                    or val == ""):
                 user_input_validated = "none"
 
             else:
-                user_input_validated = user_input
+                user_input_validated = val
 
         elif prompt == Menus.P_LOCATION:
-            if (user_input.lower()
-                    in l_menus_data.NEGATIVE_USER_RESPONSES
-                    or user_input == ""):
+            if (val in l_menus_data.NEGATIVE_USER_RESPONSES
+                    or val == ""):
                 user_input_validated = "none"
 
             else:
-                user_input_validated = user_input
+                user_input_validated = val
 
         return user_input_validated
 
