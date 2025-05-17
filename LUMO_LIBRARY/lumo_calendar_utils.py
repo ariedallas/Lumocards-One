@@ -133,13 +133,6 @@ def get_google_event_service(credentials, time_min, time_max):
         return None
 
 
-def get_google_events_for_times(credentials, time_min, time_max):
-    google_month_events = get_google_events(credentials=credentials,
-                                            time_min=time_min,
-                                            time_max=time_max)
-
-    return google_month_events
-
 def get_google_setting(setting_id):
     service = get_google_service()
     try:
@@ -466,15 +459,35 @@ class Event:
 
     def get_date(self):
         if self.event_type == "ALL DAY":
-            return self.s_date
+            return self.s_date.date()
 
         else:  # self.event_type is "multi day" or "standard"
             return self.s.date()
 
-    # def spans(self, var_date):
-    #     if self.s_date and self.e_date:
-    #         return self.s_date.date() <= var_date <= self.e_date.date()
 
+    def format_as_editing_dict(self):
+        editing_event = {}
+
+        editing_event["summary"] = self.summary
+
+        if self.event_type == "ALL DAY":
+            editing_event["s"] = "all day"
+            editing_event["e"] = "all day"
+
+            editing_event["s_date"] = self.s_date
+            editing_event["e_date"] = self.e_date
+
+        else:
+            editing_event["s"] = self.s.strftime("%I:%M %p").lower()
+            editing_event["e"] = self.e.strftime("%I:%M %p").lower()
+
+            editing_event["s_date"] = self.s.strftime("%d of %b, %Y")
+            editing_event["e_date"] = self.e.strftime("%d of %b, %Y")
+
+        editing_event["description"] = self.description
+        editing_event["location"] = self.location
+
+        return editing_event
 
 class DayBlock:
     def __init__(self, day, dayname, date, events):
@@ -546,10 +559,13 @@ class CalendarPageEvent:
         print()
 
 
-    def _row_new_event_header(self, summary):
+    def _row_editing_event_header(self, summary, header):
         summary_limited = textwrap.shorten(summary, width=70, placeholder="...")
 
-        title = f"NEW EVENT: {summary_limited}"
+        if header == "EDIT":
+            title = f"EDITING EVENT: {summary_limited}"
+        else: # header == "NEW"
+            title = f"NEW EVENT: {summary_limited}"
 
         print()
         print("{0:^{width}}".format(title,
@@ -594,8 +610,7 @@ class CalendarPageEvent:
 
 
     def display_event(self, event_obj: Event) -> None:
-
-        if not event_obj.s:
+        if not event_obj.s and event_obj.event_type != "ALL DAY":
             time_info_formatted = "..."
 
         else:
@@ -640,7 +655,7 @@ class CalendarPageEvent:
         print()
 
 
-    def display_new_event(self, event_dict):
+    def display_editing_event(self, event_dict, header):
         summary = event_dict.get("summary", "")
         s_time = event_dict.get("s")
         e_time = event_dict.get("e")
@@ -649,7 +664,6 @@ class CalendarPageEvent:
 
         description = event_dict.get("description", "none")
         location = event_dict.get("location", "none")
-        # reminders = event_dict.get("reminders", "...")
 
         if not s_time and not e_time:
             time_info_f = "..."
@@ -682,16 +696,14 @@ class CalendarPageEvent:
             loc_list_limited = list_limiter([location],
                                              col_width=CalendarPageEvent.EVENT_VALUE,
                                              row_limit=5)
-        # reminder_info = reminders
 
-        self._row_new_event_header(summary)
+        self._row_editing_event_header(summary, header)
         print()
         CalendarPageEvent._row_event_data("Times:", time_info_f)
         CalendarPageEvent._row_event_data("Start Date:", start_date_f)
         CalendarPageEvent._row_event_data("End Date:", end_date_f)
         CalendarPageEvent._rows_event_list_data("Description:", desc_list_limited)
         CalendarPageEvent._rows_event_list_data("Location:", loc_list_limited)
-        # CalendarPageEvent._row_event_data("Reminders:", reminder_info)
         print()
 
 
@@ -1361,58 +1373,3 @@ if __name__ == "__main__":
     print(datetime.datetime(dt.year, dt.month, dt.day,
                             dt.hour, dt.minute, dt.second,
                             tzinfo=dateutil.tz.tzlocal()).isoformat())
-
-    creds = get_creds()
-    start = datetime.date.today() + relativedelta(days=0)
-    end = datetime.date.today() + relativedelta(days=1)
-    events = get_google_events(creds,
-                               start,
-                               end)
-    print(len(events))
-    for e in events:
-        print(e.get("summary"), repr(e.get("description")), e.get("location"))
-    sys.exit()
-
-    event_obj = get_google_event_service(credentials=creds, time_min=w_start, time_max=w_end)
-    pp(event_obj.get('nextPageToken'))
-    print(event_obj.keys())
-
-
-
-    def create_new_local_card_w_sync(credentials, card_file, card_abspath):
-        pass
-
-
-    def create_google_event(credentials, formatted_card_title, card_steps):
-
-        try:
-            service_2 = build("calendar", "v3", credentials=credentials)
-
-            now = datetime.datetime.now().isoformat() + "Z"
-            card_steps_as_str = "\n".join(card_steps[:3])
-
-            my_event = {
-                "summary": formatted_card_title
-                , "location": "..."
-                , "description": card_steps_as_str
-                , "start": {
-                    "dateTime": f"{now}"
-                    , "timeZone": "America/Los_Angeles"
-                }
-                , "end": {
-                    "dateTime": f"{now}"
-                    , "timeZone": "America/Los_Angeles"
-                }
-                , "colorId": 7
-            }
-
-            run_event = service_2.events().insert(calendarId="primary", body=my_event).execute()
-
-            generated_id = run_event.get("id")
-            # animators.animate_text(f"Created Google Calendar Event with ID: {generated_id}")
-            return generated_id
-
-
-        except HttpError as error:
-            print("Here's the error that has occurred: ", error)
-            return None

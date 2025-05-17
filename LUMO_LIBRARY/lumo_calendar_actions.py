@@ -36,18 +36,18 @@ def create_event(dict_event, dt_parser):
         event = service.events().insert(calendarId="primary",
                                         body=new_event,
                                         ).execute()
+
         return True
 
     except:
         return False
 
-def update_event(var_id: str) -> Optional[str]:
+def update_event(updated_event: dict, var_id: str) -> Optional[str]:
     try:
         service = l_cal_utils.get_google_service()
         event = service.events().get(calendarId="primary",
                                      eventId=var_id).execute()
 
-        print("FROM UPDATER FUNCTION")
         print(f"ID {var_id} makes ->", event.get("summary"))
 
         # updated_event = service.events().update(calendarId="primary", eventId=event["id"], body=event).execute()

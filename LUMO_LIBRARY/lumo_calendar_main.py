@@ -2,6 +2,7 @@ import datetime
 import math
 import subprocess
 import textwrap
+
 from itertools import chain
 from typing import Optional, reveal_type
 
@@ -20,7 +21,7 @@ from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
                                               DayBlock,
                                               Event,
                                               get_google_setting,
-                                              Menus )
+                                              Menus)
 
 
 def clear() -> None:
@@ -72,6 +73,14 @@ class CalendarInterface:
         action = actions_dict[user_input.upper()]
 
         if action == Menus.ACTION_EDIT_TITLE:
+            start = event_obj.s if event_obj.s else event_obj.s_date
+
+            self.update_event_1(event_obj,
+                                "summary",
+                                "title",
+                                start,
+                                event_obj.id)
+
             l_animators.animate_text_indented("Edited event",
                                               indent=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
@@ -416,9 +425,10 @@ class CalendarInterface:
     def create_new_event(self, default_use_today=False):
         if not default_use_today:
             curr_day_block = self.day_blocks_window[self.curr_day_idx]
-            date_in_focus = curr_day_block.date
+            date_in_focus = datetime.datetime.combine(
+                curr_day_block.date, datetime.time(hour=0, minute=0, second=0))
         else:
-            date_in_focus = self.today
+            date_in_focus = self.today.replace(hour=0, minute=0, tzinfo=None)
 
         new_event_dict = {}
 
@@ -438,7 +448,7 @@ class CalendarInterface:
             end_idx = len(Menus.NEW_EVENT_CATEGORIES) - 1
 
             clear()
-            event_page.display_new_event(new_event_dict)
+            event_page.display_editing_event(new_event_dict, "NEW")
             event_page.display_prompts_subheader(date_in_focus)
             print()
 
@@ -509,9 +519,8 @@ class CalendarInterface:
 
         if outcome:
             summary = new_event_dict.get("summary")
-            summary_short = textwrap.shorten(summary, 10)
+            summary_short = textwrap.shorten(summary, 20)
             feedback = f"Created event: {summary_short}"
-
 
             l_animators.animate_text_indented(feedback,
                                               indent=CalendarPageEvent.l_margin_num,
@@ -519,6 +528,7 @@ class CalendarInterface:
 
             dt_parser.format_data_for_search()
             page_to_update = self._find_DayBlock_from_dt(dt_parser.search_format)
+
             if page_to_update:
                 self._refresh_DayBlock(CalendarPageDay(page_to_update))
 
@@ -528,6 +538,67 @@ class CalendarInterface:
             l_animators.animate_text_indented(feedback,
                                               indent=CalendarPageEvent.l_margin_num,
                                               finish_delay=1)
+
+    def update_event_1(self,
+                       existing_event,
+                       target_key,
+                       target_name,
+                       date_in_focus,
+                       event_id):
+
+        editing_event = existing_event.format_as_editing_dict()
+        del editing_event[target_key]
+
+        event_page = CalendarPageEvent(None)
+        event_ready = False
+        initial_round = True
+
+        print(editing_event); input("???")
+
+        # TODO: Commit, then work on proper indentations
+        # TODO: fill out each of the single updates
+        # TODO: work on the options for 'save', 'cancel' and 'try again'
+        # TODO: work on the time updater
+        while not event_ready:
+            clear()
+            event_page.display_editing_event(editing_event, "EDIT")
+            event_page.display_prompts_subheader(date_in_focus)
+            print()
+
+            if initial_round:
+                result = input(f"Enter a new {target_name}:")
+                editing_event[target_key] = result
+                initial_round = False
+
+            else:
+                print("Save")
+                print("Exit without saving")
+                print("Try again?")
+                result = input("  >  ")
+
+        # outcome = l_cal_actions.update_event(editing_event, event_id)
+        #
+        # if outcome:
+        #     summary = editing_event.get("summary")
+        #     summary_short = textwrap.shorten(summary, 20)
+        #     feedback = f"Updated event: {summary_short}"
+        #
+        #     l_animators.animate_text_indented(feedback,
+        #                                       indent=CalendarPageEvent.l_margin_num,
+        #                                       finish_delay=1)
+        #
+        #     dt_parser.format_data_for_search()
+        #     page_to_update = self._find_DayBlock_from_dt(dt_parser.search_format)
+        #
+        #     if page_to_update:
+        #         self._refresh_DayBlock(CalendarPageDay(page_to_update))
+        #
+        #
+        # else:
+        #     feedback = "The event failed when syncing to Google, try again?"
+        #     l_animators.animate_text_indented(feedback,
+        #                                       indent=CalendarPageEvent.l_margin_num,
+        #                                       finish_delay=1)
 
 
     def parse_datetime_info(self,
@@ -640,7 +711,7 @@ class CalendarInterface:
             prompt_with_context = f"{prompt}  {default_date} :"
 
         elif prompt == Menus.P_E_DATE:
-            default_date = "( ➝ etc.)"
+            default_date = "( ➝ start date)"
             prompt_with_context = f"{prompt}  {default_date} :"
 
         else:
@@ -648,18 +719,6 @@ class CalendarInterface:
 
         return prompt_with_context
 
-
-    def get_default_action(self):
-        pass
-
-
-    def update_default_action(self):
-        pass
-
-
-    # you'll need to parse previous inputs
-    # to update the default context action
-    # if the parsing breaks the default action is (???)
 
     def _day_index_lookup(self, target_date):
         for idx, db in enumerate(self.day_blocks_window):

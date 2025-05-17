@@ -180,6 +180,10 @@ class NewEventParser:
         elif self.start_date.type == "UNKNOWN" or \
                 self.end_date.type == "UNKNOWN":
             return False, "Date Error"
+
+        elif self.end_date.dt_obj < self.start_date.dt_obj:
+            return False, "Cannot set a start date after an end date"
+
         else:
             return True, "No Error"
 
@@ -224,6 +228,7 @@ class NewEventParser:
 
             self.end_G_format = {"dateTime": combined_dt_end,
                                  "timeZone": time_zone}
+
 
     def format_data_for_search(self):
         s_date = self.start_date.dt_obj.strftime("%Y-%m-%d")
@@ -314,46 +319,35 @@ class NewEventParser:
 
 
     def get_error(self):
-        if self.start_time:
-            valid, error = self.extrapolate_time_data()
+        valid_time, error = self.extrapolate_time_data()
 
-            if self.start_time.error:
-                return self.start_time.error
-            elif self.end_time.error:
-                return self.end_time.error
-            elif not valid:
-                return error
+        if self.start_time.error:
+            return self.start_time.error
+        elif self.end_time.error:
+            return self.end_time.error
+        elif not valid_time:
+            return error
 
-        if self.start_date:
-            valid, error = self.extrapolate_date_data()
+        valid_date, error = self.extrapolate_date_data()
 
-            if self.start_date.error:
-                return self.start_date.error
-            elif self.end_date.error:
-                return self.end_date.error
-            elif not valid:
-                return error
-
+        if self.start_date.error:
+            return self.start_date.error
+        elif self.end_date.error:
+            return self.end_date.error
+        elif not valid_date:
+            return error
         else:
-            return "Basic error"
-        # etc. etc.
+            return "Unknown error"
 
 
 if __name__ == "__main__":
     parser = NewEventParser(datetime.datetime.now(tzlocal()))
     parser.parse_type("12a", "start time")
-    print(parser.start_time)
     parser.parse_type("2p", "end time")
-    print(parser.end_time)
     parser.parse_type("may 21", "start date")
-    print(parser.start_date)
     parser.parse_type("may 22", "end date")
-    print(parser.end_date)
 
-    a = dateutil.parser.parse("30 may")
-    # a.replace(tzinfo=tzlocal())
-    # print(a.tzinfo)
+    parser.format_data_for_sync("America/Los_Angeles")
 
-    parser.format_data_for_search()
-    print(parser.search_format)
+
 
