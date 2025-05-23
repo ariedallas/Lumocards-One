@@ -19,6 +19,7 @@ def get_google_event_by_id(service: Any,
     except HttpError as error:
         print("An error has occurred ", error)
 
+
 def create_event(dict_event, dt_parser):
     new_event = {}
     new_event["summary"] = dict_event.get("summary")
@@ -42,23 +43,24 @@ def create_event(dict_event, dt_parser):
     except:
         return False
 
-def update_event(updated_event: dict, var_id: str) -> Optional[str]:
+
+def update_event_simple(updated_event: dict, var_id: str, target):
     try:
         service = l_cal_utils.get_google_service()
         event = service.events().get(calendarId="primary",
                                      eventId=var_id).execute()
 
-        print(f"ID {var_id} makes ->", event.get("summary"))
+        event[target] = updated_event[target]
 
-        # updated_event = service.events().update(calendarId="primary", eventId=event["id"], body=event).execute()
-        #
-        # google_id = event["id"]
-        # return google_id
-        return var_id
+        updated_G_event = service.events().update(calendarId="primary",
+                                                eventId=event["id"],
+                                                body=event).execute()
+        return True, updated_G_event[target]
 
 
     except HttpError as error:
-        print("An error happened: ", error)
+        return False, error
+
 
 def delete_event(var_id: str) -> None:
     try:
@@ -69,8 +71,10 @@ def delete_event(var_id: str) -> None:
         print("This event was (likely) already deleted.")
         print(error)
 
+
 def confirm_event_deleted(var_id: str) -> None:
     pass
+
 
 if __name__ == '__main__':
     print("Hello from main")

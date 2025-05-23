@@ -661,8 +661,8 @@ class CalendarPageEvent:
     def display_editing_event(self, event_dict, header):
         summary = event_dict.get("summary", "")
 
-        s_time = event_dict.get("e")
-        e_time = event_dict.get("s")
+        s_time = event_dict.get("s")
+        e_time = event_dict.get("e")
         s_date = event_dict.get("s_date")
         e_date = event_dict.get("e_date")
 
@@ -727,21 +727,19 @@ class CalendarPageEvent:
 
     def display_menu_columns(self, var_dict):
         menu_list = l_menus_funcs.menu_list_from_dict(var_dict)
-        menu_list_left = menu_list[:5]
-        menu_list_right = menu_list[5:10]
+        menu_list_left = menu_list[:4]
+        menu_list_right = menu_list[4:8]
         menu_columns = Menus.prep_menu_columns(menu_l=menu_list_left,
                                                menu_r=menu_list_right)
 
         wh_sp = CalendarPageEvent.l_margin_space
         whitespace_menu = Menus.add_whitespace_menu_list(menu_columns, wh_sp)
-        whitespace_save = Menus.add_whitespace_menu_list(l_menus_data.SAVE_LIST, wh_sp)
-        whitespace_exit = Menus.add_whitespace_menu_list(l_menus_data.EXIT_NOSAVE_LIST, wh_sp)
+        whitespace_exit = Menus.add_whitespace_menu_list(l_menus_data.SIMPLE_EXIT_LIST, wh_sp)
 
         print(wh_sp + "CALENDAR")
         print()
         l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
         print()
-        l_animators.list_printer(whitespace_save, indent_amt=2, speed_interval=0)
         l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
 
 
@@ -1250,12 +1248,11 @@ class CalendarPageWeek:
 
 
 class Menus:
-    ACTION_EDIT_DATE = "Date (edit)"
-    ACTION_EDIT_LOCATION = "Location (edit)"
     ACTION_EDIT_DESCRIPTION = "Notes (edit description)"
-    ACTION_EDIT_TIMES = "Times (edit)"
+    ACTION_EDIT_LOCATION = "Location (edit)"
     ACTION_EDIT_TITLE = "Title (edit)"
-    ACTION_REPEAT_EVENT = "Repeat: event"
+    ACTION_EDIT_TIME_DATE = "Time / Date (edit)"
+    # ACTION_REPEAT_EVENT = "Repeat: event"
     ACTION_DELETE_EVENT = "Delete: event"
 
     ACTION_EMPTY = "..."
@@ -1278,7 +1275,7 @@ class Menus:
     ACTION_QUIT = "Quit"
 
     ACTION_SAVE = "Save ➝ (Default action)"
-    ACTION_TRY_AGAIN = "Try again?"
+    ACTION_TRY_AGAIN = "Edit again?"
     ACTION_EXIT_NO_SAVE = "Exit without saving"
 
     P_TITLE = "Title ( ➝ no title) :"
@@ -1291,16 +1288,14 @@ class Menus:
 
     EVENT_MENU_SHORT = [
         ACTION_EDIT_TITLE,
-        ACTION_EDIT_TIMES,
-        ACTION_EDIT_DATE,
+        ACTION_EDIT_TIME_DATE,
         ACTION_EDIT_DESCRIPTION,
         ACTION_MENU_MORE
     ]
 
     EVENT_MENU_LONG = [
         ACTION_EDIT_TITLE,
-        ACTION_EDIT_TIMES,
-        ACTION_EDIT_DATE,
+        ACTION_EDIT_TIME_DATE,
         ACTION_EDIT_DESCRIPTION,
         ACTION_MENU_LESS,
 

@@ -66,79 +66,83 @@ class CalendarInterface:
 
 
     def _event_actions_router(self,
-                              user_input: str,
+                              val: str,
+                              val_str: str,
                               actions_dict: dict[str, str],
                               event_obj: Event):
 
-        action = actions_dict[user_input.upper()]
+        action = actions_dict[val.upper()] if actions_dict.get(val.upper()) else val_str
 
-        if action == Menus.ACTION_EDIT_TITLE:
+        if action == Menus.ACTION_EDIT_TITLE or \
+                action in {"title", "summary"}:
             start = event_obj.s if event_obj.s else event_obj.s_date
 
-            self.update_event_1(event_obj,
-                                "summary",
-                                "title",
-                                start,
-                                event_obj.id)
+            status = self.update_event_1(event_obj,
+                                         "summary",
+                                         "title",
+                                         start)
 
-            return False, None, None, "UPDATED EVENT"
+            return False, None, None, status
 
-        elif action == Menus.ACTION_EDIT_TIMES:
+        elif action == Menus.ACTION_EDIT_TIME_DATE or \
+                action in {"time", "times", "date", "dates"}:
 
-            return False, None, None, "UPDATED EVENT"
-
-        elif action == Menus.ACTION_EDIT_DATE:
+            status = "RELOOP"
             l_animators.animate_text_indented("Edited date",
                                               indent=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
-            return False, None, None, "UPDATED EVENT"
+
+            return False, None, None, status
 
 
-        elif action == Menus.ACTION_EDIT_DESCRIPTION:
+        elif action == Menus.ACTION_EDIT_DESCRIPTION or \
+                action in {"description", "notes"}:
             start = event_obj.s if event_obj.s else event_obj.s_date
 
-            self.update_event_1(event_obj,
-                                "description",
-                                "description",
-                                start,
-                                event_obj.id)
+            status = self.update_event_1(event_obj,
+                                         "description",
+                                         "description",
+                                         start)
 
-            return False, None, None, "UPDATED EVENT"
+            return False, None, None, status
 
-        elif action == Menus.ACTION_MENU_LESS:
+        elif action == Menus.ACTION_MENU_LESS or \
+                action in {"less", "show less"} or \
+                (action == "menu" and self.menu_size == "EVENT LONG"):
             self.menu_size = "EVENT SHORT"
             return True, None, None, "RELOOP"
 
-        elif action == Menus.ACTION_MENU_MORE:
+        elif action == Menus.ACTION_MENU_MORE or \
+                action in {"more", "show more"} or \
+                (action == "menu" and self.menu_size == "EVENT SHORT"):
             self.menu_size = "EVENT LONG"
             return True, None, None, "RELOOP"
 
-        elif action == Menus.ACTION_EDIT_LOCATION:
+        elif action == Menus.ACTION_EDIT_LOCATION or \
+                action in {"location"}:
             start = event_obj.s if event_obj.s else event_obj.s_date
 
-            self.update_event_1(event_obj,
-                                "location",
-                                "location",
-                                start,
-                                event_obj.id)
+            status = self.update_event_1(event_obj,
+                                         "location",
+                                         "location",
+                                         start)
 
-            return False, None, None, "UPDATED EVENT"
+            return False, None, None, status
 
-        elif action == Menus.ACTION_DELETE_EVENT:
+        elif action == Menus.ACTION_DELETE_EVENT or \
+                action in {"delete"}:
             l_cal_actions.delete_event(event_obj.id)
             l_animators.animate_text_indented("Deleted event",
                                               indent=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
 
-            return False, None, None, "DELETED EVENT"
+            return False, None, None, "DELETE EVENT"
 
 
     def _day_actions_router(self,
                             user_input: str,
                             actions_dict: dict[str, str]
-                            ) -> Optional[
-        tuple[bool, Optional[str], Optional[str]]
-    ]:
+                            ) -> Optional[tuple[bool, Optional[str], Optional[str]]]:
 
         action = actions_dict[user_input.upper()]
 
@@ -179,16 +183,26 @@ class CalendarInterface:
             return status
 
 
-    def view_event(self, event_obj: Event) -> None:
-        event_page = CalendarPageEvent(event_obj)
-        menu_dict, _ = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_LONG)
-        menu_dict = self._contextualize(menu_dict,
+    def view_event(self, event_idx: int) -> None:
+        valid_str_actions = {"title", "summary",
+                             "time", "times", "date", "dates",
+                             "description", "note", "notes",
+                             "menu", "less", "show less", "more", "show more",
+                             "location",
+                             "delete"
+                             }
+
+        self.menu_size = "EVENT LONG"
+        menu_update = False
+        menu_dict = self._contextualize(None,
                                         None,
                                         None,
                                         self.menu_size)
-        menu_update = False
 
         while True:
+            event_obj = self.day_blocks_window[self.curr_day_idx].events[event_idx]
+            event_page = CalendarPageEvent(event_obj)
+
             if menu_update:
                 menu_dict = self._contextualize(menu_dict,
                                                 None,
@@ -203,23 +217,28 @@ class CalendarInterface:
 
             print(CalendarPageEvent.cursor_indent_space, end="  ")
             user_input = input(">  ")
+            val = user_input.strip()
+            val_str = user_input.strip().lower()
 
-            if user_input.upper() in menu_dict.keys():
-                menu_update, _, _, status = self._event_actions_router(user_input,
+            if val.upper() in menu_dict.keys() or val_str in valid_str_actions:
+                menu_update, _, _, status = self._event_actions_router(val,
+                                                                       val_str,
                                                                        menu_dict,
                                                                        event_obj)
-                if status == "DELETED EVENT":
+                if status == "DELETE EVENT":
                     return status
 
+                elif status == "UPDATE EVENT":
+                    curr_page = CalendarPageDay(self.day_blocks_window[self.curr_day_idx])
+                    self._refresh_DayBlock(curr_page)
 
-            elif user_input.lower() in {"x", "exit"}:
+                else:
+                    continue
+
+
+            elif val.lower() in {"x", "exit"}:
                 break
 
-            elif user_input.lower() in {"s", "save"}:
-                l_animators.animate_text_indented("Saved event",
-                                                  indent=CalendarPageEvent.msg_indent_1,
-                                                  finish_delay=.5)
-                break
 
             else:
                 l_animators.animate_text_indented("Unrecognized option...",
@@ -235,6 +254,7 @@ class CalendarInterface:
         menu_update = False
         old_val = None
         new_val = None
+        show_refreshed_event = False
 
         while True:
             if menu_update:
@@ -258,14 +278,15 @@ class CalendarInterface:
                                                  len(curr_day_block.events),
                                                  self.events_limit):
                 selection = int(user_input) - 1
-                selected_event = curr_day_block.events[selection]
 
-                status = self.view_event(selected_event)
+                status = self.view_event(selection)
 
-                if status == "DELETED EVENT":
+                if status == "DELETE EVENT":
                     self._refresh_DayBlock(curr_page)
                     break
-
+            elif show_refreshed_event:
+                pass
+                # etc. go back and view refreshed event
 
             elif user_input.upper() in menu_dict.keys():
                 menu_update, old_val, new_val = self._day_actions_router(user_input, menu_dict)
@@ -549,21 +570,17 @@ class CalendarInterface:
                        existing_event,
                        target_key,
                        target_name,
-                       date_in_focus,
-                       event_id):
+                       date_in_focus):
 
+        existing_id = existing_event.id
         editing_event = existing_event.format_as_editing_dict()
+        prev_value = editing_event[target_key]
         del editing_event[target_key]
 
         event_page = CalendarPageEvent(None)
         event_ready = False
         initial_round = True
-        confirm_menu_dict, confirm_menu_list = l_menus_funcs.prep_menu_tuple(
-            Menus.EDITING_EVENT_CONFIRMATION
-        )
 
-        # TODO: fill out each of the single updates
-        # TODO: work on the options for 'save', 'cancel' and 'try again'
         # TODO: work on the time updater
         while not event_ready:
             clear()
@@ -573,14 +590,14 @@ class CalendarInterface:
 
             if initial_round:
                 wh_sp = l_cal_utils.CalendarPageEvent.cursor_indent_space
-                prompt = f"Enter a new {target_name}:"
+                prompt = f"New {target_name}:"
                 full_prompt = wh_sp + prompt + "  "
 
                 user_input = input(full_prompt)
 
-                # val = user_input if user
+                val = user_input if user_input else prev_value
 
-                editing_event[target_key] = user_input
+                editing_event[target_key] = val
                 initial_round = False
 
             else:
@@ -598,15 +615,13 @@ class CalendarInterface:
                                                       indent=CalendarPageEvent.msg_indent_1,
                                                       finish_delay=.5
                                                       )
+                    event_ready = True
 
-                elif val == "b" or val in {"try again",
-                                           "again",
-                                           "try"}:
-                    print()
-                    l_animators.animate_text_indented("Trying again",
-                                                      indent=CalendarPageEvent.msg_indent_1,
-                                                      finish_delay=.5
-                                                      )
+                elif val == "b" or val in {"edit again",
+                                           "edit",
+                                           "again"}:
+
+                    initial_round = True
 
                 elif val == "x" or val in {"exit"}:
                     print()
@@ -614,6 +629,7 @@ class CalendarInterface:
                                                       indent=CalendarPageEvent.msg_indent_1,
                                                       finish_delay=.5
                                                       )
+                    return "RELOOP"
 
                 else:
                     print()
@@ -622,29 +638,31 @@ class CalendarInterface:
                                                       finish_delay=.5
                                                       )
 
-        # outcome = l_cal_actions.update_event(editing_event, event_id)
-        #
-        # if outcome:
-        #     summary = editing_event.get("summary")
-        #     summary_short = textwrap.shorten(summary, 20)
-        #     feedback = f"Updated event: {summary_short}"
-        #
-        #     l_animators.animate_text_indented(feedback,
-        #                                       indent=CalendarPageEvent.l_margin_num,
-        #                                       finish_delay=1)
-        #
-        #     dt_parser.format_data_for_search()
-        #     page_to_update = self._find_DayBlock_from_dt(dt_parser.search_format)
-        #
-        #     if page_to_update:
-        #         self._refresh_DayBlock(CalendarPageDay(page_to_update))
-        #
-        #
-        # else:
-        #     feedback = "The event failed when syncing to Google, try again?"
-        #     l_animators.animate_text_indented(feedback,
-        #                                       indent=CalendarPageEvent.l_margin_num,
-        #                                       finish_delay=1)
+        outcome, msg = l_cal_actions.update_event_simple(editing_event,
+                                                         existing_id,
+                                                         target_key)
+
+        if outcome:
+            feedback = f"Updated event: {msg}"
+
+            print()
+            l_animators.animate_text_indented(feedback,
+                                              indent=CalendarPageEvent.msg_indent_2,
+                                              finish_delay=1)
+
+            return "UPDATE EVENT"
+
+
+        else:
+            feedback = "The event failed when syncing."
+
+            print()
+            l_animators.animate_text_indented(feedback,
+                                              indent=CalendarPageEvent.msg_indent_2,
+                                              finish_delay=1)
+            print(msg)
+
+            return "NO UPDATE"
 
 
     def parse_datetime_info(self,
