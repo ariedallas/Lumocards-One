@@ -710,19 +710,19 @@ class CalendarPageEvent:
         print()
 
 
-    def display_menu(self):
-        menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_LONG)
-
-        wh_sp = CalendarPageEvent.l_margin_space
-        whitespace_menu = Menus.add_whitespace_menu_list(menu_list, wh_sp)
-        whitespace_exit = Menus.add_whitespace_menu_list(l_menus_data.EXIT_MENU_LIST, wh_sp)
-
-        print()
-        print(wh_sp + "EVENT")
-        print()
-        l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
-        print()
-        l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
+    # def display_menu(self):
+    #     menu_dict, menu_list = l_menus_funcs.prep_menu_tuple(Menus.EVENT_MENU_LONG)
+    #
+    #     wh_sp = CalendarPageEvent.l_margin_space
+    #     whitespace_menu = Menus.add_whitespace_menu_list(menu_list, wh_sp)
+    #     whitespace_exit = Menus.add_whitespace_menu_list(l_menus_data.EXIT_MENU_LIST, wh_sp)
+    #
+    #     print()
+    #     print(wh_sp + "EVENT")
+    #     print()
+    #     l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
+    #     print()
+    #     l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
 
 
     def display_menu_columns(self, var_dict):
@@ -733,14 +733,16 @@ class CalendarPageEvent:
                                                menu_r=menu_list_right)
 
         wh_sp = CalendarPageEvent.l_margin_space
-        whitespace_menu = Menus.add_whitespace_menu_list(menu_columns, wh_sp)
-        whitespace_exit = Menus.add_whitespace_menu_list(l_menus_data.SIMPLE_EXIT_LIST, wh_sp)
-
         print(wh_sp + "CALENDAR")
+
         print()
-        l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
+        l_animators.list_printer(menu_columns,
+                                 indent_amt=CalendarPageEvent.msg_indent_2,
+                                 speed_interval=0)
         print()
-        l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
+        l_animators.list_printer(l_menus_data.SIMPLE_EXIT_LIST,
+                                 indent_amt=CalendarPageEvent.msg_indent_2,
+                                 speed_interval=0)
 
 
     def display_menu_confirmation(self):
