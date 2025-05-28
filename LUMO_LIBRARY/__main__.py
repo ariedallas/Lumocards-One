@@ -13,8 +13,7 @@ from LUMO_LIBRARY import (lumo_animationlibrary as l_animators,
                           lumo_newcard_2 as l_newcard,
                           lumo_pomodoro as l_pomodoro,
                           lumo_search as l_search,
-                          lumo_settings as l_settings,
-                          lumo_timer as l_timer)
+                          lumo_settings as l_settings)
 
 parser: argparse.ArgumentParser
 
@@ -98,13 +97,6 @@ def get_argument_parser() -> argparse.ArgumentParser:
         , help="Open the lumo settings."
         , description="Interactive settings program to adjust program features."
     )
-
-    timer = sub_parser.add_parser(
-        "timer"
-        , help="A simple timer to use in various ways."
-        , description="A simple timer feature."
-    )
-    timer.add_argument("minutes", nargs="?")
 
     return parser
 
@@ -365,19 +357,6 @@ def router(cli_input: Optional[argparse.Namespace],
 
         LumoMenu.load_transition()
         l_settings.main()
-        return None, main_menu
-
-    elif (selected_prog.lower() in {"timer"} or
-          cli_prog.lower() in {"timer"} or
-          selected_prog_dict_value in {"Timer"}):
-
-        if from_cli:
-            LumoMenu.load_transition()
-            l_timer.main(cli_input.minutes)
-        else:
-            LumoMenu.load_transition()
-            l_timer.main()
-
         return None, main_menu
 
     # No need to have a cli_prog.lower() in {"quit"}
