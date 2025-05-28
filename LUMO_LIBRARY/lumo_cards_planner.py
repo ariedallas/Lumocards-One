@@ -296,7 +296,7 @@ def iterate_cards(var_list_cards, mode):
         card = l_card_utils.filename_to_card(card_path)
 
         l_animators.list_printer(["", card_counter_feedback_text], indent_amt=2, speed_interval=0)
-        l_boxify.get_card_display_format(card)
+        l_boxify.display_card(card)
 
         if mode == "main cards":
             status = cardsrun_macro_hotwords(card_filename=card_path, card=card, card_idx=card_no - 1)

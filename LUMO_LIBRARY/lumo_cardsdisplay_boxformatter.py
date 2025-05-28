@@ -2,7 +2,7 @@ import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 
 
-def get_card_display_format(var_card, display_qty=6, length=50, height=10):
+def display_card(var_card, display_qty=6, length=50, height=10):
     f_card_name = l_card_utils.format_card_title(var_card[0])
     todo_items = var_card[1]
     card_display_list = []
