@@ -1,6 +1,4 @@
 :::::NEXT:::::
-	- work on selecting and displaying single events
-	- work on basic parser to create events
 	- make sure finish delay is set to .5 almost everywhere
 	
 :::::NEXT LVL 2:::::
@@ -36,10 +34,11 @@
 	- cancel doesn't work on renaming in search cards
 	- double check indentations for 'list_print'
 
-::::KNOWN ISSUES::::
-	- Calendar: multi day events with start and end times will only display on their start date.
+::::CALENDAR KNOWN ISSUES::::
+	- Multi day events with start and end times will only display on their start date.
 		-i.e. if the event is 24th to 28th, it only shows up on the 24th...''
 	- 2038 problem
+	- Events Checked 'All Day' will not display in calendar
 	
 
 :::::OUTLINE BIG:::::
