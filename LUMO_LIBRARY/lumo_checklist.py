@@ -5,20 +5,10 @@ import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
-import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
-
-main_card_path = os.path.join(l_files.internal_cards_folder, "Checklist_Main.txt")
-main_card = l_card_utils.fullpath_to_card(main_card_path)
-main_card_title, main_card_steps = main_card[0], main_card[1]
-
-errand_card_path = os.path.join(l_files.internal_cards_folder, "Checklist_Errand.txt")
-errand_card = l_card_utils.fullpath_to_card(errand_card_path)
-errand_card_title, errand_card_steps = errand_card[0], errand_card[1]
 
 
 def cycler(list_of_steps):
     for item in list_of_steps:
-        # print(repr(item))
         if item != "\n" and item != "" and item:
             input(f"  {item} ?  ")
         else:
@@ -96,37 +86,9 @@ def main():
     if status != "EXIT":
         display_selected_checklist(card_title=title, card_steps=steps)
 
-
     print()
     l_animators.animate_text("Quit Lumo: Checklist", finish_delay=.5)
 
 
 if __name__ == "__main__":
     main()
-
-# ---- ETC. / UNUSED CODE ---- #
-# def main_checklist_review():
-#     print()
-#     user_input = l_menus_funcs.proceed("  Would you like to review the Essentials Checklist? ")
-#     if user_input:
-#         main_card_title_formatted = l_card_utils.format_card_title(main_card_title).upper()
-#         print()
-#         l_animators.animate_text(main_card_title_formatted)
-#
-#         print()
-#         cycler(main_card_steps)
-#
-#
-# def errand_checklist_review():
-#     print()
-#     user_input = l_menus_funcs.proceed("  Would you like to review the Errands Checklist? ")
-#     if user_input:
-#         errand_card_title_formatted = l_card_utils.format_card_title(errand_card_title).upper()
-#         print()
-#         l_animators.animate_text(errand_card_title_formatted)
-#
-#         print()
-#         cycler(errand_card_steps)
-
-# main_checklist_review()
-# errand_checklist_review()
