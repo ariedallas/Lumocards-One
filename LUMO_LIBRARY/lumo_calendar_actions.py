@@ -53,9 +53,29 @@ def update_event_simple(updated_event: dict, var_id: str, target):
         event[target] = updated_event[target]
 
         updated_G_event = service.events().update(calendarId="primary",
-                                                eventId=event["id"],
-                                                body=event).execute()
+                                                  eventId=event["id"],
+                                                  body=event).execute()
         return True, updated_G_event[target]
+
+
+    except HttpError as error:
+        return False, error
+
+
+def update_event_dt(var_id: str, dt_parser):
+    try:
+        service = l_cal_utils.get_google_service()
+        event = service.events().get(calendarId="primary",
+                                     eventId=var_id).execute()
+
+        event["start"] = dt_parser.start_G_format
+        event["end"] = dt_parser.end_G_format
+
+        service.events().update(calendarId="primary",
+                                eventId=event["id"],
+                                body=event).execute()
+
+        return True, "Date/Time"
 
 
     except HttpError as error:
@@ -68,7 +88,7 @@ def delete_event(var_id: str) -> None:
         service.events().delete(calendarId="primary", eventId=var_id).execute()
 
     except HttpError as error:
-        print("This event was (likely) already deleted.")
+        print("Error when deleting event.")
         print(error)
 
 

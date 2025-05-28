@@ -474,8 +474,8 @@ class Event:
             editing_event["s"] = "all day"
             editing_event["e"] = "all day"
 
-            editing_event["s_date"] = self.s_date
-            editing_event["e_date"] = self.e_date
+            editing_event["s_date"] = self.s_date.strftime("%d of %b, %Y")
+            editing_event["e_date"] = self.e_date.strftime("%d of %b, %Y")
 
         else:
             editing_event["s"] = self.s.strftime("%I:%M %p").lower()
@@ -1319,6 +1319,11 @@ class Menus:
         [PROMPT_S_DATE, PROMPT_E_DATE],
         [PROMPT_DESCRIPTION],
         [PROMPT_LOCATION]
+    ]
+
+    EDITING_EVENT_DT = [
+        [PROMPT_S_TIME, PROMPT_E_TIME],
+        [PROMPT_S_DATE, PROMPT_E_DATE]
     ]
 
     EDITING_EVENT_CONFIRMATION = [
