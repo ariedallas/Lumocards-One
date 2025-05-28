@@ -95,6 +95,10 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
                 deleted_cards.append(card_filename)
                 l_animators.animate_text(f"Card {card_filename} marked for deletion; returning to Lumocards.")
                 return "RELOOP"
+
+            elif status == "QUIT":
+                return False
+
             else:
                 return "RELOOP"
 
@@ -170,9 +174,6 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
             if status == "RELOOP" and possible_card_path:
                 return "RELOOP"
 
-            elif status == "EXIT MENU":
-                return "RELOOP"
-
             elif status == "CARD REFOCUSED":
                 return "RELOOP"
 
@@ -181,6 +182,13 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
                 deleted_cards.append(card_filename)
                 l_animators.animate_text(f"Card {card_filename} marked for deletion; returning to Lumocards.")
                 return "RELOOP"
+
+            elif status == "EXIT MENU":
+                return "RELOOP"
+
+            elif status == "QUIT":
+                return False
+
             else:
                 return "RELOOP"
 
@@ -263,36 +271,17 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
                 l_animators.animate_text("  This feature not fully available")
                 return "CARD REFOCUSED", None
 
-            elif menu_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING_2:
-                card_title_formatted = l_card_utils.format_card_title(card_filename.replace(".txt", ""))
-                recur_menu_d, recur_menu_l = l_menus_funcs.prep_newcard_menu(l_menus_data.RECURRING_MENU,
-                                                                             l_menus_data.LETTERS_FILTERED,
-                                                                             pop_letters=False)
-                print()
-                l_animators.list_printer([card_title_formatted])
-                print()
-                l_animators.list_printer(recur_menu_l)
-
-                recurrence_settings = l_menus_funcs.menu_recurrence_settings(var_menu=recur_menu_d)
-
-                l_recurring.update_recurring_data(card_filename, recurrence_settings, initialized=True)
-                l_card_utils.card_renamer(curr_name=card_filename
-                                          , dst_dir=l_files.recurring_cards_folder
-                                          , dst_name=card_filename)
-
-                return "CARD REFOCUSED", None
-
 
         elif user_input.upper() in l_menus_data.EXIT_MENU_DICT.keys():
             return "EXIT MENU", None
 
         elif user_input.upper() in l_menus_data.QUIT_MENU_DICT.keys():
             l_animators.animate_text("Quit")
-            sys.exit(0)
+            return "QUIT", None
 
         elif user_input.lower() == 'quit':
             l_animators.animate_text("Quit")
-            sys.exit(0)
+            return "QUIT", None
 
         else:
             print("In this context your options are hotkey letter such as 'a', 'c', or 'quit'.")
