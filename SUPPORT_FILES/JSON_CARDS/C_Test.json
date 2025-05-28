@@ -1,0 +1,16 @@
+{
+    "card location": "CARDS_A_FOCUS_NEAR",
+    "card category abbreviation": "C",
+    "card category": "Computer",
+    "calendar event": null,
+    "calendar repeating event": null,
+    "recurring freq": 0,
+    "recurring freq time unit": null,
+    "last occurrence": null,
+    "card created": "2025-05-28 16:20:27",
+    "tags": [
+        "default tag a",
+        "default tag b",
+        "default tag c"
+    ]
+}
