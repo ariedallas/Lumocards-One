@@ -119,7 +119,7 @@ def select_card_from_found(searchterm):
 
     if total_amt_matches == 0:
         l_animators.animate_text_indented(f"No matches found for your term \'{searchterm}\'... ",
-                                          indent=2, finish_delay=.4)
+                                          indent_amt=2, finish_delay=.4)
         print()
         return None, None, False
 
@@ -206,7 +206,7 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
 
 
             elif var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
-                l_animators.animate_text_indented("This feature not fully available", indent=2, finish_delay=.4)
+                l_animators.animate_text_indented("This feature not fully available", indent_amt=2, finish_delay=.4)
                 print()
                 return "RELOOP", var_card_filename
 

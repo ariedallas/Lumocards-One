@@ -178,7 +178,7 @@ def add_custom_or_default_steps(indent=0):
 def retry_loop_card_filename(card_filename):
     if not card_filename:
         print()
-        l_animators.animate_text_indented("A card with this name already exists...", indent=2)
+        l_animators.animate_text_indented("A card with this name already exists...", indent_amt=2)
         # TODO: to continue type any key but [q]; [q] for quit
         # TODO: -OR- inform user they can undo after next step and to make a dummy card
 
@@ -188,7 +188,7 @@ def retry_loop_card_filename(card_filename):
                 return retry_card_filename
             else:
                 print()
-                l_animators.animate_text_indented("A card with this name already exists...", indent=2)
+                l_animators.animate_text_indented("A card with this name already exists...", indent_amt=2)
 
     return card_filename
 
@@ -227,7 +227,7 @@ def write_card(card_filename, card_steps):
                                                               l_files.cards_near_folder,
                                                               add_custom_steps=card_steps)
 
-                l_animators.animate_text_indented("Card set to ➝ Near Focus", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card set to ➝ Near Focus", indent_amt=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
             elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_MIDDLE:
@@ -236,7 +236,7 @@ def write_card(card_filename, card_steps):
                                                               l_files.cards_middle_folder,
                                                               add_custom_steps=card_steps)
 
-                l_animators.animate_text_indented("Card set to ➝ Middle Focus", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card set to ➝ Middle Focus", indent_amt=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
             elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_DIST:
@@ -245,14 +245,14 @@ def write_card(card_filename, card_steps):
                                                               l_files.cards_dist_folder,
                                                               add_custom_steps=card_steps)
 
-                l_animators.animate_text_indented("Card set to ➝ Distant Focus", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card set to ➝ Distant Focus", indent_amt=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
 
             # ---- SCHEDULING MENU ---- #
 
             elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
-                l_animators.animate_text_indented("This function currently unavailable...", indent=2)
+                l_animators.animate_text_indented("This function currently unavailable...", indent_amt=2)
 
             elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING:
 
@@ -275,7 +275,7 @@ def write_card(card_filename, card_steps):
                 l_recurring.update_recurring_data(card_filename, recurrence_settings, initialized=True)
 
                 print()
-                l_animators.animate_text_indented("Card created in ➝ Recurring Cards", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card created in ➝ Recurring Cards", indent_amt=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
             elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_CHECKLIST:
@@ -284,7 +284,7 @@ def write_card(card_filename, card_steps):
                                                               l_files.checklist_cards_folder,
                                                               add_custom_steps=card_steps)
 
-                l_animators.animate_text_indented("Card set to ➝ Checklist Cards", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card set to ➝ Checklist Cards", indent_amt=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
         elif user_input.lower() in {"x", "exit"}:
@@ -297,7 +297,7 @@ def write_card(card_filename, card_steps):
 
         else:
             l_animators.animate_text_indented("Options available in this context are just shortcut letters.",
-                                              indent=2, finish_delay=.5)
+                                              indent_amt=2, finish_delay=.5)
 
 
 def write_card_and_json(card_filename, folder, add_custom_steps=None):

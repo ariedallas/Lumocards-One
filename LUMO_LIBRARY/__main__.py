@@ -44,6 +44,11 @@ def get_argument_parser() -> argparse.ArgumentParser:
         , description="Alternate shortcut to run Lumocards."
     )
     sub_parser.add_parser(
+        "cards"
+        , help="Alternate shortcut name to run Lumocards."
+        , description="Alternate shortcut to run Lumocards."
+    )
+    sub_parser.add_parser(
         "home"
         , help="Defaults to main menu when you type 'lumo' by itself."
         , description="Defaults to main meny when you type 'lumo' by itself."
@@ -204,17 +209,19 @@ def root_loop(cli_parsed_args: argparse.Namespace, unknown: list[str]) -> None:
                               lumo_input="_",
                               contextual_menu=main_menu)
 
+
+
     while True:
         if status == "QUIT":
             break
 
         if status == "RELOOP":
             print()
-            l_animators.animate_text_indented("unrecognized option", indent=2, finish_delay=1)
+            l_animators.animate_text_indented("unrecognized option", indent_amt=2, finish_delay=1)
 
         if status == "LUMO DUPLICATE":
             print()
-            l_animators.animate_text_indented("Try typing the keyword without 'lumo' first or use a shortcut letter.", indent=2, finish_delay=1)
+            l_animators.animate_text_indented("Try typing the keyword without 'lumo' first or use a shortcut letter.", indent_amt=2, finish_delay=1)
 
         LumoMenu.load_transition()
         if menu.name == "all":
@@ -283,6 +290,7 @@ def router(cli_input: Optional[argparse.Namespace],
         l_calendar.main()
         return None, main_menu
 
+
     elif (selected_prog.lower() in {"checklist", "checklists"} or
           cli_prog.lower() in {"checklist"} or
           selected_prog_dict_value in {"Checklist"}):
@@ -303,9 +311,10 @@ def router(cli_input: Optional[argparse.Namespace],
     elif (selected_prog.lower() in {"lumo"}):
         return "LUMO DUPLICATE", contextual_menu
 
-    elif (selected_prog.lower() in {"new card", "newcard"} or
+    elif (selected_prog.lower() in {"newcard"} or
           cli_prog.lower() in {"newcard"} or
           selected_prog_dict_value in {"New Card"}):
+
 
         if from_cli and (cli_input.card_category and cli_input.card_title):
             category, title = cli_input.card_category, cli_input.card_title
@@ -318,7 +327,7 @@ def router(cli_input: Optional[argparse.Namespace],
         return None, main_menu
 
     elif (selected_prog.lower() in {"planner", "cards planner", "cards"} or
-          cli_prog.lower() in {"planner"} or
+          cli_prog.lower() in {"planner", "cards"} or
           selected_prog_dict_value in {"Cards Planner"}):
 
         LumoMenu.load_transition()

@@ -16,13 +16,13 @@ def animate_text(text: str, speed: float =.025, finish_delay: float=0) -> None:
         time.sleep(finish_delay)
 
 
-def animate_text_indented(text: str, speed: float=.025, indent=Optional[int], finish_delay: float=0) -> None:
-    if not indent:
-        indent = 0
+def animate_text_indented(text: str, speed: float=.025, indent_amt=Optional[int], finish_delay: float=0) -> None:
+    if not indent_amt:
+        indent_amt = 0
 
-    text_add_space = (" " * indent) + text
+    text_add_space = (" " * indent_amt) + text
 
-    for n in range(indent, len(text_add_space) + 1):
+    for n in range(indent_amt, len(text_add_space) + 1):
         print(text_add_space[:n], end="\r")
         time.sleep(speed)
 
@@ -53,5 +53,5 @@ def list_printer(text_list: Optional[list[str]] = None,
 
 
 if __name__ == "__main__":
-    animate_text_indented("boooo!", indent=2)
+    animate_text_indented("boooo!", indent_amt=2)
 

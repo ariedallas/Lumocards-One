@@ -6,8 +6,6 @@ import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 
-reactivated_cards = []
-
 
 def test_for_reactivation(json_filename):
     json_fullpath = l_json_utils.get_json_card_fullpath(json_filename)
@@ -33,6 +31,8 @@ def test_for_reactivation(json_filename):
 
 
 def get_recurring_cards():
+    reactivated_cards = []
+
     for card in os.listdir(l_files.recurring_cards_folder):
         if test_for_reactivation(card):
             reactivated_cards.append(card)
@@ -121,7 +121,7 @@ def update_recurring_data(json_filename, var_settings=None, initialized=False):
         json_data["recurring freq time unit"]: None
         json_data["last occurrence"]: None
 
-        l_animators.animate_text_indented("Oops! Something is funky...", indent=2)
+        l_animators.animate_text_indented("Oops! Something is funky...", indent_amt=2)
         next_occurrence = today
 
     with open (json_fullpath, "w+") as fin:

@@ -74,7 +74,7 @@ def main():
             break
         else:
             print()
-            l_animators.animate_text_indented("Unrecognized option", indent=2, finish_delay=.5)
+            l_animators.animate_text_indented("Unrecognized option", indent_amt=2, finish_delay=.5)
             subprocess.run(["clear"], shell=True)
             print("\n\n")
 

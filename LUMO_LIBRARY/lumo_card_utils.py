@@ -19,7 +19,7 @@ default_card_steps = [
 ]
 
 
-def card_header(var_card):
+def card_header(var_card, indent_amt=0):
     card_title = var_card[0]
     card_steps = var_card[1]
     steps_amt = len(card_steps)
@@ -27,11 +27,12 @@ def card_header(var_card):
 
     formatted_card_title = format_card_title(card_title)
     card_steps_three = steps_preview(card_steps, steps_amt, steps_idx)
+    card_steps_formatted = f"First three items: 1) {card_steps_three[0]}  2) {card_steps_three[1]}  3) {card_steps_three[2]}"
 
     print()
-    l_animators.animate_text(formatted_card_title.upper())
+    l_animators.animate_text_indented(formatted_card_title.upper(), indent_amt=indent_amt)
     print()
-    print("  First three items: ", card_steps_three[0], card_steps_three[1], card_steps_three[2])
+    l_animators.list_printer([card_steps_formatted], indent_amt=indent_amt+2)
     print()
 
 
@@ -43,22 +44,22 @@ def step_abbreviator(var_step):
 def steps_preview(card_steps, steps_amt, steps_idx):
     if 0 < steps_amt < 3:
 
-        initial = [f" {n} — {step_abbreviator(step)}" for n, step in
+        initial = [f"{step_abbreviator(step)}" for n, step in
                    zip(range(1, steps_idx), card_steps[0:steps_amt])]
-        filler = [f" {n} — {step}" for n, step in
+        filler = [f"{step}" for n, step in
                   zip(range(steps_idx, 4), default_card_steps)]
 
         card_steps_three = initial + filler
 
     elif steps_amt >= 3:
-        card_steps_three = [f" {n} — {step_abbreviator(step)}" for n, step in
+        card_steps_three = [f"{step_abbreviator(step)}" for n, step in
                             zip(range(4), card_steps[0:3])]
 
     elif steps_amt == 0:
-        card_steps_three = [f" {n} — (empty)" for n in range(4)]
+        card_steps_three = [f"(empty)" for n in range(4)]
 
     else:
-        card_steps_three = [f" {n} — {step}" for n, step in zip(range(4), default_card_steps)]
+        card_steps_three = [f"{step}" for n, step in zip(range(4), default_card_steps)]
 
     return card_steps_three
 
@@ -104,13 +105,16 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False
 
 
 def card_deleter(card_filename):
-    if not l_menus_funcs.proceed("  Type 'no' or 'x' to cancel, otherwise press any key to continue >  "):
+    l_animators.list_printer([f"{card_filename} ➝ Type 'no' or 'x' to cancel deletion",
+                              "or press any other key to confirm deletion"], indent_amt=2)
+    if not l_menus_funcs.proceed(f"  >  "):
         return "CANCELLED"
     card_fullpath = get_card_abspath(card_filename)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
 
     send2trash.send2trash(card_fullpath)
     send2trash.send2trash(json_fullpath)
+    l_animators.animate_text_indented(f"Card {card_filename} deleted", indent_amt=2)
 
 
 def set_card_near_focus(card_filename, var_dst_dir):

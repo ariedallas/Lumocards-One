@@ -16,7 +16,7 @@ ACTION_SET_NEAR = "Set as ➝ Near Focus"
 ACTION_SET_MIDDLE = "Set as ➝ Middle Focus"
 ACTION_SET_DIST = "Set as ➝ Distant Focus"
 
-ACTION_ARCHIVE = "Move card to Archives"
+ACTION_ARCHIVE = "Move card to archives"
 ACTION_DELETE = "Delete card"
 ACTION_MARK_DELETE = "Mark card for deletion"
 ACTION_NEW_SEARCH = "New search"

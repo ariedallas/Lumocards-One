@@ -109,17 +109,18 @@ def menu_recurrence_settings(var_menu):
         return recurrence_settings
 
 
-def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
+def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict, indent_amt):
     print()
-    l_animators.animate_text("MODIFYING CARD")
+    l_animators.animate_text_indented("MODIFYING CARD", indent_amt=indent_amt)
     print()
 
     while True:
-        l_animators.list_printer(var_hotkey_list, indent_amt=2, speed_interval=0)
+        l_animators.list_printer(var_hotkey_list, indent_amt=indent_amt+2, speed_interval=0)
         print()
-        l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, indent_amt=2, speed_interval=0)
+        l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, indent_amt=indent_amt+2, speed_interval=0)
 
-        response = input("\n  >  ")
+        input_space = " " * (indent_amt+2)
+        response = input(f"\n{input_space}>  ")
 
         if response.upper() in var_hotkey_dict.keys():
 
@@ -129,7 +130,7 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
                                           dst_dir=l_files.cards_near_folder,
                                           dst_name=selected_card)
 
-                l_animators.animate_text_indented("Card set to ➝ Near Focus", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card set to ➝ Near Focus", indent_amt=2, finish_delay=.5)
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_SET_MIDDLE:
@@ -138,7 +139,7 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
                                           dst_dir=l_files.cards_middle_folder,
                                           dst_name=selected_card)
 
-                l_animators.animate_text_indented("Card set to ➝ Middle Focus", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card set to ➝ Middle Focus", indent_amt=2, finish_delay=.5)
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_SET_DIST:
@@ -147,7 +148,7 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
                                           dst_dir=l_files.cards_dist_folder,
                                           dst_name=selected_card)
 
-                l_animators.animate_text_indented("Card set to ➝ Distant Focus", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card set to ➝ Distant Focus", indent_amt=2, finish_delay=.5)
                 return "CARD REFOCUSED", None
 
             elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_RENAME:
@@ -160,10 +161,10 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
                                           ask_confirmation=True)
 
                 if confirmation == "CANCELLED":
-                    l_animators.animate_text_indented("Cancelled card rename", indent=2, finish_delay=.5)
+                    l_animators.animate_text_indented("Cancelled card rename", indent_amt=2, finish_delay=.5)
                     return None, None
 
-                l_animators.animate_text_indented("Card renamed", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card renamed", indent_amt=2, finish_delay=.5)
                 return None, retitled_card_path
 
             elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_ARCHIVE:
@@ -172,17 +173,17 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict):
                                           dst_dir=l_files.archived_cards_folder,
                                           dst_name=selected_card)
 
-                l_animators.animate_text_indented("Card archived", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card archived", indent_amt=2, finish_delay=.5)
                 return None, None
 
             elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_DELETE:
                 confirmation = l_card_utils.card_deleter(selected_card)
 
                 if confirmation == "CANCELLED":
-                    l_animators.animate_text_indented("Card not deleted", indent=2, finish_delay=.5)
+                    l_animators.animate_text_indented("Card not deleted", indent_amt=2, finish_delay=.5)
                     return None, None
 
-                l_animators.animate_text_indented("Card deleted", indent=2, finish_delay=.5)
+                l_animators.animate_text_indented("Card deleted", indent_amt=2, finish_delay=.5)
                 return "DELETED CARD", None
 
             elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_MARK_DELETE:

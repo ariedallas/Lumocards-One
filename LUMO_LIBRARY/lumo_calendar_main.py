@@ -133,7 +133,7 @@ class CalendarInterface:
                 action in {"delete"}:
             l_cal_actions.delete_event(event_obj.id)
             l_animators.animate_text_indented("Deleted event",
-                                              indent=CalendarPageEvent.msg_indent_1,
+                                              indent_amt=CalendarPageEvent.msg_indent_1,
                                               finish_delay=.5)
 
             return False, None, None, "DELETE EVENT"
@@ -244,7 +244,7 @@ class CalendarInterface:
 
             else:
                 l_animators.animate_text_indented("Unrecognized option...",
-                                                  indent=CalendarPageEvent.msg_indent_1,
+                                                  indent_amt=CalendarPageEvent.msg_indent_1,
                                                   finish_delay=.5)
 
 
@@ -308,12 +308,12 @@ class CalendarInterface:
                 custom_error = self.parse_for_error(user_input)
 
                 l_animators.animate_text_indented("Unrecognized option...",
-                                                  indent=CalendarPageDay.msg_indent_num,
+                                                  indent_amt=CalendarPageDay.msg_indent_num,
                                                   finish_delay=.5)
 
                 if custom_error:
                     l_animators.animate_text_indented(custom_error,
-                                                      indent=CalendarPageDay.msg_indent_num,
+                                                      indent_amt=CalendarPageDay.msg_indent_num,
                                                       finish_delay=.5)
 
 
@@ -405,7 +405,7 @@ class CalendarInterface:
             else:
                 indent = int(CalendarPageWeek.l_margin_menu) + 7
                 l_animators.animate_text_indented("Unrecognized option...",
-                                                  indent=indent,
+                                                  indent_amt=indent,
                                                   finish_delay=.5)
 
 
@@ -546,7 +546,7 @@ class CalendarInterface:
             feedback = f"Created event: {summary_short}"
 
             l_animators.animate_text_indented(feedback,
-                                              indent=CalendarPageEvent.l_margin_num,
+                                              indent_amt=CalendarPageEvent.l_margin_num,
                                               finish_delay=1)
 
             dt_parser.format_data_for_search()
@@ -559,7 +559,7 @@ class CalendarInterface:
         else:
             feedback = "The event failed when creating, try again?"
             l_animators.animate_text_indented(feedback,
-                                              indent=CalendarPageEvent.l_margin_num,
+                                              indent_amt=CalendarPageEvent.l_margin_num,
                                               finish_delay=1)
 
     # Figure out how to split this up into some smaller chunks
@@ -608,7 +608,7 @@ class CalendarInterface:
                         val == "":
                     print()
                     l_animators.animate_text_indented("Saving event...",
-                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      indent_amt=CalendarPageEvent.msg_indent_1,
                                                       finish_delay=.5
                                                       )
                     event_ready = True
@@ -623,7 +623,7 @@ class CalendarInterface:
                 elif val == "x" or val in {"exit"}:
                     print()
                     l_animators.animate_text_indented("Back to un-edited event",
-                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      indent_amt=CalendarPageEvent.msg_indent_1,
                                                       finish_delay=.5
                                                       )
                     return "RELOOP"
@@ -631,7 +631,7 @@ class CalendarInterface:
                 else:
                     print()
                     l_animators.animate_text_indented("Unrecognized option",
-                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      indent_amt=CalendarPageEvent.msg_indent_1,
                                                       finish_delay=.5
                                                       )
 
@@ -644,7 +644,7 @@ class CalendarInterface:
 
             print()
             l_animators.animate_text_indented(feedback,
-                                              indent=CalendarPageEvent.msg_indent_2,
+                                              indent_amt=CalendarPageEvent.msg_indent_2,
                                               finish_delay=1)
 
             return "UPDATE EVENT"
@@ -655,7 +655,7 @@ class CalendarInterface:
 
             print()
             l_animators.animate_text_indented(feedback,
-                                              indent=CalendarPageEvent.msg_indent_2,
+                                              indent_amt=CalendarPageEvent.msg_indent_2,
                                               finish_delay=1)
             print(msg)
 
@@ -745,7 +745,7 @@ class CalendarInterface:
                         val == "":
                     print()
                     l_animators.animate_text_indented("Saving event...",
-                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      indent_amt=CalendarPageEvent.msg_indent_1,
                                                       finish_delay=.5
                                                       )
                     event_ready = True
@@ -764,7 +764,7 @@ class CalendarInterface:
                 elif val == "x" or val in {"exit"}:
                     print()
                     l_animators.animate_text_indented("Back to un-edited event",
-                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      indent_amt=CalendarPageEvent.msg_indent_1,
                                                       finish_delay=.5
                                                       )
                     return "RELOOP"
@@ -772,7 +772,7 @@ class CalendarInterface:
                 else:
                     print()
                     l_animators.animate_text_indented("Unrecognized option",
-                                                      indent=CalendarPageEvent.msg_indent_1,
+                                                      indent_amt=CalendarPageEvent.msg_indent_1,
                                                       finish_delay=.5
                                                       )
         time_zone = get_google_setting("timezone")
@@ -785,7 +785,7 @@ class CalendarInterface:
 
             print()
             l_animators.animate_text_indented(feedback,
-                                              indent=CalendarPageEvent.msg_indent_2,
+                                              indent_amt=CalendarPageEvent.msg_indent_2,
                                               finish_delay=1)
 
             return "UPDATE EVENT"
@@ -796,7 +796,7 @@ class CalendarInterface:
 
             print()
             l_animators.animate_text_indented(feedback,
-                                              indent=CalendarPageEvent.msg_indent_2,
+                                              indent_amt=CalendarPageEvent.msg_indent_2,
                                               finish_delay=1)
             print(msg)
 
@@ -830,7 +830,7 @@ class CalendarInterface:
             error = dt_parser.get_error()
             print()
             l_animators.animate_text_indented(error,
-                                              indent=CalendarPageEvent.msg_indent_2,
+                                              indent_amt=CalendarPageEvent.msg_indent_2,
                                               finish_delay=1)
 
             return None, None

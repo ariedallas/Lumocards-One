@@ -12,16 +12,6 @@ import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 
 settings = l_files.get_json_settings()
-
-reviewed_cards = []
-reviewed_recurring_cards = []
-todays_cards = []
-
-reassigned_cards = []
-reactivated_cards = l_recurring.get_recurring_cards()
-archived_cards = []
-deleted_cards = []
-# days_since_birth = l_files.get_days_from_date(1988, 6, 12)
 day, day_num, month, year = l_files.isolate_date_units()
 
 
@@ -30,7 +20,7 @@ def cards_intro():
 
     l_animators.list_printer([
         f"IT'S: {day.upper()}, {day_num} of {month.upper()}, {year}",
-        "RUNNING: NEAR FOCUS CARDS",], indent_amt=2)
+        "RUNNING: NEAR FOCUS CARDS", ], indent_amt=2)
 
 
 def add_step_via_integers(card_steps, card_title, user_input):
@@ -44,23 +34,25 @@ def add_step_via_integers(card_steps, card_title, user_input):
 
     for num in selected_integers:
         if 0 <= int(num) > total_cards:
-            l_animators.animate_text(f"Skipping number {num}, it shouldn't correspond to a step...")
+            l_animators.animate_text_indented(f"Skipping number {num}, it shouldn't correspond to a step...",
+                                              indent_amt=2)
 
 
 def cardsrun_macro_hotwords(card_filename, card, card_idx):
     card_title, card_steps = card[0], card[1]
 
-    user_input = input("\n  > ")
+    user_input = input("\n  >  ")
     user_input_filtered = l_card_utils.add_blank_space(user_input)
 
     # ---- START OF MAIN IF/ELIF ---- #
 
     if user_input_filtered == " ":  # I.E. SKIPPED CARD
-        l_animators.animate_text("  ...", speed=.075)
+        l_animators.animate_text_indented("...", speed=.075, indent_amt=2)
         reviewed_cards.append(card_filename)
 
     elif user_input_filtered in l_menus_data.NEGATIVE_USER_RESPONSES:  # I.E. QUIT
-        l_animators.animate_text(text="Quitted card review.", speed=.075)
+        l_animators.animate_text_indented(text="Quitted card review.",
+                                          indent_amt=2)
         return False
 
     elif user_input_filtered[0].isnumeric():
@@ -90,7 +82,8 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
             elif status == "CARD MARKED FOR DELETION":
                 reviewed_cards.append(card_filename)
                 deleted_cards.append(card_filename)
-                l_animators.animate_text(f"Card {card_filename} marked for deletion; returning to Lumocards.")
+                l_animators.animate_text_indented(f"Card {card_filename} marked for deletion; returning to Lumocards.",
+                                                  indent_amt=2)
                 return "RELOOP"
 
             elif status == "QUIT":
@@ -102,7 +95,6 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
 
         elif route == 'edit':
             card_fullpath = l_card_utils.get_card_abspath(card_filename)
-            l_animators.animate_text((l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered.lower()][0]))
             subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
 
             return "RELOOP"
@@ -111,20 +103,22 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
         elif route == 'archive':
             reviewed_cards.append(card_filename)
             archived_cards.append(card_filename)
-            print("Card completed: {}".format(l_files.curr_time_hr))
-            print(random.choice(l_menus_data.CARDS_PLANNER_COMPLETED_PHRASES))
+            l_animators.list_printer(["Card completed: {}".format(l_files.curr_time_hr)],
+                                     indent_amt=2
+                                     )
 
 
         elif route == 'delete':
             deleted_cards.append(card_filename)
             reviewed_cards.append(card_filename)
-            print(l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0])
+            l_animators.list_printer([l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0]],
+                                     indent_amt=2)
 
 
         elif route == 'superquit':
             found_tuple = l_menus_data.CARDS_PLANNER_FEEDBACK.get(user_input_filtered)
             feedback = found_tuple[0]
-            l_animators.animate_text(feedback, speed=.075)
+            l_animators.animate_text_indented(feedback, indent_amt=2)
             return "SUPER QUIT"
 
     else:
@@ -139,17 +133,17 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
 def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
     card_title, card_steps = card[0], card[1]
 
-    user_input = input("    \n> ")
+    user_input = input("\n  >  ")
     user_input_filtered = l_card_utils.add_blank_space(user_input)
 
     # ---- START OF MAIN IF/ELIF ---- #
 
     if user_input_filtered == " ":  # I.E. SKIPPED CARD
-        l_animators.animate_text(text=" ...", speed=.075)
+        l_animators.animate_text_indented(text="...", speed=.075, indent_amt=2)
         reviewed_recurring_cards.append(card_filename)
 
     elif user_input_filtered in l_menus_data.NEGATIVE_USER_RESPONSES:  # I.E. QUIT
-        l_animators.animate_text(text="Quitted card review.", speed=.075)
+        l_animators.animate_text_indented(text="Quitted card review.", indent_amt=2)
         return False
 
     elif user_input_filtered[0].isnumeric():
@@ -172,12 +166,14 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
                 return "RELOOP"
 
             elif status == "CARD REFOCUSED":
+                reviewed_recurring_cards.append(card_filename)
                 return "RELOOP"
 
             elif status == "CARD MARKED FOR DELETION":
                 reviewed_recurring_cards.append(card_filename)
                 deleted_cards.append(card_filename)
-                l_animators.animate_text(f"Card {card_filename} marked for deletion; returning to Lumocards.")
+                l_animators.animate_text_indented(f"Card {card_filename} marked for deletion; returning to Lumocards.",
+                                                  indent_amt=2)
                 return "RELOOP"
 
             elif status == "EXIT MENU":
@@ -194,7 +190,8 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
 
             card_fullpath = os.path.join(l_files.recurring_cards_folder, card_filename)
 
-            l_animators.animate_text((l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered.lower()][0]))
+            l_animators.animate_text_indented((l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered.lower()][0]),
+                                              indent_amt=2)
             subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
 
             return "RELOOP"
@@ -203,7 +200,8 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
         elif route == 'archive':
             next_occurrence = l_recurring.update_recurring_data(card_filename)
             reviewed_recurring_cards.append(card_filename)
-            l_animators.animate_text(f"Recurring card will reactivate next {next_occurrence}")
+            l_animators.animate_text_indented(f"Recurring card will reactivate next {next_occurrence}",
+                                              indent_amt=2)
 
 
         elif route == 'delete':
@@ -213,7 +211,8 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
 
 
         elif route == 'superquit':
-            l_animators.animate_text(l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0], speed=.075)
+            l_animators.animate_text_indented(l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0],
+                                              indent_amt=2)
             return "SUPER QUIT"
 
     else:
@@ -226,15 +225,15 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
 def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
     card_fullpath = l_card_utils.get_card_abspath(card_filename)
 
-    l_card_utils.card_header(card)
+    l_card_utils.card_header(card, indent_amt=2)
 
-    l_animators.list_printer(menu_list, speed_interval=0)
+    l_animators.list_printer(menu_list, indent_amt=4, speed_interval=0)
     print()
-    l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, speed_interval=0)
-    l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, speed_interval=0)
+    l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, indent_amt=4, speed_interval=0)
+    l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, indent_amt=4, speed_interval=0)
 
     while True:
-        user_input = input("\n  > ")
+        user_input = input("\n    >  ")
 
         if user_input.upper() in menu_dict.keys():
 
@@ -251,7 +250,8 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
 
                 status, possible_returned_card = l_menus_funcs.menu_modify_card(selected_card=card_filename,
                                                                                 var_hotkey_list=hotkey_list,
-                                                                                var_hotkey_dict=hotkey_dict)
+                                                                                var_hotkey_dict=hotkey_dict,
+                                                                                indent_amt=2)
                 if possible_returned_card:
                     return "RELOOP", possible_returned_card
 
@@ -265,23 +265,26 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
                     return "RELOOP", card_filename
 
             elif menu_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
-                l_animators.animate_text("  This feature not fully available")
+                print()
+                l_animators.animate_text_indented("This feature not fully available", indent_amt=2)
                 return "CARD REFOCUSED", None
 
 
         elif user_input.upper() in l_menus_data.EXIT_MENU_DICT.keys():
             return "EXIT MENU", None
 
-        elif user_input.upper() in l_menus_data.QUIT_MENU_DICT.keys():
-            l_animators.animate_text("Quit")
-            return "QUIT", None
-
-        elif user_input.lower() == 'quit':
-            l_animators.animate_text("Quit")
+        elif user_input.upper() in l_menus_data.QUIT_MENU_DICT.keys() or \
+                user_input.lower() == 'quit':
+            print()
+            l_animators.animate_text_indented("Quit", indent_amt=2, finish_delay=.5)
             return "QUIT", None
 
         else:
-            print("In this context your options are hotkey letter such as 'a', 'c', or 'quit'.")
+            print()
+            l_animators.list_printer(["In this context your options are hotkey letter such as 'a', 'c'"
+                                         , "and words 'quit' or 'exit' "],
+                                     indent_amt=4,
+                                     speed_interval=0)
 
 
 def iterate_cards(var_list_cards, mode):
@@ -326,8 +329,12 @@ def run_remaining_cards():
 
 
 def review_and_write_recurring():
+    reactivated_cards = l_recurring.get_recurring_cards()
+
     if reactivated_cards:
-        l_animators.animate_text(f'{len(reactivated_cards)} cards were reactivated...', finish_delay=.5)
+        l_animators.animate_text_indented(f"{len(reactivated_cards)} cards were reactivated...",
+                                          finish_delay=.5,
+                                          indent_amt=2)
 
         review_set = set(reviewed_recurring_cards)
         remaining_cards = [x for x in reactivated_cards if x not in review_set]
@@ -345,42 +352,46 @@ def review_and_write_recurring():
             remaining_cards = [x for x in reactivated_cards if x not in review_set]
 
     else:
-        l_animators.animate_text(f'No recurring cards for today...', finish_delay=.5)
+        l_animators.animate_text_indented(f'No recurring cards for today...', finish_delay=.5, indent_amt=2)
 
 
 def planner_feedback(card_title, card_step):
     formatted_output = f"{card_title}: {card_step}"
     full_message = f"Added: '{formatted_output}.' to planner."
-    l_animators.list_printer([full_message])
+    l_animators.list_printer([full_message], indent_amt=2)
     todays_cards.append(formatted_output)
 
 
 def update_cards():
     print()
     if todays_cards:
-        l_animators.animate_text("ADDING TO PLANNER:")
-        l_animators.list_printer(todays_cards)
+        l_animators.animate_text_indented("ADDING TO PLANNER:", indent_amt=2)
+        print()
+        l_animators.list_printer(todays_cards, indent_amt=4)
 
     if len(archived_cards) > 0:
         print()
-        l_animators.animate_text("The system is now going to archive cards:")
-        l_animators.list_printer(archived_cards)
+        l_animators.animate_text_indented("The system is now going to archive cards:", indent_amt=2)
+        print()
+        l_animators.list_printer(archived_cards, indent_amt=4)
+        print()
 
-        if l_menus_funcs.proceed("> "):
+        if l_menus_funcs.proceed("  >  "):
             for card in archived_cards:
                 l_card_utils.near_focus_to_archive(card)
 
     if len(deleted_cards) > 0:
         print()
-        l_animators.animate_text("The system is now going to delete cards:")
-        l_animators.list_printer(deleted_cards)
+        l_animators.animate_text_indented("The system is now going to delete cards:", indent_amt=2)
+        print()
+        l_animators.list_printer(deleted_cards, indent_amt=4)
+        print()
 
-        if l_menus_funcs.proceed("> "):
-            for card in deleted_cards:
-                l_card_utils.card_deleter(card)
+        for card in deleted_cards:
+            l_card_utils.card_deleter(card)
 
     if not l_files.exists_planner_file():
-        l_animators.animate_text("Creating Planner file for today...")
+        l_animators.animate_text_indented("Creating Planner file for today...", indent_amt=2)
         l_files.make_today_planner()
 
     if len(todays_cards) > 0:
@@ -390,7 +401,7 @@ def update_cards():
         l_files.basic_wrtr_list(todays_cards, l_files.today_planner_fullpath)
 
     print()
-    l_animators.animate_text("This round of cards has completed.", finish_delay=.5)
+    l_animators.animate_text_indented("This round of cards has completed.", indent_amt=2, finish_delay=1)
 
 
 def program_header():
@@ -400,6 +411,17 @@ def program_header():
 
 
 def main():
+    global reviewed_cards, reviewed_recurring_cards, todays_cards, \
+        reassigned_cards, reactivated_cards, archived_cards, deleted_cards
+
+    reviewed_cards = []
+    reviewed_recurring_cards = []
+    todays_cards = []
+
+    reassigned_cards = []
+    archived_cards = []
+    deleted_cards = []
+
     program_header()
     cards_intro()
 
@@ -413,7 +435,7 @@ def main():
 
     if status == "EXIT CARD LIST":
         print()
-        user_input = l_menus_funcs.proceed("Proceed to Recurring Cards? ")
+        user_input = l_menus_funcs.proceed("  Proceed to Recurring Cards? ")
 
         if user_input:
             review_and_write_recurring()
