@@ -1,7 +1,7 @@
 {
-    "card location": "CARDS_A_FOCUS_NEAR",
-    "card category abbreviation": "E",
-    "card category": "Errand",
+    "card location": "CARDS_C_FOCUS_DISTANT",
+    "card category abbreviation": "F",
+    "card category": "Finance",
     "calender event": null,
     "calendar repeating event": null,
     "recurring freq": 0,

@@ -6,7 +6,6 @@ SUPPORT_FILES/lumo_to_arie_updater.py
 SUPPORT_FILES/Z_CREDENTIALS/credentials.json
 SUPPORT_FILES/Z_CREDENTIALS/token.json
 LUMO_LIBRARY/scratch.py
-LUMO_LIBRARY/scratch_json.py
 
 
 # Byte-compiled / optimized / DLL files
