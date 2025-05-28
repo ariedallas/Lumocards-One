@@ -90,7 +90,8 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False
         print(f"  Renaming from '{curr_name}' to '{dst_name}' ")
 
     if ask_confirmation:
-        if not l_menus_funcs.proceed("  Type 'no' or 'x' to cancel, otherwise press any key to continue >  "):
+        if not l_menus_funcs.proceed("Type 'no' or 'x' to cancel, otherwise press any key to continue >  ",
+                                     indent_amt=2):
             return "CANCELLED"
         os.rename(source, dest)
         l_json_utils.rename_json_card(src_filename=curr_name, dest_filename=dst_name)
@@ -107,7 +108,7 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False
 def card_deleter(card_filename):
     l_animators.list_printer([f"{card_filename} ➝ Type 'no' or 'x' to cancel deletion",
                               "or press any other key to confirm deletion"], indent_amt=2)
-    if not l_menus_funcs.proceed(f"  >  "):
+    if not l_menus_funcs.proceed(f">  ", indent_amt=2):
         return "CANCELLED"
     card_fullpath = get_card_abspath(card_filename)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)

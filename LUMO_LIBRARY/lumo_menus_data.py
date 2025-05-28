@@ -189,8 +189,8 @@ CARDS_PLANNER_FEEDBACK = {
 }
 
 NEGATIVE_USER_RESPONSES = [
-     "n"
-    ,"no"
+    "n"
+    , "no"
     , "exit"
     , "x"
     , "quit"

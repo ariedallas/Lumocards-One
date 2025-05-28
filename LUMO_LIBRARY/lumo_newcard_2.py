@@ -153,14 +153,11 @@ def check_for_dupes(card_filename):
     return card_exists
 
 
-def add_custom_or_default_steps(indent=0):
+def add_custom_or_default_steps():
     scratchpad_file = os.path.join(l_files.temp_folder, "scratchpad.txt")
     print()
 
-    if indent > 0:
-        print(" " * indent, end="")
-
-    if l_menus_funcs.proceed("Edit steps? >  "):
+    if l_menus_funcs.proceed("Edit steps? ( ➝ yes) >  ", indent_amt=2):
         with open(scratchpad_file, "w") as fin:
             fin.write("")
 
@@ -333,7 +330,7 @@ def card_write_loop(card_filename, card_steps):
         else:
             possible_card_filename = validate_from_input()
             new_card_filename = retry_loop_card_filename(possible_card_filename)
-            new_card_steps = add_custom_or_default_steps(indent=2)
+            new_card_steps = add_custom_or_default_steps()
             status, possible_card_abspath = write_card(new_card_filename, new_card_steps)
 
     return status, possible_card_abspath
@@ -413,7 +410,7 @@ def main(card_category=None, card_title=None, from_lumo_menu=False):
         possible_card_filename = validate_from_input()
 
     card_filename = retry_loop_card_filename(possible_card_filename)
-    card_steps = add_custom_or_default_steps(indent=2)
+    card_steps = add_custom_or_default_steps()
     status, possible_card_abspath = card_write_loop(card_filename, card_steps)
 
     if status == "QUIT" and locally_run:

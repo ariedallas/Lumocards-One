@@ -376,7 +376,7 @@ def update_cards():
         l_animators.list_printer(archived_cards, indent_amt=4)
         print()
 
-        if l_menus_funcs.proceed("  >  "):
+        if l_menus_funcs.proceed("( ➝ yes) >  ", indent_amt=2):
             for card in archived_cards:
                 l_card_utils.near_focus_to_archive(card)
 
@@ -435,7 +435,7 @@ def main():
 
     if status == "EXIT CARD LIST":
         print()
-        user_input = l_menus_funcs.proceed("  Proceed to Recurring Cards? ")
+        user_input = l_menus_funcs.proceed("Proceed to Recurring Cards? ( ➝ yes) >  ", indent_amt=2)
 
         if user_input:
             review_and_write_recurring()

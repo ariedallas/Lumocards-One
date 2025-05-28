@@ -6,9 +6,14 @@ import LUMO_LIBRARY.lumo_recurring as l_recurring
 import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 
 
-def proceed(input_text="... "):
-    user_input = input(f"{input_text}")
+def proceed(input_text="... ", indent_amt=0, empty_means_true=True):
+    indent_space = " " * indent_amt
+    user_input = input(f"{indent_space}{input_text}")
     user_input_filtered = user_input.lower().strip()
+
+    if user_input_filtered == "":
+        return True if empty_means_true else False
+
     return True if user_input_filtered not in l_menus_data.NEGATIVE_USER_RESPONSES else False
 
 
