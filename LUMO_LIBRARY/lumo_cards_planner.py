@@ -21,7 +21,7 @@ reassigned_cards = []
 reactivated_cards = l_recurring.get_recurring_cards()
 archived_cards = []
 deleted_cards = []
-days_since_birth = l_files.get_days_from_date(1988, 6, 12)
+# days_since_birth = l_files.get_days_from_date(1988, 6, 12)
 day, day_num, month, year = l_files.isolate_date_units()
 
 
@@ -29,11 +29,8 @@ def cards_intro():
     print()
 
     l_animators.list_printer([
-        f"IT'S DAY: {days_since_birth}",
         f"IT'S: {day.upper()}, {day_num} of {month.upper()}, {year}",
-        f"VERSION: {l_files.parents[1].name}",
-        "",
-        "RUNNING: NEAR FOCUS CARDS"])
+        "RUNNING: NEAR FOCUS CARDS",], indent_amt=2)
 
 
 def add_step_via_integers(card_steps, card_title, user_input):
@@ -53,13 +50,13 @@ def add_step_via_integers(card_steps, card_title, user_input):
 def cardsrun_macro_hotwords(card_filename, card, card_idx):
     card_title, card_steps = card[0], card[1]
 
-    user_input = input("    \n> ")
+    user_input = input("\n  > ")
     user_input_filtered = l_card_utils.add_blank_space(user_input)
 
     # ---- START OF MAIN IF/ELIF ---- #
 
     if user_input_filtered == " ":  # I.E. SKIPPED CARD
-        l_animators.animate_text(" ...", speed=.075)
+        l_animators.animate_text("  ...", speed=.075)
         reviewed_cards.append(card_filename)
 
     elif user_input_filtered in l_menus_data.NEGATIVE_USER_RESPONSES:  # I.E. QUIT
@@ -298,8 +295,8 @@ def iterate_cards(var_list_cards, mode):
 
         card = l_card_utils.filename_to_card(card_path)
 
-        l_animators.list_printer(["", card_counter_feedback_text], speed_interval=0)
-        l_boxify.display_card(card)
+        l_animators.list_printer(["", card_counter_feedback_text], indent_amt=2, speed_interval=0)
+        l_boxify.get_card_display_format(card)
 
         if mode == "main cards":
             status = cardsrun_macro_hotwords(card_filename=card_path, card=card, card_idx=card_no - 1)
