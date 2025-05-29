@@ -5,7 +5,7 @@ import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 
-category_letters = l_files.get_lumocards_categories()
+category_letters = l_files.get_category_prefixes()
 sample_steps = ["Step 01\n", "Step 02\n", "Step 03\n"]
 
 

@@ -15,7 +15,7 @@ import LUMO_LIBRARY.lumo_search as l_search
 
 settings = l_files.get_json_settings()
 
-all_card_categories = l_files.get_lumocards_categories()
+all_category_prefixes = l_files.get_category_prefixes()
 default_text = "\n".join(("...", "...", "..."))
 
 parser = ArgumentParser(add_help=False)
@@ -63,7 +63,7 @@ def get_category_from_input(indent=0):
 def category_check(card_category):
     valid_cat = card_category.upper().strip()
 
-    if valid_cat not in all_card_categories:
+    if valid_cat not in all_category_prefixes:
         print()
         l_animators.list_printer([
             "That category letter currently doesn't exist"

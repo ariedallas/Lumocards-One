@@ -66,7 +66,7 @@ def steps_preview(card_steps, steps_amt, steps_idx):
 
 def print_card_categories():
     for k, v in settings.get("card categories").items():
-        print(f"  {k} — {v[1]}")
+        print(f"  {k} — {v}")
 
 
 def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False):

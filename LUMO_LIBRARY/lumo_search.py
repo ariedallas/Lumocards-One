@@ -194,7 +194,8 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
 
                 possible_status, possible_returned_card = l_menus_funcs.menu_modify_card(selected_card=var_card_filename,
                                                                                    var_hotkey_list=hotkey_list,
-                                                                                   var_hotkey_dict=hotkey_dict)
+                                                                                   var_hotkey_dict=hotkey_dict,
+                                                                                         indent_amt=0)
                 if possible_returned_card:
                     return "RELOOP", possible_returned_card
 

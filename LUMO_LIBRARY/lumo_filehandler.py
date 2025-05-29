@@ -68,9 +68,9 @@ def get_near_focus_cards():
     return fetched_cards
 
 
-def get_lumocards_categories():
+def get_category_prefixes():
     settings = get_json_settings()
-    categories = list(settings['card categories'].keys())
+    categories = list(settings["card categories"].keys())
 
     return sorted(categories)
 
