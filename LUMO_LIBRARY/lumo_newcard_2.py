@@ -61,9 +61,10 @@ def get_category_from_input(indent=0):
 
 
 def category_check(card_category):
-    valid_cat = card_category.upper().strip()
+    valid_cat = card_category.strip().upper()
 
-    if valid_cat not in all_category_prefixes:
+    if valid_cat not in all_category_prefixes and \
+            valid_cat != "Z":
         print()
         l_animators.list_printer([
             "That category letter currently doesn't exist"
@@ -73,8 +74,9 @@ def category_check(card_category):
             , indent_amt=2
             , speed_interval=.5)
         print()
-        return "R"
-
+        return "Z"
+    elif valid_cat == "Z":
+        return "Z"
     else:
         return valid_cat
 
@@ -146,8 +148,6 @@ def check_for_dupes(card_filename):
     elif card_filename in os.listdir(l_files.checklist_cards_folder):
         card_exists = True
     elif card_filename in os.listdir(l_files.recurring_cards_folder):
-        card_exists = True
-    elif card_filename in os.listdir(l_files.archived_cards_folder):
         card_exists = True
 
     return card_exists

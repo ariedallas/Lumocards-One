@@ -45,7 +45,11 @@ def get_category_from_json_settings(var_ltr):
         data = json.load(fin)
 
     card_settings = data["card categories"]
-    selected_category = card_settings[var_ltr.upper()]
+
+    if var_ltr == "Z":
+        selected_category = "Default Category"
+    else:
+        selected_category = card_settings[var_ltr.upper()]
 
     return selected_category
 

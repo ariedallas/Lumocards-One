@@ -111,13 +111,24 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False
         l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name,
                                            update_category=category_change)
 
+def card_prefix_renamer(old_prefix, new_prefix):
+    for f in l_files.get_all_cards_by_prefix(old_prefix):
+        p, n = f.split("_")
+        new_f = "_".join([new_prefix, n])
+        source = get_card_abspath(f)
+        dest = os.path.join(
+            pathlib.Path(source).parent, new_f)
+
+        os.rename(source, dest)
+        l_json_utils.rename_json_card(src_filename=f, dest_filename=new_f)
+        l_json_utils.flexible_json_updater(json_filename=new_f, update_category=True)
 
 def card_deleter(card_filename):
     l_animators.list_printer([f"{card_filename} ➝ Type 'no' or 'x' to cancel deletion",
                               "or press any other key to confirm deletion"], indent_amt=2)
     if not l_menus_funcs.proceed(f">  ", indent_amt=2):
         return "CANCELLED"
-    card_fullpath = get_card_abspath(card_filename)
+    card_fullpath = get_card_abspath(card_filename, check_archives=True)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)
 
     send2trash.send2trash(card_fullpath)
@@ -184,7 +195,7 @@ def default_json_card_handler(filename):
 
 
 def mk_default_json_card(card_filename):
-    card_fullpath = get_card_abspath(card_filename)
+    card_fullpath = get_card_abspath(card_filename, check_archives=True)
     loc = pathlib.Path(card_fullpath).parent.name
     abbr = card_filename[0]
 
@@ -234,7 +245,7 @@ def clean_cards():
             print(f"  {u}.txt", end=" ")
             user_input = input("——> [D]elete this or [C]reate .json file to pair it? >  ")
             if user_input.lower() == "d":
-                card_fullpath = get_card_abspath(f"{u}.txt")
+                card_fullpath = get_card_abspath(f"{u}.txt", check_archives=True)
                 send2trash.send2trash(card_fullpath)
                 feedback(deleted=True)
             elif user_input.lower() == "c":
@@ -367,8 +378,7 @@ def recursive_parser(var_list):
 
     return additions
 
-
-def get_card_abspath(card_filename):
+def get_card_abspath(card_filename, check_archives=False):
     folder_route = None
 
     if card_filename in os.listdir(l_files.cards_near_folder):
@@ -383,19 +393,21 @@ def get_card_abspath(card_filename):
         folder_route = l_files.checklist_cards_folder
     elif card_filename in os.listdir(l_files.recurring_cards_folder):
         folder_route = l_files.recurring_cards_folder
-    elif card_filename in os.listdir(l_files.archived_cards_folder):
+    elif check_archives and \
+            card_filename in os.listdir(l_files.archived_cards_folder):
+
         folder_route = l_files.archived_cards_folder
+
 
     card_fullpath = os.path.join(folder_route, card_filename)
     return card_fullpath
 
-
-def filename_to_card(card_filename):
+def filename_to_card(card_filename, check_archives=False):
     card_name_a = card_filename.replace(".txt", "")
     card_name_b = card_name_a.replace("_", " ")
     card_name_c = card_name_b.strip()
 
-    card_fullpath = get_card_abspath(card_filename)
+    card_fullpath = get_card_abspath(card_filename, check_archives=check_archives)
 
     with open(card_fullpath, "r") as fin:
         card_steps = [l.strip() for l in fin.readlines()]
@@ -469,4 +481,6 @@ def load_transition() -> None:
 
 if __name__ == "__main__":
     print("Hello from main")
-    clean_cards()
+    card_prefix_renamer("V", "Z")
+    # clean_cards()
+

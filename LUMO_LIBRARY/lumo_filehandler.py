@@ -82,21 +82,34 @@ def get_json_settings():
 
 
 def get_all_json_cards():
-    all_json_cards = set([c[:-5] for c in os.listdir(json_cards_folder)])
+    all_json_cards = set([pathlib.Path(f).stem for f in os.listdir(json_cards_folder)])
     return all_json_cards
 
 def get_all_cards():
     all_txt_cards =  set(itertools.chain(
-    [l[:-4] for l in os.listdir(cards_near_folder)],
-    [l[:-4] for l in os.listdir(cards_middle_folder)],
-    [l[:-4] for l in os.listdir(cards_dist_folder)],
-    [l[:-4] for l in os.listdir(cards_calendar_folder)],
+    [pathlib.Path(f).stem for f in os.listdir(cards_near_folder)],
+    [pathlib.Path(f).stem for f in os.listdir(cards_middle_folder)],
+    [pathlib.Path(f).stem for f in os.listdir(cards_dist_folder)],
+    [pathlib.Path(f).stem for f in os.listdir(cards_calendar_folder)],
 
-    [l[:-4] for l in os.listdir(checklist_cards_folder)],
-    [l[:-4] for l in os.listdir(recurring_cards_folder)],
-    [l[:-4] for l in os.listdir(archived_cards_folder)],
+    [pathlib.Path(f).stem for f in os.listdir(checklist_cards_folder)],
+    [pathlib.Path(f).stem for f in os.listdir(recurring_cards_folder)],
+    [pathlib.Path(f).stem for f in os.listdir(archived_cards_folder)],
 ))
     return all_txt_cards
+
+def get_all_cards_by_prefix(search_prefix):
+    matching_paths = list(itertools.chain(
+        [f for f in os.listdir(cards_near_folder) if f[0]==search_prefix],
+        [f for f in os.listdir(cards_middle_folder) if f[0]==search_prefix],
+        [f for f in os.listdir(cards_dist_folder) if f[0]==search_prefix],
+        [f for f in os.listdir(cards_calendar_folder) if f[0]==search_prefix],
+
+        [f for f in os.listdir(checklist_cards_folder) if f[0]==search_prefix],
+        [f for f in os.listdir(recurring_cards_folder) if f[0]==search_prefix],
+        [f for f in os.listdir(archived_cards_folder) if f[0]==search_prefix]
+    ))
+    return matching_paths
 
 
 def basic_wrtr(content, card_fullpath):
@@ -152,4 +165,4 @@ def get_days_from_date(birth_year, birth_month, birth_day):
 
 if __name__ == '__main__':
     print("hello from main")
-    print(get_near_focus_cards())
+

@@ -49,7 +49,7 @@ def iterate_and_find(searchterm, folder):
 
 
 def reshow_match(chosen_file):
-    card = l_card_utils.filename_to_card(chosen_file)
+    card = l_card_utils.filename_to_card(chosen_file, check_archives=True)
     l_menus_funcs.prep_menu_tuple(l_menus_data.SEARCH_MAIN_MENU)
     return card, chosen_file
 
@@ -125,7 +125,7 @@ def select_card_from_found(searchterm):
 
     if len(all_matches_formatted[5]) > 1:
         archived_matches_line = all_matches_formatted[5][1]
-        archives_letter = archived_matches_line[3]
+        archives_letter = archived_matches_line[1]
     else:
         archives_letter = None
 
@@ -151,7 +151,7 @@ def select_card_from_found(searchterm):
             letter_as_listindex = ord(user_input.lower()) - 97
 
             chosen_file = shortcut_file_matches[letter_as_listindex]
-            card = l_card_utils.filename_to_card(chosen_file)
+            card = l_card_utils.filename_to_card(chosen_file, check_archives=True)
 
             return card, chosen_file, False
 
