@@ -4,14 +4,10 @@
     },
     "text editor": "nano",
     "card categories": {
-        "A": "Audio",
-        "C": "Computer",
-        "D": "Domestic",
-        "E": "Errand",
-        "F": "Finance",
-        "P": "Painting",
-        "R": "Creative Projects",
-        "S": "Self Care"
+        "C": "Category C",
+        "E": "Carrot",
+        "P": "Hey",
+        "R": "Rainbow"
     },
     "pomodoro": {
         "pom_presets": {
