@@ -2,6 +2,7 @@ import datetime
 import os
 import pathlib
 import re
+import subprocess
 
 import send2trash
 
@@ -33,7 +34,7 @@ def card_header(var_card, indent_amt=0):
     print()
     l_animators.animate_text_indented(formatted_card_title.upper(), indent_amt=indent_amt)
     print()
-    l_animators.list_printer([card_steps_formatted], indent_amt=indent_amt+2)
+    l_animators.list_printer([card_steps_formatted], indent_amt=indent_amt + 2)
     print()
 
 
@@ -448,6 +449,22 @@ def test_for_int(text: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+def clear() -> None:
+    subprocess.run(["clear"], shell=True)
+
+
+def load_dots() -> None:
+    print("\033[33;1m", end="")
+    l_animators.animate_text(" ...", speed=.1)
+    print("\033[0m", end="")
+
+
+def load_transition() -> None:
+    clear()
+    print()
+    load_dots()
 
 
 if __name__ == "__main__":

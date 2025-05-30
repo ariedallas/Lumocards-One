@@ -69,7 +69,7 @@ def category_check(card_category):
             "That category letter currently doesn't exist"
             , "- or -"
             , "You entered something other than one letter."
-            , "The system defaults the category to R — Creative Projects."]
+            , "The system defaults the category to Z — Default Category."]
             , indent_amt=2
             , speed_interval=.5)
         print()

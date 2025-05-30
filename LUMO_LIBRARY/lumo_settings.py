@@ -1,6 +1,7 @@
 import subprocess
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
@@ -15,12 +16,17 @@ singleCat_menu_d, singleCat_menu_l = l_menus_funcs.prep_menu_tuple_integers(
     l_menus_data.SETTINGS_CARD_MANAGER_SINGLE)
 
 
+
 def main():
     categories_manager()
 
 
 def categories_manager():
+    global first_round
+    first_round = True
+
     while True:
+
         status = manager_menu()
         if status == "QUIT":
             break
@@ -28,14 +34,21 @@ def categories_manager():
 
 def manager_menu():
     categories_dict = get_categories_copy()
+    global first_round
 
     while True:
+
+        if not first_round:
+            l_card_utils.load_transition()
+        else:
+            first_round = False
+
+
         categories_header(categories_dict)
         print()
         l_animators.list_printer(manager_menu_l,
                                  indent_amt=2,
                                  speed_interval=0)
-        print()
         l_animators.list_printer(l_menus_data.QUIT_MENU_LIST,
                                  indent_amt=2,
                                  speed_interval=0,
@@ -110,7 +123,7 @@ def get_empty_slots(diff_amt):
     empty_slots = []
 
     for _ in range(diff_amt):
-        empty_slots.append("...  (empty slot)")
+        empty_slots.append(" .   (empty slot)")
 
     return empty_slots
 
@@ -140,7 +153,7 @@ def letter_router(categories_dict, key):
                 valid = update_category(categories_dict, key, format)
                 if valid:
                     return "UPDATED"
-            elif singleCat_menu_d[val] == l_menus_data.ACTION_DELETE_CATEGORY:
+            elif singleCat_menu_d[val] == l_menus_data.ACTION_DELETE_THIS_CATEGORY:
                 del categories_dict[key]
                 write_new_settings(categories_dict)
                 return "DELETED"

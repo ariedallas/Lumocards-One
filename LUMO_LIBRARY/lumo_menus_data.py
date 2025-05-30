@@ -36,7 +36,8 @@ ACTION_QUIT = "Quit"
 
 ACTION_NEW_CATEGORY = "New: create new card category"
 ACTION_UPDATE_CATEGORY = "Update: this card category"
-ACTION_DELETE_CATEGORY = "Delete: this card category"
+ACTION_DELETE_CATEGORY = "Delete: a card category"
+ACTION_DELETE_THIS_CATEGORY = "Delete: this card category"
 
 LUMO_MAIN = [
     "Cards Planner"
@@ -135,7 +136,7 @@ SETTINGS_CARD_MANAGER = [
 
 SETTINGS_CARD_MANAGER_SINGLE = [
     ACTION_UPDATE_CATEGORY
-    , ACTION_DELETE_CATEGORY
+    , ACTION_DELETE_THIS_CATEGORY
 ]
 
 START_OVER_MENU_LIST = [f"[X]  {ACTION_START_OVER}"]
