@@ -4,8 +4,10 @@
     },
     "text editor": "nano",
     "card categories": {
+        "D": "Dinosaurs",
         "R": "Rainbow",
-        "V": "Diamonds"
+        "V": "Diamonds",
+        "M": "Mountains"
     },
     "pomodoro": {
         "pom_presets": {

@@ -1,13 +1,13 @@
 {
-    "card location": "CARDS_G_ARCHIVED",
-    "card category abbreviation": "D",
-    "card category": "Dinosaurs",
+    "card location": "CARDS_C_FOCUS_DISTANT",
+    "card category abbreviation": "M",
+    "card category": "Mountains",
     "calendar event": null,
     "calendar repeating event": null,
     "recurring freq": 0,
     "recurring freq time unit": null,
     "last occurrence": null,
-    "card created": "2025-05-30 14:32:31",
+    "card created": "2025-05-30 14:32:33",
     "tags": [
         "default tag a",
         "default tag b",
