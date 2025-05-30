@@ -4,10 +4,8 @@
     },
     "text editor": "nano",
     "card categories": {
-        "C": "Category C",
-        "E": "Carrot",
-        "P": "Hey",
-        "R": "Rainbow"
+        "R": "Rainbow",
+        "V": "Diamonds"
     },
     "pomodoro": {
         "pom_presets": {
