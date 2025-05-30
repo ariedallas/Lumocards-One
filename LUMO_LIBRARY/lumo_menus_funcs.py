@@ -41,6 +41,16 @@ def prep_menu_tuple(var_menu):
 
     return full_hotkey_set_dict, full_hotkey_set_list
 
+def prep_menu_tuple_integers(var_menu):
+    full_hotkey_set_dict = {f"{int}": f"{match}" for int, match in
+                            zip(l_menus_data.INTEGERS_10, var_menu)}
+
+    full_hotkey_set_list = [f"[{int}]  {action}" for int, action in zip(
+        full_hotkey_set_dict.keys(),
+        full_hotkey_set_dict.values())]
+
+    return full_hotkey_set_dict, full_hotkey_set_list
+
 def menu_list_from_dict(var_dict):
     full_hotkey_set_list = [f"[{letter}]  {action}" for letter, action in zip(
         var_dict.keys(),
@@ -158,7 +168,7 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict, indent_amt
 
             elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_RENAME:
                 print()
-                l_card_utils.print_card_categories()
+                l_card_utils.print_card_categories(indent_amt=2)
                 retitled_card_path = l_newcard.input_to_filename()
                 print()
                 confirmation = l_card_utils.card_renamer(curr_name=selected_card,

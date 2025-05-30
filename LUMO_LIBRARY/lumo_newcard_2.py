@@ -394,7 +394,7 @@ def program_header():
     print()
     print("NEW CARD")
     print()
-    l_card_utils.print_card_categories()
+    l_card_utils.print_card_categories(indent_amt=2)
 
 
 def main(card_category=None, card_title=None, from_lumo_menu=False):

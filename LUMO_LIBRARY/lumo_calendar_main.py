@@ -448,7 +448,11 @@ class CalendarInterface:
 
         return curr_week_block
 
-    # Figure out how to split this up into some smaller chunks
+    # Figure out how to split this up into some smaller chunks:
+    # Basic idea: Each field of the new event is its own function.
+    # Each function gets parsed for an error, and if so it triggers the
+    # While loop to repeat again.
+    # Possibly, each function takes the new-event dict and hands back the dictionary
     def create_new_event(self, default_use_today=False):
         if not default_use_today:
             curr_day_block = self.day_blocks_window[self.curr_day_idx]

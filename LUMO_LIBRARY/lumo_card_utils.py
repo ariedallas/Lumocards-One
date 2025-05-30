@@ -8,6 +8,7 @@ import send2trash
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
+import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 
 settings = l_files.get_json_settings()
@@ -64,9 +65,14 @@ def steps_preview(card_steps, steps_amt, steps_idx):
     return card_steps_three
 
 
-def print_card_categories():
+def print_card_categories(indent_amt):
+    indent_space = " " * indent_amt
+
     for k, v in settings.get("card categories").items():
-        print(f"  {k} — {v}")
+        print(f"{indent_space}{k} — {v}")
+
+    for k, v in l_menus_data.Z_CATEGORY_DICT.items():
+        print(f"{indent_space}{k} — {v}")
 
 
 def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False):

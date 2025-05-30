@@ -36,7 +36,8 @@ def animate_text_indented(text: str, speed: float=.025, indent_amt=Optional[int]
 
 def list_printer(text_list: Optional[list[str]] = None,
                  indent_amt: int=0,
-                 speed_interval: float=.35) -> None:
+                 speed_interval: float=.35,
+                 finish_delay: float=0) -> None:
 
     if not text_list:
         text_list = [""]
@@ -50,6 +51,24 @@ def list_printer(text_list: Optional[list[str]] = None,
         else:
             print(item)
         time.sleep(speed_interval)
+
+    if finish_delay > 0:
+        time.sleep(finish_delay)
+
+
+def list_printer_breaks(text_list: Optional[list[str]] = None,
+                 indent_amt: int=0,
+                        regular_break: int=0) -> None:
+    space = (" " * indent_amt)
+    if not text_list:
+        text_list = [""]
+
+    for idx, item in enumerate(text_list):
+        print(f"{space}{item}")
+
+        if (idx + 1) % regular_break == 0\
+                and (idx + 1) != len(text_list):
+            print()
 
 
 if __name__ == "__main__":

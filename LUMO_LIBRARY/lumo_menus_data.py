@@ -5,6 +5,9 @@ import string
 LETTERS_CAPS = string.ascii_uppercase
 LETTERS_FILTERED = [L for L in LETTERS_CAPS if not (L == 'Q') and not (L == 'X')]
 
+INTEGERS_10 = list(range(1, 11))
+Z_CATEGORY_DICT = {"Z":  "Default Category"}
+
 ACTION_OPEN = "Open/Edit card in text editor"
 ACTION_MODIFY = "Refocus, Rename, Archive, or Delete"
 ACTION_SCHEDULE = "Schedule to ➝ Calendar"
@@ -30,6 +33,10 @@ ACTION_SIMPLE_EXIT = "Exit"
 ACTION_START_OVER = "Start Over"
 ACTION_CANCEL = "Cancel"
 ACTION_QUIT = "Quit"
+
+ACTION_NEW_CATEGORY = "New: create new card category"
+ACTION_UPDATE_CATEGORY = "Update: this card category"
+ACTION_DELETE_CATEGORY = "Delete: this card category"
 
 LUMO_MAIN = [
     "Cards Planner"
@@ -119,6 +126,16 @@ NEWCARD_MAIN_MENU = [
     ACTION_OPEN
     , ACTION_MODIFY
     , ACTION_SCHEDULE
+]
+
+SETTINGS_CARD_MANAGER = [
+    ACTION_NEW_CATEGORY
+    , ACTION_DELETE_CATEGORY
+]
+
+SETTINGS_CARD_MANAGER_SINGLE = [
+    ACTION_UPDATE_CATEGORY
+    , ACTION_DELETE_CATEGORY
 ]
 
 START_OVER_MENU_LIST = [f"[X]  {ACTION_START_OVER}"]
