@@ -176,8 +176,8 @@ def retry_loop_card_filename(card_filename):
     if not card_filename:
         print()
         l_animators.animate_text_indented("A card with this name already exists...", indent_amt=2)
-        # TODO: to continue type any key but [q]; [q] for quit
-        # TODO: -OR- inform user they can undo after next step and to make a dummy card
+        print()
+        l_card_utils.print_card_categories(indent_amt=2)
 
         while True:
             retry_card_filename = validate_from_input()
@@ -186,6 +186,8 @@ def retry_loop_card_filename(card_filename):
             else:
                 print()
                 l_animators.animate_text_indented("A card with this name already exists...", indent_amt=2)
+                print()
+                l_card_utils.print_card_categories(indent_amt=2)
 
     return card_filename
 
@@ -390,23 +392,32 @@ def write_calendar_card_and_json(card_filename, folder, google_calendar_data, ad
     return formatted_card_fullpath, json_fullpath
 
 
-def program_header():
-    print()
-    print("NEW CARD")
-    print()
-    l_card_utils.print_card_categories(indent_amt=2)
+def program_header(reference_name=None):
 
+    if reference_name:
+        print()
+        print(f"NEW CARD: {reference_name}")
+        print()
+
+    else:
+        print()
+        print("NEW CARD")
+        print()
 
 def main(card_category=None, card_title=None, from_lumo_menu=False):
     from_local_args = test_for_local_args()
     locally_run = (__name__ == "__main__")
-    program_header()
 
     if from_lumo_menu and card_category and card_title:
         possible_card_filename = validate_from_lumo_parser(card_category, card_title)
+        program_header(possible_card_filename)
     elif from_local_args:
+        program_header()
+        l_card_utils.print_card_categories(indent_amt=2)
         possible_card_filename = validate_from_local_parser()
     else:  # get from input
+        program_header()
+        l_card_utils.print_card_categories(indent_amt=2)
         possible_card_filename = validate_from_input()
 
     card_filename = retry_loop_card_filename(possible_card_filename)
