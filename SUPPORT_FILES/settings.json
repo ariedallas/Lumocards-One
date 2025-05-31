@@ -4,11 +4,10 @@
     },
     "text editor": "nano",
     "card categories": {
-        "B": "Boo",
+        "P": "Pinocle",
         "Q": "Qualm",
         "R": "Rainbow",
-        "V": "Diamonds",
-        "L": "Lemon"
+        "V": "Diamonds"
     },
     "pomodoro": {
         "pom_presets": {
