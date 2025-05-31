@@ -390,8 +390,6 @@ def get_card_abspath(card_filename, check_archives=False):
         folder_route = l_files.cards_middle_folder
     elif card_filename in os.listdir(l_files.cards_dist_folder):
         folder_route = l_files.cards_dist_folder
-    elif card_filename in os.listdir(l_files.cards_calendar_folder):
-        folder_route = l_files.cards_calendar_folder
     elif card_filename in os.listdir(l_files.checklist_cards_folder):
         folder_route = l_files.checklist_cards_folder
     elif card_filename in os.listdir(l_files.recurring_cards_folder):
@@ -484,6 +482,5 @@ def load_transition() -> None:
 
 if __name__ == "__main__":
     print("Hello from main")
-    card_prefix_renamer("V", "Z")
-    # clean_cards()
+    clean_cards()
 

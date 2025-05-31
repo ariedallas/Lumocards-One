@@ -355,12 +355,6 @@ def card_menu_loop(result_card, result_path):
 
 
 # ---- LUMO CALENDAR FUNCTIONS ---- #
-def check_for_calendar_cards(card_filename):
-    for card in os.listdir(l_files.cards_middle_folder):
-        if card[2:] == card_filename:
-            return False
-    return True
-
 
 def string_to_filename(var_str):
     split_string = str.split(var_str)
@@ -391,6 +385,7 @@ def write_calendar_card_and_json(card_filename, folder, google_calendar_data, ad
 
     return formatted_card_fullpath, json_fullpath
 
+# ---- END: LUMO CALENDAR FUNCTIONS ---- #
 
 def program_header(reference_name=None):
 

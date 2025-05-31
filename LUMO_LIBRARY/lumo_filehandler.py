@@ -16,7 +16,6 @@ desktop = f"{home}/Desktop"
 cards_near_folder = os.path.join(rootpath, "CARDS/CARDS_A_FOCUS_NEAR")
 cards_middle_folder = os.path.join(rootpath, "CARDS/CARDS_B_FOCUS_MIDDLE")
 cards_dist_folder = os.path.join(rootpath, "CARDS/CARDS_C_FOCUS_DISTANT")
-cards_calendar_folder = os.path.join(rootpath, "CARDS/CARDS_D_CALENDAR")
 
 checklist_cards_folder = os.path.join(rootpath, "CARDS/CARDS_E_CHECKLISTS")
 recurring_cards_folder = os.path.join(rootpath, "CARDS/CARDS_F_RECURRING")
@@ -90,7 +89,6 @@ def get_all_cards():
     [pathlib.Path(f).stem for f in os.listdir(cards_near_folder)],
     [pathlib.Path(f).stem for f in os.listdir(cards_middle_folder)],
     [pathlib.Path(f).stem for f in os.listdir(cards_dist_folder)],
-    [pathlib.Path(f).stem for f in os.listdir(cards_calendar_folder)],
 
     [pathlib.Path(f).stem for f in os.listdir(checklist_cards_folder)],
     [pathlib.Path(f).stem for f in os.listdir(recurring_cards_folder)],
@@ -103,8 +101,6 @@ def get_all_cards_by_prefix(search_prefix, check_archives=False):
         [f for f in os.listdir(cards_near_folder) if f[0]==search_prefix],
         [f for f in os.listdir(cards_middle_folder) if f[0]==search_prefix],
         [f for f in os.listdir(cards_dist_folder) if f[0]==search_prefix],
-        [f for f in os.listdir(cards_calendar_folder) if f[0]==search_prefix],
-
         [f for f in os.listdir(checklist_cards_folder) if f[0]==search_prefix],
         [f for f in os.listdir(recurring_cards_folder) if f[0]==search_prefix]
     ))

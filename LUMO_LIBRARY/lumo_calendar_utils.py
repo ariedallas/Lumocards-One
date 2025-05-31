@@ -350,21 +350,6 @@ def get_adjacent_month(base_month, base_year, direction, months_distance):
     return adjacent
 
 
-def get_local_calendar_cards(window_start, window_end):
-    calendar_cards_found = []
-    dt_window_start = datetime.datetime(window_start.year, window_start.month, window_start.day, tzinfo=tz_local)
-    dt_window_end = datetime.datetime(window_end.year, window_end.month, window_end.day, tzinfo=tz_local)
-
-    for card in os.listdir(l_files.cards_calendar_folder):
-        json_data = l_json_utils.read_and_get_json_data(card)
-        dt_google_start = json_data["google calendar data"]["start"]["dateTime"]
-        dt_python_start = datetime.datetime.strptime(dt_google_start, "%Y-%m-%dT%H:%M:%S%z")
-        within_window = dt_window_start <= dt_python_start <= dt_window_end
-        calendar_cards_found.append(card) if within_window else None
-
-    return calendar_cards_found
-
-
 def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
     creds = get_creds()
 
