@@ -47,7 +47,7 @@ def manager_menu():
         l_animators.list_printer(manager_menu_l,
                                  indent_amt=2,
                                  speed_interval=0)
-        l_animators.list_printer(l_menus_data.QUIT_MENU_LIST,
+        l_animators.list_printer(l_menus_data.QUIT_MENU_INT_LIST,
                                  indent_amt=2,
                                  speed_interval=0,
                                  finish_delay=.5)
@@ -79,7 +79,7 @@ def manager_menu():
             valid = delete_category(categories_dict)
             if valid:
                 return "RELOOP"
-        elif val == "Q":
+        elif val == "3":
             return "QUIT"
         else:
             l_animators.animate_text_indented(
@@ -150,11 +150,14 @@ def letter_router(categories_dict, key):
                 if valid:
                     return "UPDATED"
             elif singleCat_menu_d[val] == l_menus_data.ACTION_DELETE_THIS_CATEGORY:
-                confirmed = card_rename_confirmation(mode="DELETE", prev_category=category_display)
+                confirmed = card_rename_confirmation(mode="DELETE",
+                                                     prefix=key,
+                                                     prev_category=category_display)
 
                 if confirmed:
-                    del categories_dict[val]
+                    del categories_dict[key]
                     write_new_settings(categories_dict)
+                    l_card_utils.card_prefix_renamer(key, "Z")
                     return "RELOOP"
                 else:
                     return "DELETED"
@@ -227,7 +230,7 @@ def update_category(categories_dict, key, existing):
         valid_prefix, error = category_prefix_validator(prefix, key, keys)
 
         if valid_prefix:
-            confirmed = card_rename_confirmation("UPDATE")
+            confirmed = card_rename_confirmation("UPDATE", prefix=key)
 
             if confirmed:
                 del categories_dict[key]
@@ -239,6 +242,7 @@ def update_category(categories_dict, key, existing):
                                                   indent_amt=2,
                                                   finish_delay=.5)
                 write_new_settings(categories_dict)
+                l_card_utils.card_prefix_renamer(key, valid_prefix)
                 return True
 
             else:
@@ -270,11 +274,14 @@ def delete_category(categories_dict):
 
         if val in keys:
             category_display = f"{val} — {categories_dict[val]}"
-            confirmed = card_rename_confirmation("DELETE", prev_category=category_display)
+            confirmed = card_rename_confirmation("DELETE",
+                                                 prefix=val,
+                                                 prev_category=category_display)
 
             if confirmed:
                 del categories_dict[val]
                 write_new_settings(categories_dict)
+                l_card_utils.card_prefix_renamer(val, "Z")
                 return True
             else:
                 return False
@@ -290,10 +297,12 @@ def delete_category(categories_dict):
                                               finish_delay=.5)
 
 
-def card_rename_confirmation(mode, prev_category=None):
+def card_rename_confirmation(mode, prefix, prev_category=None):
     feedback = []
+    amt = len(l_files.get_all_cards_by_prefix(prefix))
+
     mode_formatted = "Deleting" if mode == "DELETE" else "Updating"
-    f1 = f"{mode_formatted} this category letter, will rename 'num' cards."
+    f1 = f"{mode_formatted} this category letter, will rename {amt} card(s)."
     f2 = f"Any cards from {prev_category} will be assigned to Z — DEFAULT CATEGORY"
     confirmation_formatted = ["",
                               "Type 'cancel', 'no', or 'stop' to go stop this,",

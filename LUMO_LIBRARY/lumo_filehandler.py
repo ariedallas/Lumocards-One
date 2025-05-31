@@ -98,7 +98,7 @@ def get_all_cards():
 ))
     return all_txt_cards
 
-def get_all_cards_by_prefix(search_prefix):
+def get_all_cards_by_prefix(search_prefix, check_archives=False):
     matching_paths = list(itertools.chain(
         [f for f in os.listdir(cards_near_folder) if f[0]==search_prefix],
         [f for f in os.listdir(cards_middle_folder) if f[0]==search_prefix],
@@ -106,9 +106,14 @@ def get_all_cards_by_prefix(search_prefix):
         [f for f in os.listdir(cards_calendar_folder) if f[0]==search_prefix],
 
         [f for f in os.listdir(checklist_cards_folder) if f[0]==search_prefix],
-        [f for f in os.listdir(recurring_cards_folder) if f[0]==search_prefix],
-        [f for f in os.listdir(archived_cards_folder) if f[0]==search_prefix]
+        [f for f in os.listdir(recurring_cards_folder) if f[0]==search_prefix]
     ))
+
+    if check_archives:
+        matching_paths.extend(
+            [f for f in os.listdir(archived_cards_folder) if f[0] == search_prefix]
+        )
+
     return matching_paths
 
 
