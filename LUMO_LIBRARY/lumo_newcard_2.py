@@ -143,8 +143,6 @@ def check_for_dupes(card_filename):
         card_exists = True
     elif card_filename in os.listdir(l_files.cards_dist_folder):
         card_exists = True
-    elif card_filename in os.listdir(l_files.cards_calendar_folder):
-        card_exists = True
     elif card_filename in os.listdir(l_files.checklist_cards_folder):
         card_exists = True
     elif card_filename in os.listdir(l_files.recurring_cards_folder):
