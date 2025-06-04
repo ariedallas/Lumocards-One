@@ -752,11 +752,14 @@ def main(initial_mins_from_cli=None):
         focus_mins, break_mins = initial_mins_from_cli.minutes_focus, initial_mins_from_cli.minutes_break
         valid_focus, valid_break = Data.valid_float(focus_mins), Data.valid_float(break_mins)
         if not (valid_focus and valid_break):
-            return
-
-        pomodoro.focus_mins, pomodoro.break_mins = float(focus_mins), float(break_mins)
-        pomodoro.focus_menu.menu_update_prepend(f"Preset break: {pomodoro.break_mins} min.", Data.FOCUS_MENU)
-        pomodoro.focus_break_loop()
+            l_animators.animate_text_indented(f"Unable to make sense of {focus_mins} and {break_mins}", indent_amt=2)
+            l_animators.animate_text_indented(f"Going to pomodoro menu...", indent_amt=2, finish_delay=.5)
+            pass
+        else:
+            pomodoro.focus_mins, pomodoro.break_mins = float(focus_mins), float(break_mins)
+            pomodoro.focus_menu.menu_update_prepend(f"Preset break: {pomodoro.break_mins} min.", Data.FOCUS_MENU)
+            pomodoro.focus_break_loop()
+            Menu.clear()
 
     pomodoro.run_setup_loop()
 
