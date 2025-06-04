@@ -342,11 +342,6 @@ class PomodoroFlow:
         self.selected_timer = timer
 
 
-    @classmethod
-    def _update_json_settings(cls):
-        l_json_utils.write_json(l_files.settings_fullpath, Data.settings)
-
-
     def _reload(self):
         self.setup_menu = Menu(Data.SETUP_MENU)
         self.settings_menu = Menu(Data.SETTINGS_MENU)
@@ -367,12 +362,17 @@ class PomodoroFlow:
             Menu.program_header()
             self.setup_menu.display("setup menu", show_exit=False, marker=Data.default_marker)
             user_input = Menu.ask("Select an option")
+
             user_choice = self.setup_menu.lookup_user_choice(user_input)
 
             if user_choice == "QUIT":
                 break
 
-            if not user_choice:
+            elif user_choice == "EXIT":
+                l_animators.animate_text("  'x' or 'exit' can't be used here", finish_delay=.5)
+                continue
+
+            elif not user_choice:
                 print()
                 l_animators.animate_text("  unrecognized option", finish_delay=.5)
 
@@ -385,6 +385,7 @@ class PomodoroFlow:
 
 
     def setup_router(self, user_choice):
+
         if user_choice == "DEFAULT":
             self.focus_mins, self.break_mins = Data.default_timer[0], Data.default_timer[1]
             self.focus_menu.menu_update_prepend(f"Preset break: {self.break_mins} min.", Data.FOCUS_MENU)
@@ -401,7 +402,7 @@ class PomodoroFlow:
             self.set_custom_pomodoro()
             self.focus_menu.menu_update_prepend(f"Preset break: {self.break_mins} min.", Data.FOCUS_MENU)
             self.focus_break_loop()
-        else:  # user_choice == "Pomodoro settings"
+        elif user_choice == "Pomodoro settings":
             self.go_settings()
 
 
@@ -613,7 +614,6 @@ class PomodoroFlow:
                 self.quit_marker = True
                 break
             elif user_choice == "EXIT":
-                self.exit_marker = True
                 break
             elif not user_choice:
                 print()
