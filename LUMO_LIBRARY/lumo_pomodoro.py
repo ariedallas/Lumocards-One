@@ -42,18 +42,15 @@ class Data:
         Data.SETUP_MENU = [f"Preset 1:  {int(Data.p1_time)} min. / {int(Data.p1_break)} min. break",
                            f"Preset 2:  {int(Data.p2_time)} min. / {int(Data.p2_break)} min. break",
                            "Set custom pomodoro",
-                           "Pomodoro settings",
-                           "Log | stats"]
+                           "Pomodoro settings"]
 
         Data.FOCUS_MENU = ["Break for 7 min.",
                            "Break for 10 min.",
                            "Break for custom amount",
-                           "Preset break, then start a new custom pomodoro",
-                           "Log | stats"]
+                           "Preset break, then start a new custom pomodoro"]
 
         Data.BREAK_MENU = ["Start next round / continue",
-                           "Start new custom pomodoro",
-                           "Log | stats"]
+                           "Start new custom pomodoro"]
 
         Data.SETTINGS_MENU = [f"Toggle pomodoro default to ➝ {Data.toggle_name}",
                               "Edit Preset 1",
@@ -82,7 +79,7 @@ class Menu:
     @classmethod
     def clear(cls):
         subprocess.run(["clear"], shell=True)
-        print("\n\n")
+        print("\n")
 
 
     @classmethod
@@ -305,9 +302,6 @@ class TimerStandard:
             play_sound(selected_sound)
 
 
-
-
-
 class TimerDev:
     def __init__(self, initial_mins=0):
         self.initial_mins = initial_mins
@@ -328,46 +322,7 @@ class TimerDev:
         print()
 
 
-class TimerDots:
-    def __init__(self, initial_mins=0):
-        self.initial_mins = initial_mins
-
-
-    def run_timer(self):
-        self.dots_timer()
-
-
-    def dots_timer(self):
-        play_sound(selected_sound)
-
-        time_in_secs = int((self.initial_mins * 60))
-        for x in range(time_in_secs):
-            mins_remaining = round(self.initial_mins) - (x // 60)
-            mins_as_dots = "." * mins_remaining
-            blinker = "." * (mins_remaining - 1)
-
-            print(f"  {mins_as_dots}", end="\r  ")
-            time.sleep(.1)
-            print(" " * 30, end="\r  ")
-            time.sleep(.1)
-
-            print(f"  {mins_as_dots}", end="\r  ")
-            time.sleep(.1)
-            print(" " * 30, end="\r  ")
-            time.sleep(.1)
-
-            print(f"  {blinker}", end="\r  ")
-            time.sleep(.6)
-
-        print("Done")
-        for n in range(3):
-            play_sound(selected_sound)
-
 class PomodoroFlow:
-    round_counter_int = 0
-    current_round = {}
-    log = collections.deque()
-
 
     def __init__(self, timer, focus_mins=None, break_mins=None):
 
@@ -395,24 +350,6 @@ class PomodoroFlow:
     def _reload(self):
         self.setup_menu = Menu(Data.SETUP_MENU)
         self.settings_menu = Menu(Data.SETTINGS_MENU)
-
-
-    @staticmethod
-    def round_counter(func):
-        def wrapper(*args, **kwargs):
-            PomodoroFlow.round_counter_int += 1
-            result = func(*args, **kwargs)
-            return result
-
-
-        return wrapper
-
-
-    def round_updater(self, status):
-        if status == "focus":
-            PomodoroFlow.current_round["focus"] = self.focus_mins
-        elif status == "break":
-            PomodoroFlow.current_round["break"] = self.break_mins
 
 
     def run_setup_loop(self):
@@ -464,10 +401,8 @@ class PomodoroFlow:
             self.set_custom_pomodoro()
             self.focus_menu.menu_update_prepend(f"Preset break: {self.break_mins} min.", Data.FOCUS_MENU)
             self.focus_break_loop()
-        elif user_choice == "Pomodoro settings":
+        else:  # user_choice == "Pomodoro settings"
             self.go_settings()
-        else:  # Log | stats
-            PomodoroFlow.display_log()
 
 
     def breaktime_router(self, user_choice):
@@ -484,10 +419,8 @@ class PomodoroFlow:
         elif user_choice == "Break for custom amount":
             self.break_mins = Menu.ask_break()
             self.user_single_use_break = True
-        elif user_choice == "Preset break, then start a new custom pomodoro":
+        else:  # user_choice == "Preset break, then start a new custom pomodoro":
             self.user_request_new_pomodoro = True
-        else:  # Log | stats
-            PomodoroFlow.display_log()
 
 
     def continuation_router(self, user_choice):
@@ -497,8 +430,6 @@ class PomodoroFlow:
             pass
         elif user_choice == "Start new custom pomodoro":
             self.set_custom_pomodoro()
-        else:  # Log | stats
-            PomodoroFlow.display_log()
 
 
     def settings_router(self, user_choice):
@@ -591,18 +522,12 @@ class PomodoroFlow:
                     continue
 
 
-
-
-    @round_counter
     def go_focus(self, var_mins):
         self.selected_timer.initial_mins = var_mins
         self.run_timer()
 
         Menu.clear()
         Menu.program_header()
-
-        self.round_updater("focus")
-        self.round_logger("focus")
 
         while True:
             self.focus_menu.display("focus completed", marker=0)
@@ -633,9 +558,6 @@ class PomodoroFlow:
 
         Menu.clear()
         Menu.program_header()
-
-        self.round_updater("break")
-        self.round_logger("break")
 
         skip_menu = False
 
@@ -702,46 +624,6 @@ class PomodoroFlow:
 
             self.settings_router(user_choice)
             break
-
-
-    @classmethod
-    def round_logger(cls, status):
-        possible_text_focus = "min." if PomodoroFlow.current_round.get("focus") else ""
-        possible_text_break = "min." if PomodoroFlow.current_round.get("break") else ""
-
-        focus_text = f"Main: {PomodoroFlow.current_round.get("focus")} {possible_text_focus}"
-        break_text = f"Break: {PomodoroFlow.current_round.get("break")} {possible_text_break}"
-        curr_round = f"Rnd{PomodoroFlow.round_counter_int} — {focus_text} | {break_text}"
-
-        if status == "focus":
-            PomodoroFlow.log.appendleft(curr_round)
-        elif status == "break":
-            PomodoroFlow.log.popleft()
-            PomodoroFlow.log.appendleft(curr_round)
-            PomodoroFlow.current_round = {}
-
-
-    @classmethod
-    def display_log(cls):
-        today_date = datetime.date.today().strftime("%m/%d/%Y")
-
-        Menu.clear()
-        Menu.program_header()
-
-        print("  Session Log:")
-        print(f"  {today_date}")
-        print()
-
-        if not PomodoroFlow.log:
-            l_animators.animate_text("  Nothing to display for this session")
-        else:
-            for record in PomodoroFlow.log:
-                print(f"  {record}")
-
-        print()
-        Menu.ask("Type any key to continue", show_help_msg=False)
-
-
 
 
 def main(initial_mins_from_cli=None):
