@@ -1,6 +1,7 @@
 import collections
 import datetime
 import os
+import playsound3
 import subprocess
 import sys
 import threading
@@ -13,6 +14,10 @@ import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 
 selected_sound = os.path.join(l_files.sounds_folder, "block.mp3")
+
+
+def play_sound(soundfile):
+    playsound3.playsound(soundfile)
 
 
 class Data:
@@ -254,7 +259,7 @@ class TimerStandard:
         clip_top_secs = None
         time_is_int = float.is_integer(var_mins)
 
-        subprocess.run(f'pw-play {selected_sound}', shell=True)
+        play_sound(selected_sound)
 
         if not time_is_int:
             remaining_whole_mins = (base_mins - 1) if base_mins > 1 else None
@@ -297,7 +302,7 @@ class TimerStandard:
         print("  Timer finished.\n  press any key to continue >  ", end="")
 
         for n in range(3):
-            subprocess.run(f'pw-play {selected_sound}', shell=True)
+            play_sound(selected_sound)
 
 
 
@@ -333,7 +338,7 @@ class TimerDots:
 
 
     def dots_timer(self):
-        subprocess.run(f'pw-play {selected_sound}', shell=True)
+        play_sound(selected_sound)
 
         time_in_secs = int((self.initial_mins * 60))
         for x in range(time_in_secs):
@@ -356,8 +361,7 @@ class TimerDots:
 
         print("Done")
         for n in range(3):
-            subprocess.run(f'pw-play {selected_sound}', shell=True)
-
+            play_sound(selected_sound)
 
 class PomodoroFlow:
     round_counter_int = 0
@@ -736,6 +740,8 @@ class PomodoroFlow:
 
         print()
         Menu.ask("Type any key to continue", show_help_msg=False)
+
+
 
 
 def main(initial_mins_from_cli=None):
