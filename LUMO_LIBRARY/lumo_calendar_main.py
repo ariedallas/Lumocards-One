@@ -28,8 +28,14 @@ def clear() -> None:
     subprocess.run(["clear"], shell=True)
 
 
+def feedback_not_implemented(indent_context):
+    l_animators.animate_text_indented("This feature not yet implemented yet...",
+                                      indent_amt=indent_context,
+                                      finish_delay=.5)
+
+
 class CalendarInterface:
-    default_view: str = "DAY"
+    default_view: str = "WEEK"
     EVENTS_LIMIT_LOW: int = 6
     EVENTS_LIMIT_HIGH: int = 40
 
@@ -50,8 +56,6 @@ class CalendarInterface:
 
         self.events_limit: int = CalendarInterface.EVENTS_LIMIT_LOW
 
-        self.custom_error_msg: Optional[str] = None
-
         self.creds = l_cal_utils.get_creds()
 
 
@@ -60,10 +64,19 @@ class CalendarInterface:
         curr_end = curr_start + relativedelta(days=1)
 
         selected_events = l_cal_utils.get_google_events(self.creds, curr_start, curr_end)
-        refreshed_events = [l_cal_utils.google_event_to_obj(e) for
-                            e in selected_events]
+
+        if not selected_events:
+            refreshed_events = [l_cal_utils.google_event_to_obj(e) for
+                                e in list() ]
+        else:
+            refreshed_events = [l_cal_utils.google_event_to_obj(e) for
+                                e in selected_events]
+
         curr_page.day_block.events = refreshed_events
 
+    def _refresh_all(self):
+        self.day_blocks_window: list[DayBlock] = l_cal_utils.get_day_blocks()
+        self.week_blocks_window: list[list[DayBlock]] = self._separate_by_weeks()
 
     def _event_actions_router(self,
                               val: str,
@@ -150,6 +163,26 @@ class CalendarInterface:
             self.create_new_event()
             return False, None, None
 
+        elif action == Menus.ACTION_NEW_QUICK:
+            feedback_not_implemented(CalendarPageDay.msg_indent_num)
+            return False, None, None
+
+        elif action == Menus.ACTION_SEARCH:
+            feedback_not_implemented(CalendarPageDay.msg_indent_num)
+            return False, None, None
+
+        elif action == Menus.ACTION_MENU_LESS:
+            self.menu_size = "DAY SHORT"
+            return True, None, None
+
+        elif action == Menus.ACTION_MENU_MORE:
+            self.menu_size = "DAY LONG"
+            return True, None, None
+
+        elif action == Menus.ACTION_GOTO:
+            feedback_not_implemented(CalendarPageDay.msg_indent_num)
+            return False, None, None
+
         elif action == Menus.ACTION_LIST_ALL:
             self.events_limit = CalendarInterface.EVENTS_LIMIT_HIGH
             old_val = action
@@ -162,25 +195,34 @@ class CalendarInterface:
             new_val = Menus.ACTION_LIST_ALL
             return True, old_val, new_val
 
-        elif action == Menus.ACTION_MENU_LESS:
-            self.menu_size = "DAY SHORT"
-            return True, None, None
+        elif action == Menus.ACTION_HELP_MORE:
+            feedback_not_implemented(CalendarPageDay.msg_indent_num)
+            return False, None, None
 
-        elif action == Menus.ACTION_MENU_MORE:
-            self.menu_size = "DAY LONG"
-            return True, None, None
+        elif action == Menus.ACTION_DELETE_EVENT:
+            feedback_not_implemented(CalendarPageDay.msg_indent_num)
+            return False, None, None
+
+
 
 
     def _week_actions_router(self,
                              user_input: str,
                              actions_dict: dict[str, str]) -> None:
 
-        status = None
         action = actions_dict[user_input.upper()]
 
         if action == Menus.ACTION_NEW_EVENT:
             self.create_new_event(default_use_today=True)
-            return status
+
+        elif action == Menus.ACTION_SEARCH:
+            feedback_not_implemented(CalendarPageWeek.msg_indent_num)
+
+        elif action == Menus.ACTION_GOTO:
+            feedback_not_implemented(CalendarPageWeek.msg_indent_num)
+
+        elif action == Menus.ACTION_HELP_MORE:
+            feedback_not_implemented(CalendarPageWeek.msg_indent_num)
 
 
     def view_event(self, event_idx: int) -> None:
@@ -233,6 +275,7 @@ class CalendarInterface:
                 elif status == "UPDATE EVENT":
                     curr_page = CalendarPageDay(self.day_blocks_window[self.curr_day_idx])
                     self._refresh_DayBlock(curr_page)
+                    return status
 
                 else:
                     continue
@@ -282,12 +325,9 @@ class CalendarInterface:
                 selection = int(user_input) - 1
                 status = self.view_event(selection)
 
-                if status == "DELETE EVENT":
-                    break
-
-            elif show_refreshed_event:
-                pass
-                # etc. go back and view refreshed event
+                if status == "UPDATE EVENT":
+                    self._refresh_all()
+                    curr_day_block = self.day_blocks_window[self.curr_day_idx]
 
             elif user_input.upper() in menu_dict.keys():
                 menu_update, old_val, new_val = self._day_actions_router(user_input, menu_dict)
@@ -305,17 +345,9 @@ class CalendarInterface:
 
 
             else:
-                custom_error = self.parse_for_error(user_input)
-
                 l_animators.animate_text_indented("Unrecognized option...",
                                                   indent_amt=CalendarPageDay.msg_indent_num,
                                                   finish_delay=.5)
-
-                if custom_error:
-                    l_animators.animate_text_indented(custom_error,
-                                                      indent_amt=CalendarPageDay.msg_indent_num,
-                                                      finish_delay=.5)
-
 
     def paginate_days(self, user_input: str) -> DayBlock:
         shift: int
@@ -377,7 +409,7 @@ class CalendarInterface:
                 curr_week_block = self.paginate_weeks(user_input)
 
             elif user_input.upper() in menu_dict.keys():
-                status = self._week_actions_router(user_input, menu_dict)
+                self._week_actions_router(user_input, menu_dict)
 
 
             elif curr_page.valid_day_selection(user_input=user_input, var_weekblock=curr_week_block):
@@ -403,7 +435,7 @@ class CalendarInterface:
 
 
             else:
-                indent = int(CalendarPageWeek.l_margin_menu) + 7
+                indent = CalendarPageWeek.msg_indent_num
                 l_animators.animate_text_indented("Unrecognized option...",
                                                   indent_amt=indent,
                                                   finish_delay=.5)
@@ -1036,7 +1068,7 @@ class CalendarInterface:
 
 
     def parse_for_error(self, user_input: str) -> Optional[str]:
-        return "custom error message"
+        return None
 
 
 def main() -> None:

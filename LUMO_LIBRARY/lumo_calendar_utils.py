@@ -856,11 +856,6 @@ class CalendarPageDay:
                                       f"+ {remaining_e} more events",
                                       " ")
         print()
-        # print(CalendarPageDay.total_width,
-        #       CalendarPageDay.total_width - CalendarPageEvent.EVENTS_WIDTH,
-        #       CalendarPageDay.l_margin_num
-        #       )
-        # print((CalendarPageDay.l_margin_num + CalendarPageDay.EVENTS_SELECTOR) * "-")
 
 
     def display_menu(self):
@@ -943,6 +938,8 @@ class CalendarPageWeek:
     indent_margin = margins_total + (COL_WIDTH / 2)
     l_margin_menu = round(indent_margin)
     l_margin_menu_space = " " * int(l_margin_menu)
+
+    msg_indent_num = l_margin_menu + 7
 
 
     def __init__(self, week_of_day_blocks):
