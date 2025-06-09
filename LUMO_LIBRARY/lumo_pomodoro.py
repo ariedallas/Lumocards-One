@@ -44,7 +44,8 @@ class Data:
                            "Set custom pomodoro",
                            "Pomodoro settings"]
 
-        Data.FOCUS_MENU = ["Break for 7 min.",
+        Data.FOCUS_MENU = ["Preset break:",
+                           "Break for 7 min.",
                            "Break for 10 min.",
                            "Break for custom amount"]
 
@@ -62,7 +63,7 @@ class Data:
     @staticmethod
     def valid_float(user_input):
         try:
-            float(user_input)
+            float(user_input.strip())
             return True
         except ValueError:
             return False
@@ -181,11 +182,14 @@ class Menu:
     @staticmethod
     def ask(prompt, show_help_msg=True):
         if show_help_msg:
-            print("  (To use default action, type 'return'"
-                  "\n   or 'enter' without typing a letter first)")
+            l_animators.list_printer(["To use default action, type 'return'",
+                                      "or 'enter' without typing a letter first"]
+                                     , indent_amt=2
+                                     , speed_interval=0)
             print()
         user_input = input(f"  {prompt} >  ")
-        return user_input
+        val = user_input.strip()
+        return val
 
 
     @staticmethod
@@ -193,7 +197,7 @@ class Menu:
         first_try = True
         while True:
             try:
-                float_mins = float(user_input)
+                float_mins = float(user_input.strip())
                 return float_mins, first_try
 
             except ValueError:
@@ -206,14 +210,16 @@ class Menu:
     @staticmethod
     def ask_timer(prompt="  Set main timer amount in minutes >  "):
         focus_mins = input(prompt)
-        valid_focus_mins, first_try = Menu.validate_minutes(focus_mins)
+        val = focus_mins.strip()
+        valid_focus_mins, first_try = Menu.validate_minutes(val)
         return valid_focus_mins, first_try
 
 
     @staticmethod
     def ask_break(prompt="  Set how long to take a break for >  "):
         break_mins = input(prompt)
-        valid_break_mins, _ = Menu.validate_minutes(break_mins)
+        val = break_mins.strip()
+        valid_break_mins, _ = Menu.validate_minutes(val)
 
         return valid_break_mins
 
@@ -257,8 +263,9 @@ class TimerStandard:
 
     def running_menu(self):
         user_input = input("  ")
+        val = user_input.strip().lower()
 
-        if user_input.lower() == "x":
+        if val == "x":
             return "EXIT"
         else:
             return "PAUSE"
@@ -274,8 +281,9 @@ class TimerStandard:
         Menu.simple_display(Data.TIMER_PAUSED_MENU, marker=0)
 
         user_input = input("  ")
+        val = user_input.strip().lower()
 
-        if user_input.lower() == "x":
+        if val == "x":
             return "EXIT"
         else:
             return "RESUME"
@@ -287,7 +295,12 @@ class TimerStandard:
         clip_top_secs = None
         time_is_int = float.is_integer(var_mins)
 
-        play_sound(selected_sound)
+        try:
+            play_sound(selected_sound)
+        except:
+            print()
+            print("  Tried to play a sound...")
+            l_animators.list_printer(["But systems are not compatible"], indent_amt=2, finish_delay=.5)
 
         if not time_is_int:
             remaining_whole_mins = (base_mins - 1) if base_mins > 1 else None
@@ -327,11 +340,13 @@ class TimerStandard:
 
         Menu.clear()
         Menu.program_header()
+        try:
+            for n in range(3):
+                play_sound(selected_sound)
+        except:
+            pass
+
         print("  Timer finished.\n  press any key to continue >  ", end="")
-
-        for n in range(3):
-            play_sound(selected_sound)
-
 
 class TimerDev(TimerStandard):
 
@@ -346,7 +361,12 @@ class TimerDev(TimerStandard):
         clip_top_secs = None
         time_is_int = float.is_integer(var_mins)
 
-        play_sound(selected_sound)
+        try:
+            play_sound(selected_sound)
+        except:
+            print()
+            print("  Tried to play a sound...")
+            l_animators.list_printer(["But systems are not compatible"], indent_amt=2, finish_delay=.5)
 
         if not time_is_int:
             remaining_whole_mins = (base_mins - 1) if base_mins > 1 else None
@@ -382,10 +402,17 @@ class TimerDev(TimerStandard):
 
         Menu.clear()
         Menu.program_header()
+
+        try:
+            for n in range(3):
+                play_sound(selected_sound)
+        except:
+            pass
+
         print("  Timer finished.\n  press any key to continue >  ", end="")
 
-        for n in range(3):
-            play_sound(selected_sound)
+
+
 
 
 class PomodoroFlow:
@@ -426,9 +453,9 @@ class PomodoroFlow:
 
             Menu.program_header()
             self.setup_menu.display("setup menu", show_exit=False, marker=Data.default_marker)
-            user_input = Menu.ask("Select an option")
+            val = Menu.ask("Select an option")
 
-            user_choice = self.setup_menu.lookup_user_choice(user_input)
+            user_choice = self.setup_menu.lookup_user_choice(val)
 
             if user_choice == "QUIT":
                 break
@@ -446,26 +473,23 @@ class PomodoroFlow:
             self.setup_router(user_choice)
 
         print()
-        l_animators.animate_text("  Quit Lumo: Pomodoro", finish_delay=.5)
+        # NOTE: this feature is non-essential, but could be optional later
+        # l_animators.animate_text_indented("Quit Lumo: Pomodoro", indent_amt=2, finish_delay=.5)
 
 
     def setup_router(self, user_choice):
 
         if user_choice == "DEFAULT":
             self.focus_mins, self.break_mins = Data.default_timer[0], Data.default_timer[1]
-            self.focus_menu.menu_update_prepend(f"Preset break: {self.break_mins} min.", Data.FOCUS_MENU)
             self.focus_break_loop()
         elif user_choice == f"Preset 1:  {int(Data.p1_time)} min. / {int(Data.p1_break)} min. break":
             self.focus_mins, self.break_mins = Data.p1_time, Data.p1_break
-            self.focus_menu.menu_update_prepend(f"Preset break: {self.break_mins} min.", Data.FOCUS_MENU)
             self.focus_break_loop()
         elif user_choice == f"Preset 2:  {int(Data.p2_time)} min. / {int(Data.p2_break)} min. break":
             self.focus_mins, self.break_mins = Data.p2_time, Data.p2_break
-            self.focus_menu.menu_update_prepend(f"Preset break: {self.break_mins} min.", Data.FOCUS_MENU)
             self.focus_break_loop()
         elif user_choice == "Set custom pomodoro":
             self.set_custom_pomodoro()
-            self.focus_menu.menu_update_prepend(f"Preset break: {self.break_mins} min.", Data.FOCUS_MENU)
             self.focus_break_loop()
         elif user_choice == "Pomodoro settings":
             self.go_settings()
@@ -474,7 +498,7 @@ class PomodoroFlow:
     def breaktime_router(self, user_choice):
         if user_choice == "DEFAULT":
             pass
-        elif user_choice == f"Preset break: {self.break_mins} min.":
+        elif user_choice == "Preset break:":
             pass
         elif user_choice == "Break for 7 min.":
             self.break_mins = 7
@@ -594,9 +618,9 @@ class PomodoroFlow:
         Menu.program_header()
 
         while True:
-            self.focus_menu.display("focus completed", marker=0)
-            user_input = Menu.ask("Select an option")
-            user_choice = self.focus_menu.lookup_user_choice(user_input)
+            self.focus_menu.display_2("focus completed", self.break_mins)
+            val = Menu.ask("Select an option")
+            user_choice = self.focus_menu.lookup_user_choice(val)
 
             if user_choice == "QUIT":
                 self.quit_marker = True
@@ -632,10 +656,9 @@ class PomodoroFlow:
         while True:
             if skip_menu:
                 break
-            # TODO: work on display_2
             self.break_menu.display_2("break completed", self.focus_mins)
-            user_input = Menu.ask("Select an option")
-            user_choice = self.break_menu.lookup_user_choice(user_input)
+            val = Menu.ask("Select an option")
+            user_choice = self.break_menu.lookup_user_choice(val)
 
             if user_choice == "QUIT":
                 self.quit_marker = True
@@ -661,8 +684,8 @@ class PomodoroFlow:
             Menu.program_header()
 
             self.settings_menu.display("settings")
-            user_input = Menu.ask("Select an option", show_help_msg=False)
-            user_choice = self.settings_menu.lookup_user_choice(user_input)
+            val = Menu.ask("Select an option", show_help_msg=False)
+            user_choice = self.settings_menu.lookup_user_choice(val)
 
             if user_choice == "QUIT":
                 self.quit_marker = True
@@ -688,12 +711,12 @@ def main(initial_mins_from_cli=None):
         focus_mins, break_mins = initial_mins_from_cli.minutes_focus, initial_mins_from_cli.minutes_break
         valid_focus, valid_break = Data.valid_float(focus_mins), Data.valid_float(break_mins)
         if not (valid_focus and valid_break):
-            l_animators.animate_text_indented(f"Unable to make sense of {focus_mins} and {break_mins}", indent_amt=2)
+            l_animators.animate_text_indented(f"Unable to make sense of {focus_mins} and {break_mins}",
+                                              indent_amt=2)
             l_animators.animate_text_indented(f"Going to pomodoro menu...", indent_amt=2, finish_delay=.5)
             pass
         else:
             pomodoro.focus_mins, pomodoro.break_mins = float(focus_mins), float(break_mins)
-            pomodoro.focus_menu.menu_update_prepend(f"Preset break: {pomodoro.break_mins} min.", Data.FOCUS_MENU)
             pomodoro.focus_break_loop()
             Menu.clear()
 
