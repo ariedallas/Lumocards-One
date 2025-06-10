@@ -67,16 +67,18 @@ class CalendarInterface:
 
         if not selected_events:
             refreshed_events = [l_cal_utils.google_event_to_obj(e) for
-                                e in list() ]
+                                e in list()]
         else:
             refreshed_events = [l_cal_utils.google_event_to_obj(e) for
                                 e in selected_events]
 
         curr_page.day_block.events = refreshed_events
 
+
     def _refresh_all(self):
         self.day_blocks_window: list[DayBlock] = l_cal_utils.get_day_blocks()
         self.week_blocks_window: list[list[DayBlock]] = self._separate_by_weeks()
+
 
     def _event_actions_router(self,
                               val: str,
@@ -103,7 +105,7 @@ class CalendarInterface:
             start = event_obj.s if event_obj.s else event_obj.s_date
 
             status = self.update_event_dt_vals(event_obj,
-                                      start)
+                                               start)
 
             return False, None, None, status
 
@@ -202,8 +204,6 @@ class CalendarInterface:
         elif action == Menus.ACTION_DELETE_EVENT:
             feedback_not_implemented(CalendarPageDay.msg_indent_num)
             return False, None, None
-
-
 
 
     def _week_actions_router(self,
@@ -315,24 +315,26 @@ class CalendarInterface:
             print(CalendarPageDay.cursor_indent_space, end="  ")
 
             user_input = input(">  ")
+            val = user_input.strip()
+            val_str = user_input.strip().lower()
 
-            if "]" in user_input or "[" in user_input:
-                curr_day_block = self.paginate_days(user_input)
+            if "]" in val or "[" in val:
+                curr_day_block = self.paginate_days(val)
 
-            elif curr_page.valid_event_selection(user_input,
+            elif curr_page.valid_event_selection(val,
                                                  len(curr_day_block.events),
                                                  self.events_limit):
-                selection = int(user_input) - 1
+                selection = int(val) - 1
                 status = self.view_event(selection)
 
                 if status == "UPDATE EVENT":
                     self._refresh_all()
                     curr_day_block = self.day_blocks_window[self.curr_day_idx]
 
-            elif user_input.upper() in menu_dict.keys():
-                menu_update, old_val, new_val = self._day_actions_router(user_input, menu_dict)
+            elif val.upper() in menu_dict.keys():
+                menu_update, old_val, new_val = self._day_actions_router(val, menu_dict)
 
-            elif user_input.lower() in {"t", "toggle"}:
+            elif val_str in {"t", "toggle"}:
                 self.curr_view_mode = "WEEK"
                 for idx, group in enumerate(self.week_blocks_window):
                     if curr_day_block in group:
@@ -340,7 +342,7 @@ class CalendarInterface:
                         break
                 return "TOGGLE"
 
-            elif user_input.lower() in {"q", "quit"}:
+            elif val_str in {"q", "quit"}:
                 return "QUIT"
 
 
@@ -348,6 +350,7 @@ class CalendarInterface:
                 l_animators.animate_text_indented("Unrecognized option...",
                                                   indent_amt=CalendarPageDay.msg_indent_num,
                                                   finish_delay=.5)
+
 
     def paginate_days(self, user_input: str) -> DayBlock:
         shift: int
@@ -404,24 +407,26 @@ class CalendarInterface:
             print(CalendarPageWeek.l_margin_menu_space, end="    ")
 
             user_input = input(">  ")
+            val = user_input.strip()
+            val_str = user_input.strip().lower()
 
-            if "]" in user_input or "[" in user_input:
-                curr_week_block = self.paginate_weeks(user_input)
+            if "]" in val or "[" in val:
+                curr_week_block = self.paginate_weeks(val)
 
-            elif user_input.upper() in menu_dict.keys():
-                self._week_actions_router(user_input, menu_dict)
+            elif val.upper() in menu_dict.keys():
+                self._week_actions_router(val, menu_dict)
 
 
-            elif curr_page.valid_day_selection(user_input=user_input, var_weekblock=curr_week_block):
+            elif curr_page.valid_day_selection(user_input=val, var_weekblock=curr_week_block):
                 week_in_focus_day_ints = [block.day for block in curr_week_block]
-                selected_idx = week_in_focus_day_ints.index(int(user_input))
+                selected_idx = week_in_focus_day_ints.index(int(val))
                 selected_day_block = curr_week_block[selected_idx]
                 self.curr_day_idx = self.day_blocks_window.index(selected_day_block)
 
                 self.curr_view_mode = "DAY"
                 return "TOGGLE"
 
-            elif user_input.lower() in {"t", "toggle"}:
+            elif val_str in {"t", "toggle"}:
                 self.curr_view_mode = "DAY"
                 monday_DayBlock = curr_week_block[0]
                 target_date = monday_DayBlock.date
@@ -430,7 +435,7 @@ class CalendarInterface:
                 return "TOGGLE"
 
 
-            elif user_input.lower() in {"q", "quit"}:
+            elif val_str in {"q", "quit"}:
                 return "QUIT"
 
 
@@ -479,6 +484,7 @@ class CalendarInterface:
             curr_week_block = self.week_blocks_window[self.curr_week_idx]
 
         return curr_week_block
+
 
     # Figure out how to split this up into some smaller chunks:
     # Basic idea: Each field of the new event is its own function.
@@ -598,6 +604,7 @@ class CalendarInterface:
                                               indent_amt=CalendarPageEvent.l_margin_num,
                                               finish_delay=1)
 
+
     # Figure out how to split this up into some smaller chunks
     def update_event_one_val(self,
                              existing_event,
@@ -626,8 +633,7 @@ class CalendarInterface:
                 full_prompt = wh_sp + prompt + "  "
 
                 user_input = input(full_prompt)
-
-                val = user_input if user_input else prev_value
+                val = user_input.strip() if user_input else prev_value
 
                 editing_event[target_key] = val
                 initial_round = False
@@ -838,6 +844,7 @@ class CalendarInterface:
 
             return "RELOOP"
 
+
     def parse_datetime_info(self,
                             dt_parser,
                             result_a,
@@ -877,7 +884,7 @@ class CalendarInterface:
         full_prompt = wh_sp + prompt + "  "
 
         user_input = input(full_prompt)
-        val = user_input.strip().lower()
+        val = user_input.strip()
 
         if prompt == Menus.P_TITLE:
             user_input_validated = "(no title)" if val == "" else val
@@ -916,7 +923,8 @@ class CalendarInterface:
             return ""
 
         user_input = input(full_prompt)
-        return user_input
+        val = user_input.strip()
+        return val
 
 
     def prompter_double(self, prompt_one, prompt_two, date_in_focus, valid_times):

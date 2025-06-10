@@ -2,7 +2,9 @@ import time
 from typing import Optional
 
 
-def animate_text(text: str, speed: float =.025, finish_delay: float=0) -> None:
+def animate_text(text: str,
+                 speed: float =.025,
+                 finish_delay: float=0) -> None:
     text_add_space = " " + text
     for n in range(len(text_add_space)):
         print(text_add_space[:n], end="\r")
@@ -16,7 +18,10 @@ def animate_text(text: str, speed: float =.025, finish_delay: float=0) -> None:
         time.sleep(finish_delay)
 
 
-def animate_text_indented(text: str, speed: float=.025, indent_amt=Optional[int], finish_delay: float=0) -> None:
+def animate_text_indented(text: str,
+                          speed: float=.025,
+                          indent_amt=Optional[int],
+                          finish_delay: float=0) -> None:
     if not indent_amt:
         indent_amt = 0
 

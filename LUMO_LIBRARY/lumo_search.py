@@ -11,19 +11,17 @@ import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 
-
 letters = string.ascii_lowercase
 letters_filtered = [l.upper() for l in letters if not (l == "q") and not (l == "x")]
 settings = l_files.get_json_settings()
 
-def test_match(queried):
 
-    unique_words =  re.findall(r"[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))", queried)
+def test_match(queried):
+    unique_words = re.findall(r"[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))", queried)
     return unique_words
 
 
 def test_match_digit(queried, search_term):
-
     digit_match = re.findall(fr"{search_term}\d*", queried)
     return digit_match
 
@@ -44,7 +42,6 @@ def iterate_and_find(searchterm, folder):
         if digit_match:
             possible_files.append(item)
 
-
     return possible_files
 
 
@@ -55,7 +52,6 @@ def reshow_match(chosen_file):
 
 
 def big_zipper_prep(searchterm):
-
     file_matches_near = iterate_and_find(searchterm, l_files.cards_near_folder)
     file_matches_middle = iterate_and_find(searchterm, l_files.cards_middle_folder)
     file_matches_dist = iterate_and_find(searchterm, l_files.cards_dist_folder)
@@ -68,14 +64,13 @@ def big_zipper_prep(searchterm):
                      , sorted(file_matches_recurring), sorted(file_matches_checklist), sorted(file_matches_archived))
 
     shortcut_file_matches = sorted(file_matches_near) + sorted(file_matches_middle) + sorted(file_matches_dist) \
-                            + sorted(file_matches_recurring) + sorted(file_matches_checklist) + sorted(file_matches_archived)
-
+                            + sorted(file_matches_recurring) + sorted(file_matches_checklist) + sorted(
+        file_matches_archived)
 
     return found_matches, shortcut_file_matches
 
 
 def big_zipper(var_total_matches):
-
     total_amt_matches = sum([len(m) for m in var_total_matches])
 
     if total_amt_matches > 24:
@@ -90,8 +85,8 @@ def big_zipper(var_total_matches):
     dist_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[2]]
     recurring_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[3]]
     checklist_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[4]]
-    archived_matches_setup = [f"[{letters_filtered_copy.pop(0)}] ({len(var_total_matches[5])})"] if len(var_total_matches[5]) > 0 else []
-
+    archived_matches_setup = [f"[{letters_filtered_copy.pop(0)}] ({len(var_total_matches[5])})"] if len(
+        var_total_matches[5]) > 0 else []
 
     near_matches_formatted = ["NEAR FOCUS CARDS:"] + near_matches_setup
     mid_matches_formatted = ["MIDDLE FOCUS CARDS:"] + mid_matches_setup
@@ -103,23 +98,27 @@ def big_zipper(var_total_matches):
     used_letters = [letter for letter in letters_filtered if letter not in letters_filtered_copy]
 
     big_zipp = [near_matches_formatted, mid_matches_formatted, dist_matches_formatted
-                , recurring_matches_formatted, checklist_matches_formatted, archived_matches_formatted]
+        , recurring_matches_formatted, checklist_matches_formatted, archived_matches_formatted]
 
     return total_amt_matches, big_zipp, used_letters
 
 
 def select_card_from_found(searchterm):
-
     found_matches, shortcut_file_matches = big_zipper_prep(searchterm=searchterm)
-    total_amt_matches, all_matches_formatted, used_letters  = big_zipper(found_matches)
+    total_amt_matches, all_matches_formatted, used_letters = big_zipper(found_matches)
 
     if total_amt_matches > 24:
-        print(f"More than 24 possible matches for term \'{searchterm}\'... try something more specific.")
+        print()
+        l_animators.list_printer([f"More than 24 possible matches for term \'{searchterm}\'...",
+                                  "Try something more specific."]
+                                 , indent_amt=2)
+
         return None, None, False
 
     if total_amt_matches == 0:
-        l_animators.animate_text_indented(f"No matches found for your term \'{searchterm}\'... ",
-                                          indent_amt=2, finish_delay=.4)
+        l_animators.animate_text_indented(f"No matches found for your term \'{searchterm}\'... "
+                                          , indent_amt=2
+                                          , finish_delay=.5)
         print()
         return None, None, False
 
@@ -139,36 +138,42 @@ def select_card_from_found(searchterm):
 
     while True:
         user_input = input("\n  > ")
+        val = user_input.strip()
 
-        if user_input.upper() == archives_letter:
-            print("  Archived cards are not shown in this mode, but"
-                  "\n  the number indicator is shown for reference."
-                  f"\n  i.e. there is/are ({len(found_matches[5])}) archived cards that pertain.")
+        if val.upper() == archives_letter:
+            print()
+            l_animators.list_printer(["Archived cards are not shown in this mode, but",
+                                      "the number indicator is shown for reference.",
+                                      f"i.e. there is/are ({len(found_matches[5])}) archived cards that match."]
+                                     , indent_amt=2
+                                     , speed_interval=0)
             continue
 
-        # change this to be if ... in dict.keys() etc.
-        if user_input.isalpha() and len(user_input) == 1 and (user_input.upper() in used_letters):
-            letter_as_listindex = ord(user_input.lower()) - 97
+        # TODO: change this to be if ... in dict.keys() etc.
+        if val.isalpha() and len(val) == 1 and (val.upper() in used_letters):
+            letter_as_idx = ord(val.lower()) - 97
 
-            chosen_file = shortcut_file_matches[letter_as_listindex]
+            chosen_file = shortcut_file_matches[letter_as_idx]
             card = l_card_utils.filename_to_card(chosen_file, check_archives=True)
 
             return card, chosen_file, False
 
-        elif user_input.lower() == "x":
+        elif val.lower() in {"x", "exit"}:
             return None, None, False
 
-        elif user_input.lower() == "q":
+        elif val.lower() in {"q", "quit"}:
             return None, None, True
 
         else:
-            print( "\nYou entered something other than one letter "
-                   "\n- or - "
-                   "\nYou entered a letter that doesn't match anything.")
+            print()
+            l_animators.list_printer(["You entered something other than one letter ",
+                                      "- or - ",
+                                      "You entered a letter that doesn't match anything."],
+                                     indent_amt=2,
+                                     speed_interval=0)
 
 
 def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_hotkey_list):
-
     card_fullpath = l_card_utils.get_card_abspath(var_card_filename)
 
     l_card_utils.card_header(var_card)
@@ -180,22 +185,27 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
 
     while True:
         user_input = input("\n  > ")
+        val = user_input.strip()
 
-        if user_input.upper() in var_hotkey_dict.keys():
+        if val.upper() in var_hotkey_dict.keys():
 
-            if var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_OPEN:
+            action = var_hotkey_dict.get(val.upper())
+
+            if action == l_menus_data.ACTION_OPEN:
                 subprocess.run([f"{settings.get("text editor")} {card_fullpath}"], shell=True)
                 return "RELOOP", var_card_filename
 
-            elif var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_MODIFY:
+            elif action == l_menus_data.ACTION_MODIFY:
 
                 hotkey_list, hotkey_dict = l_menus_funcs.prep_card_modify_menu(l_menus_data.SEARCH_MODIFY_MENU.copy(),
-                                                                         card_filename=var_card_filename)
+                                                                               card_filename=var_card_filename)
 
-                possible_status, possible_returned_card = l_menus_funcs.menu_modify_card(selected_card=var_card_filename,
-                                                                                   var_hotkey_list=hotkey_list,
-                                                                                   var_hotkey_dict=hotkey_dict,
-                                                                                         indent_amt=0)
+                possible_status, possible_returned_card = l_menus_funcs.menu_modify_card(
+                    selected_card=var_card_filename,
+                    var_hotkey_list=hotkey_list,
+                    var_hotkey_dict=hotkey_dict,
+                    indent_amt=0)
+
                 if possible_returned_card:
                     return "RELOOP", possible_returned_card
 
@@ -206,20 +216,20 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
                     return "RELOOP", var_card_filename
 
 
-            elif var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
+            elif action == l_menus_data.ACTION_SCHEDULE:
                 l_animators.animate_text_indented("This feature not fully available", indent_amt=2, finish_delay=.4)
                 print()
                 return "RELOOP", var_card_filename
 
-            elif var_hotkey_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING_2:
+            elif action == l_menus_data.ACTION_SET_RECURRING_2:
                 card_title_formatted = l_card_utils.format_card_title(var_card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus_funcs.prep_newcard_menu(l_menus_data.RECURRING_MENU,
-                                                                       l_menus_data.LETTERS_FILTERED,
-                                                                       pop_letters=False)
+                                                                             l_menus_data.LETTERS_FILTERED,
+                                                                             pop_letters=False)
                 print()
-                l_animators.list_printer([card_title_formatted])
+                l_animators.animate_text(card_title_formatted)
                 print()
-                l_animators.list_printer(recur_menu_l, indent_amt=2)
+                l_animators.list_printer(recur_menu_l, indent_amt=2, speed_interval=0)
 
                 recurrence_settings = l_menus_funcs.menu_recurrence_settings(var_menu=recur_menu_d)
 
@@ -231,18 +241,17 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
                 return "RELOOP", var_card_filename
 
 
-        elif user_input.upper() in l_menus_data.EXIT_MENU_DICT.keys():
+        elif val.lower() in {"x", "exit"}:
             return "NEW SEARCH", None
 
-        elif user_input.upper() in l_menus_data.QUIT_MENU_DICT.keys():
-            return "QUIT", None
-
-        elif user_input.lower() == "quit":
+        elif val.lower() in {"q", "quit"}:
             return "QUIT", None
 
         else:
             print()
-            print("  In this context your options are hotkey letter such as 'a', 'c', or 'quit'.")
+            l_animators.list_printer(["Your options are hotkey letters:", "such as 'a', 'c'; or quit/exit", ""]
+                                     , indent_amt=2
+                                     , finish_delay=.5)
 
 
 def steps_preview(card_steps, steps_amt, steps_idx):
@@ -288,15 +297,16 @@ def main(initial_search_from_cli=None):
 
             print(status)
             user_input = input(
-                "\n"                
+                "\n"
                 "                  (Type 'quit' to quit)"
-                "\n  Enter a single search term i.e. 'hat'  >  " )
+                "\n  Enter a single search term i.e. 'hat'  >  ")
 
-            if user_input == "quit":
+            val = user_input.strip()
+            if val.lower() == "quit":
                 status = "QUIT"
                 continue
 
-            card, matched_path, user_quit = select_card_from_found(user_input)
+            card, matched_path, user_quit = select_card_from_found(val)
 
             if card:
                 hotkey_dict, hotkey_list = l_menus_funcs.prep_menu_tuple(l_menus_data.SEARCH_MAIN_MENU)
@@ -305,10 +315,11 @@ def main(initial_search_from_cli=None):
                 status = "QUIT"
 
 
-        else: # status == "QUIT"
-            print()
-            l_animators.animate_text("Quit Lumo: Search", finish_delay=.5)
+        else:  # status == "QUIT"
             break
+
+            # Optional feature: show quit message.
+            # l_animators.animate_text("Quit Lumo: Search", finish_delay=.5)
 
 
 if __name__ == "__main__":
@@ -322,4 +333,3 @@ if __name__ == "__main__":
     parsed = parser.parse_args()
 
     main(parsed.match_term)
-

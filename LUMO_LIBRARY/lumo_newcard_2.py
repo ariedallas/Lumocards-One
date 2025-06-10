@@ -215,10 +215,12 @@ def write_card(card_filename, card_steps):
         l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, indent_amt=2, speed_interval=0)
         print()
         user_input = input("  Select where this card should go >  ")
+        val = user_input.strip()
 
-        if user_input.upper() in combined_menus_dict.keys():
+        if val.upper() in combined_menus_dict.keys():
+            action = combined_menus_dict[val.upper()]
 
-            if combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_NEAR:
+            if action == l_menus_data.ACTION_SET_NEAR:
 
                 card_abspath, json_file = write_card_and_json(card_filename,
                                                               l_files.cards_near_folder,
@@ -227,7 +229,7 @@ def write_card(card_filename, card_steps):
                 l_animators.animate_text_indented("Card set to ➝ Near Focus", indent_amt=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
-            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_MIDDLE:
+            elif action == l_menus_data.ACTION_SET_MIDDLE:
 
                 card_abspath, json_file = write_card_and_json(card_filename,
                                                               l_files.cards_middle_folder,
@@ -236,7 +238,7 @@ def write_card(card_filename, card_steps):
                 l_animators.animate_text_indented("Card set to ➝ Middle Focus", indent_amt=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
-            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_DIST:
+            elif action == l_menus_data.ACTION_SET_DIST:
 
                 card_abspath, json_file = write_card_and_json(card_filename,
                                                               l_files.cards_dist_folder,
@@ -248,10 +250,10 @@ def write_card(card_filename, card_steps):
 
             # ---- SCHEDULING MENU ---- #
 
-            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
+            elif action == l_menus_data.ACTION_SCHEDULE:
                 l_animators.animate_text_indented("This function currently unavailable...", indent_amt=2)
 
-            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_RECURRING:
+            elif action == l_menus_data.ACTION_SET_RECURRING:
 
                 card_title_formatted = l_card_utils.format_card_title(card_filename.replace(".txt", ""))
                 recur_menu_d, recur_menu_l = l_menus_funcs.prep_newcard_menu(l_menus_data.RECURRING_MENU,
@@ -275,7 +277,7 @@ def write_card(card_filename, card_steps):
                 l_animators.animate_text_indented("Card created in ➝ Recurring Cards", indent_amt=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
-            elif combined_menus_dict[user_input.upper()] == l_menus_data.ACTION_SET_CHECKLIST:
+            elif action == l_menus_data.ACTION_SET_CHECKLIST:
 
                 card_abspath, json_file = write_card_and_json(card_filename,
                                                               l_files.checklist_cards_folder,
@@ -284,10 +286,10 @@ def write_card(card_filename, card_steps):
                 l_animators.animate_text_indented("Card set to ➝ Checklist Cards", indent_amt=2, finish_delay=.5)
                 return "CREATED CARD", card_abspath
 
-        elif user_input.lower() in {"x", "exit"}:
+        elif val.lower() in {"x", "exit"}:
             return "RELOOP", None
 
-        elif user_input.lower() in {"q", "quit"}:
+        elif val.lower() in {"q", "quit"}:
             print()
             l_animators.animate_text("Quit Lumo: New Card", finish_delay=.5)
             return "QUIT", None

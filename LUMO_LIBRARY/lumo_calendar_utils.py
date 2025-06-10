@@ -93,7 +93,6 @@ def get_google_events(credentials, time_min, time_max):
         events = event_result.get("items", [])
 
         if not events:
-            print("No upcoming events found.")
             return
 
         return events

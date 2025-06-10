@@ -127,9 +127,11 @@ def card_prefix_renamer(old_prefix, new_prefix):
 
 
 def card_deleter(card_filename):
+    print()
     l_animators.list_printer([f"{card_filename} ➝ Type 'no' or 'x' to cancel deletion",
                               "or press any other key to confirm deletion"], indent_amt=2)
-    if not l_menus_funcs.proceed(f">  ", indent_amt=2):
+    print()
+    if not l_menus_funcs.proceed(">  ", indent_amt=2):
         return "CANCELLED"
     card_fullpath = get_card_abspath(card_filename, check_archives=True)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)

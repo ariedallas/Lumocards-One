@@ -226,10 +226,11 @@ def root_loop(cli_parsed_args: argparse.Namespace, unknown: list[str]) -> None:
         print()
 
         user_input: str
-        user_input = input("  > ")
+        user_input = input("  >  ")
+        val = user_input.strip()
         status, menu = router(cli_input=None,
                               unknown_args=[],
-                              lumo_input=user_input,
+                              lumo_input=val,
                               contextual_menu=current_menu)
 
 
@@ -237,6 +238,7 @@ def router(cli_input: Optional[argparse.Namespace],
            unknown_args: list[str],
            lumo_input: str,
            contextual_menu: LumoMenu) -> tuple[Optional[str], LumoMenu]:
+
     selected_prog: str
     from_cli: bool
     from_cli = _determine_from_cli(cli_input)

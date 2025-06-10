@@ -279,8 +279,9 @@ class TimerStandard:
         l_animators.animate_text(f"  Timer paused at {paused_amt} ...")
         print()
         Menu.simple_display(Data.TIMER_PAUSED_MENU, marker=0)
+        print()
 
-        user_input = input("  ")
+        user_input = input("  >  ")
         val = user_input.strip().lower()
 
         if val == "x":
@@ -453,7 +454,7 @@ class PomodoroFlow:
 
             Menu.program_header()
             self.setup_menu.display("setup menu", show_exit=False, marker=Data.default_marker)
-            val = Menu.ask("Select an option")
+            val = Menu.ask("")
 
             user_choice = self.setup_menu.lookup_user_choice(val)
 
@@ -619,7 +620,7 @@ class PomodoroFlow:
 
         while True:
             self.focus_menu.display_2("focus completed", self.break_mins)
-            val = Menu.ask("Select an option")
+            val = Menu.ask("")
             user_choice = self.focus_menu.lookup_user_choice(val)
 
             if user_choice == "QUIT":
@@ -711,7 +712,8 @@ def main(initial_mins_from_cli=None):
         focus_mins, break_mins = initial_mins_from_cli.minutes_focus, initial_mins_from_cli.minutes_break
         valid_focus, valid_break = Data.valid_float(focus_mins), Data.valid_float(break_mins)
         if not (valid_focus and valid_break):
-            l_animators.animate_text_indented(f"Unable to make sense of {focus_mins} and {break_mins}",
+            print()
+            l_animators.animate_text_indented(f"Unable to make sense of '{focus_mins}' and '{break_mins}'",
                                               indent_amt=2)
             l_animators.animate_text_indented(f"Going to pomodoro menu...", indent_amt=2, finish_delay=.5)
             pass

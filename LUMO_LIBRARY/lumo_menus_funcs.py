@@ -9,12 +9,12 @@ import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 def proceed(input_text="... ", indent_amt=0, empty_means_true=True):
     indent_space = " " * indent_amt
     user_input = input(f"{indent_space}{input_text}")
-    user_input_filtered = user_input.lower().strip()
+    val = user_input.strip().lower()
 
-    if user_input_filtered == "":
+    if val == "":
         return True if empty_means_true else False
 
-    return True if user_input_filtered not in l_menus_data.NEGATIVE_USER_RESPONSES else False
+    return True if val not in l_menus_data.NEGATIVE_USER_RESPONSES else False
 
 
 def prep_newcard_menu(var_menu, var_letters, pop_letters=False):
@@ -103,21 +103,27 @@ def menu_recurrence_settings(var_menu):
 
     while not recurrence_settings:
         print()
-        response = input("  Should this recur in days, weeks, or months? >  ")
-        if response.upper() not in var_menu.keys():
+        user_input = input("  Should this recur in days, weeks, or months? >  ")
+        val = user_input.strip()
+
+
+        if val.upper() not in var_menu.keys():
             avlbl = list(var_menu.keys())
-            print(f"  Available letters are '{avlbl[0]}' '{avlbl[1]}' and '{avlbl[2]}' (upper or lower case)")
+            l_animators.animate_text_indented(f"Available letters are '{avlbl[0]}' '{avlbl[1]}' and '{avlbl[2]}'"
+                                              , indent_amt=2)
             continue
 
-        units = var_menu[response.upper()]
-        response = input(f"  Select a number of {units}? e.g. '2' >  ")
+        units = var_menu[val.upper()]
+        user_input = input(f"  Select a number of {units}? e.g. '2' >  ")
+        val = user_input.strip()
 
-        if not l_card_utils.test_for_float(response):
+        if not l_card_utils.test_for_float(val):
             print()
-            print(f"  Please use whole numbers only (no decimals)")
+            l_animators.animate_text_indented("Please use whole numbers only (no decimals)"
+                                              , indent_amt=2)
             continue
         else:
-            amt = float(response)
+            amt = float(val)
             units = units.replace("(s)", "")
 
         recurrence_settings = (units, amt)
@@ -135,11 +141,13 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict, indent_amt
         l_animators.list_printer(l_menus_data.EXIT_MENU_LIST, indent_amt=indent_amt+2, speed_interval=0)
 
         input_space = " " * (indent_amt+2)
-        response = input(f"\n{input_space}>  ")
+        user_input = input(f"\n{input_space}>  ")
+        val = user_input.strip()
 
-        if response.upper() in var_hotkey_dict.keys():
+        if val.upper() in var_hotkey_dict.keys():
+            action = var_hotkey_dict[val.upper()]
 
-            if var_hotkey_dict[response.upper()] == l_menus_data.ACTION_SET_NEAR:
+            if action == l_menus_data.ACTION_SET_NEAR:
                 l_recurring.remove_recurring_data(json_filename=selected_card)
                 l_card_utils.card_renamer(curr_name=selected_card,
                                           dst_dir=l_files.cards_near_folder,
@@ -148,7 +156,7 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict, indent_amt
                 l_animators.animate_text_indented("Card set to ➝ Near Focus", indent_amt=2, finish_delay=.5)
                 return "CARD REFOCUSED", None
 
-            elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_SET_MIDDLE:
+            elif action == l_menus_data.ACTION_SET_MIDDLE:
                 l_recurring.remove_recurring_data(json_filename=selected_card)
                 l_card_utils.card_renamer(curr_name=selected_card,
                                           dst_dir=l_files.cards_middle_folder,
@@ -157,7 +165,7 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict, indent_amt
                 l_animators.animate_text_indented("Card set to ➝ Middle Focus", indent_amt=2, finish_delay=.5)
                 return "CARD REFOCUSED", None
 
-            elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_SET_DIST:
+            elif action == l_menus_data.ACTION_SET_DIST:
                 l_recurring.remove_recurring_data(json_filename=selected_card)
                 l_card_utils.card_renamer(curr_name=selected_card,
                                           dst_dir=l_files.cards_dist_folder,
@@ -166,7 +174,7 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict, indent_amt
                 l_animators.animate_text_indented("Card set to ➝ Distant Focus", indent_amt=2, finish_delay=.5)
                 return "CARD REFOCUSED", None
 
-            elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_RENAME:
+            elif action == l_menus_data.ACTION_RENAME:
                 print()
                 l_card_utils.print_card_categories(indent_amt=2)
                 retitled_card_path = l_newcard.input_to_filename()
@@ -182,7 +190,7 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict, indent_amt
                 l_animators.animate_text_indented("Card renamed", indent_amt=2, finish_delay=.5)
                 return None, retitled_card_path
 
-            elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_ARCHIVE:
+            elif action == l_menus_data.ACTION_ARCHIVE:
                 l_recurring.remove_recurring_data(json_filename=selected_card)
                 l_card_utils.card_renamer(curr_name=selected_card,
                                           dst_dir=l_files.archived_cards_folder,
@@ -191,30 +199,27 @@ def menu_modify_card(selected_card, var_hotkey_list, var_hotkey_dict, indent_amt
                 l_animators.animate_text_indented("Card archived", indent_amt=2, finish_delay=.5)
                 return None, None
 
-            elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_DELETE:
+            elif action == l_menus_data.ACTION_DELETE:
                 confirmation = l_card_utils.card_deleter(selected_card)
 
                 if confirmation == "CANCELLED":
                     l_animators.animate_text_indented("Card not deleted", indent_amt=2, finish_delay=.5)
                     return None, None
 
-                l_animators.animate_text_indented("Card deleted", indent_amt=2, finish_delay=.5)
                 return "DELETED CARD", None
 
-            elif var_hotkey_dict[response.upper()] == l_menus_data.ACTION_MARK_DELETE:
+            elif action == l_menus_data.ACTION_MARK_DELETE:
                 return "CARD MARKED FOR DELETION", None
 
 
-        elif response.upper() in l_menus_data.EXIT_MENU_DICT.keys():
-            return None, None
-
-        elif response in l_menus_data.NEGATIVE_USER_RESPONSES:
-            l_animators.animate_text("Returning to Main Menu", finish_delay=.5)
+        elif val.lower() in {"x", "exit"}:
             return None, None
 
         else:
             print()
-            print("You entered something other than one letter.")
+            l_animators.animate_text_indented(f"Unrecognized option '{val}' ..."
+                                              , indent_amt=2
+                                              , finish_delay=.5)
             print()
 
 if __name__ == "__main__":
