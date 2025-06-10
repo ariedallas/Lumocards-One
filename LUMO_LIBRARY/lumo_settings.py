@@ -55,18 +55,19 @@ def manager_menu():
         print()
         l_animators.list_printer(["Select a category using it's prefix letter (except Z)",
                                   "- or -",
-                                  "Select a menu option with '1' or '2'"],
+                                  "Select a menu option with a number, e.g. '1'"],
                                  indent_amt=7,
                                  speed_interval=0)
 
         user_input = input("\n  >  ")
-        val = user_input.strip().upper()
+        val = user_input.strip()
 
-        if val in categories_dict.keys():
-            status = letter_router(categories_dict, val)
+        if val.upper() in categories_dict.keys():
+            status = letter_router(categories_dict, val.upper())
             if status == "DELETED" or status == "UPDATED":
                 return "RELOOP"
-        elif val == "Z":
+
+        elif val.lower() == "z":
             print()
             l_animators.animate_text_indented("Z — Default Category, is a fixed category.",
                                               indent_amt=2,
@@ -79,11 +80,11 @@ def manager_menu():
             valid = delete_category(categories_dict)
             if valid:
                 return "RELOOP"
-        elif val == "3":
+        elif val == "3" or val.lower() == "quit":
             return "QUIT"
         else:
             l_animators.animate_text_indented(
-                "Options available are shortcut letters and shortcut numbers.",
+                f"Unrecognized option '{val}' ...",
                 indent_amt=2, finish_delay=.5)
 
 
@@ -145,13 +146,15 @@ def letter_router(categories_dict, key):
         val = user_input.strip()
 
         if val in singleCat_menu_d.keys():
-            if singleCat_menu_d[val] == l_menus_data.ACTION_UPDATE_CATEGORY:
+            action = singleCat_menu_d[val]
+
+            if action == l_menus_data.ACTION_UPDATE_CATEGORY:
                 valid = update_category(categories_dict, key, category_display)
                 if valid:
                     return "UPDATED"
-            elif singleCat_menu_d[val] == l_menus_data.ACTION_DELETE_THIS_CATEGORY:
+            elif action == l_menus_data.ACTION_DELETE_THIS_CATEGORY:
                 confirmed = card_rename_confirmation(mode="DELETE",
-                                                     prefix=key,
+                                                     old_prefix=key,
                                                      prev_category=category_display)
 
                 if confirmed:
@@ -162,11 +165,11 @@ def letter_router(categories_dict, key):
                 else:
                     return "DELETED"
 
-        elif val.upper() == "X":
+        elif val.lower() == "x":
             return "RELOOP"
         else:
             l_animators.animate_text_indented(
-                "Options available are shortcut letters and shortcut numbers.",
+                f"Unrecognized option '{val}' ...",
                 indent_amt=2, finish_delay=.5)
 
 
@@ -180,25 +183,32 @@ def create_category(categories_dict):
 
     while True:
         print()
-        l_animators.animate_text("CREATE NEW CATEGORY")
+        print("CREATE NEW CATEGORY")
         print()
 
         prefix = get_category_prefix(indent_amt=2)
         name = get_category_name(indent_amt=2)
 
         valid_prefix, error_prefix = category_prefix_validator(prefix, None, keys)
+        valid_name, error_name = category_name_validator(name)
 
-        if valid_prefix:
+        if valid_prefix and valid_name:
             categories_dict[valid_prefix] = name
             l_animators.animate_text_indented(f"Created: {valid_prefix} — {name}",
                                               indent_amt=2,
                                               finish_delay=.5)
             write_new_settings(categories_dict)
             return True
-        else:
-            l_animators.animate_text_indented(f"{error_prefix}", indent_amt=2, finish_delay=.5)
+
+        elif error_prefix:
+            print()
+            l_animators.animate_text_indented(f"{error_prefix}", indent_amt=2, finish_delay=1)
             return False
 
+        else:
+            print()
+            l_animators.animate_text_indented(f"{error_name}", indent_amt=2, finish_delay=1)
+            return False
 
 def update_category(categories_dict, key, existing):
     keys = list(categories_dict.keys())
@@ -227,10 +237,15 @@ def update_category(categories_dict, key, existing):
         prefix = get_category_prefix(indent_amt=2)
         name = get_category_name(indent_amt=2)
 
-        valid_prefix, error = category_prefix_validator(prefix, key, keys)
+        valid_prefix, error_prefix = category_prefix_validator(prefix, key, keys)
+        valid_name, error_name = category_name_validator(name)
 
-        if valid_prefix:
-            confirmed = card_rename_confirmation("UPDATE", prefix=key)
+        if valid_prefix and valid_name:
+            confirmed = card_rename_confirmation("UPDATE"
+                                                 , old_prefix=key
+                                                 , prev_category=existing
+                                                 , new_prefix=valid_prefix
+                                                 , new_name=name)
 
             if confirmed:
                 del categories_dict[key]
@@ -247,8 +262,15 @@ def update_category(categories_dict, key, existing):
 
             else:
                 return False
+
+        elif error_prefix:
+            print()
+            l_animators.animate_text_indented(f"{error_prefix}", indent_amt=2, finish_delay=1)
+            return False
+
         else:
-            l_animators.animate_text_indented(f"{error}", indent_amt=2, finish_delay=.5)
+            print()
+            l_animators.animate_text_indented(f"{error_name}", indent_amt=2, finish_delay=1)
             return False
 
 
@@ -259,7 +281,7 @@ def delete_category(categories_dict):
 
     while True:
         print()
-        l_animators.animate_text("DELETE A CATEGORY")
+        print("DELETE A CATEGORY")
         print()
 
         l_animators.list_printer(categories_as_list,
@@ -267,21 +289,22 @@ def delete_category(categories_dict):
                                  speed_interval=0)
 
         print()
-        l_animators.list_printer(["(Type 'cancel' or 'exit' to go back)"], indent_amt=2)
+        l_animators.list_printer(["Type 'cancel' or 'exit' to go back"], indent_amt=2)
 
         user_input = input("\n  >  ")
-        val = user_input.strip().upper()
+        val = user_input.strip()
 
-        if val in keys:
-            category_display = f"{val} — {categories_dict[val]}"
+
+        if val.upper() in keys:
+            category_display = f"{val.upper()} — {categories_dict[val.upper()]}"
             confirmed = card_rename_confirmation("DELETE",
-                                                 prefix=val,
+                                                 old_prefix=val.upper(),
                                                  prev_category=category_display)
 
             if confirmed:
-                del categories_dict[val]
+                del categories_dict[val.upper()]
                 write_new_settings(categories_dict)
-                l_card_utils.card_prefix_renamer(val, "Z")
+                l_card_utils.card_prefix_renamer(val.upper(), "Z")
                 return True
             else:
                 return False
@@ -292,28 +315,41 @@ def delete_category(categories_dict):
                                               finish_delay=.5)
             return False
         else:
-            l_animators.animate_text_indented("That letter doesn't match a category.",
+            l_animators.animate_text_indented(f"Unrecognized option '{val}' ...",
                                               indent_amt=2,
                                               finish_delay=.5)
 
 
-def card_rename_confirmation(mode, prefix, prev_category=None):
+def card_rename_confirmation(mode,
+                             old_prefix,
+                             prev_category,
+                             new_prefix=None,
+                             new_name=None):
     feedback = []
-    amt = len(l_files.get_all_cards_by_prefix(prefix))
+    amt = len(l_files.get_all_cards_by_prefix(old_prefix))
+    new_category = f"{new_prefix} — {new_name.upper()}"
 
     mode_formatted = "Deleting" if mode == "DELETE" else "Updating"
-    f1 = f"{mode_formatted} this category letter, will rename {amt} card(s)."
-    f2 = f"Any cards from {prev_category} will be assigned to Z — DEFAULT CATEGORY"
+
+    if old_prefix != new_prefix or mode == "DELETE":
+        f1 = f"{mode_formatted} this category letter will rename {amt} card(s)."
+    else:
+        f1 = "The category name is changing, but not the letter."
+
+    f2 = f"You are changing {prev_category} to {new_category}"
+    f3 = f"Any cards from {prev_category} will be assigned to Z — DEFAULT CATEGORY"
+
     confirmation_formatted = ["",
                               "Type 'cancel', 'no', or 'stop' to go stop this,",
                               "Otherwise type any key to continue"]
 
     if mode == "DELETE":
         feedback.append(f1)
-        feedback.append(f2)
+        feedback.append(f3)
         feedback.extend(confirmation_formatted)
     else:
         feedback.append(f1)
+        feedback.append(f2)
         feedback.extend(confirmation_formatted)
 
     print()
@@ -331,9 +367,9 @@ def category_prefix_validator(new_prefix, old_prefix, keys):
     if not new_prefix and old_prefix:
         return old_prefix, None
     elif not new_prefix:
-        return None, "You did not type a letter"
-    elif len(new_prefix) > 1:
-        return None, "Please use just one letter"
+        return None, "You did not type anything."
+    elif len(new_prefix) > 1 or not new_prefix.isalpha():
+        return None, f"Please use one letter for a prefix, not '{new_prefix}'"
     elif new_prefix == "Z":
         return None, "Z is reserved for the Default Category"
     elif new_prefix not in keys:
@@ -345,6 +381,8 @@ def category_prefix_validator(new_prefix, old_prefix, keys):
 def category_name_validator(new_name):
     if not new_name:
         return None, "You did not type a name"
+    else:
+        return new_name, None
 
 
 def get_category_prefix(indent_amt=0, default_for_empty=None):

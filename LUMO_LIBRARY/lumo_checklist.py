@@ -16,31 +16,27 @@ def cycler(list_of_steps):
 
 
 def display_menu(var_menu):
-    exit_and_quit = l_menus_data.SIMPLE_EXIT_LIST + l_menus_data.QUIT_MENU_LIST
-
     l_animators.list_printer(var_menu, indent_amt=2, speed_interval=0)
     print()
-    l_animators.list_printer(exit_and_quit, indent_amt=2, speed_interval=0)
+    l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, indent_amt=2, speed_interval=0)
 
 
 def card_select(var_dict):
-    lookup = input("\n  > ")
+    user_input = input("\n  > ")
+    val = user_input.strip()
 
-    # TODO: change this to a dict lookup
-    if lookup.lower() in {"q", "x"}:
-        return (None, None, "EXIT") if lookup.lower() == "x" else (None, None, "QUIT")
-
-    # Note that var_dict.keys() are capitals; they are created from the base string.ascii_uppercase
-    # this is a style choice which could later be a feature in settings to toggle upper/lower case
-    elif lookup.upper() in var_dict.keys():
-        selected = var_dict[lookup.upper()]
+    if val.upper() in var_dict.keys():
+        selected = var_dict[val.upper()]
         card_title = l_card_utils.format_card_title(selected[0])
         card_steps = selected[1]
 
-        return card_title, card_steps, None
+        return card_title, card_steps, None, None
+
+    elif val.lower() in {"q", "quit"}:
+        return None, None, "QUIT", None
 
     else:
-        return None, None, None
+        return None, None, None, val
 
 
 def display_selected_checklist(card_title, card_steps):
@@ -67,27 +63,25 @@ def main():
     while True:
         program_header()
         display_menu(formatted_results_menu)
-        title, steps, status = card_select(formatted_results_dict)
+        title, steps, status, val = card_select(formatted_results_dict)
         if title and steps:
             break
-        elif status == "EXIT" or status == "QUIT":
+        elif status == "QUIT":
             break
         else:
             print()
-            l_animators.animate_text_indented("Unrecognized option", indent_amt=2, finish_delay=.5)
+            l_animators.animate_text_indented(f"Unrecognized option '{val}' ...", indent_amt=2, finish_delay=.5)
             subprocess.run(["clear"], shell=True)
-            print("\n\n")
+            print("\n")
 
     if status == "QUIT":
         print()
-        l_animators.animate_text("Quit Lumo: Checklist", finish_delay=.5)
+        # Optional feature:
+        # l_animators.animate_text("Quit Lumo: Checklist", finish_delay=.5)
         return
 
-    if status != "EXIT":
-        display_selected_checklist(card_title=title, card_steps=steps)
-
+    display_selected_checklist(card_title=title, card_steps=steps)
     print()
-    l_animators.animate_text("Quit Lumo: Checklist", finish_delay=.5)
 
 
 if __name__ == "__main__":

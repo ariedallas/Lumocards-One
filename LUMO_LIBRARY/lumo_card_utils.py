@@ -119,11 +119,9 @@ def card_prefix_renamer(old_prefix, new_prefix):
         dest = os.path.join(
             pathlib.Path(source).parent, new_f)
 
-        print("before rename"); input("???")
         os.rename(source, dest)
         l_json_utils.rename_json_card(src_filename=f, dest_filename=new_f)
         l_json_utils.flexible_json_updater(json_filename=new_f, update_category=True)
-        print("after rename"); input("???")
 
 
 def card_deleter(card_filename):
