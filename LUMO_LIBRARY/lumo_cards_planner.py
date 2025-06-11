@@ -234,15 +234,17 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
 
     while True:
         user_input = input("\n    >  ")
+        val = user_input.strip()
 
-        if user_input.upper() in menu_dict.keys():
+        if val.upper() in menu_dict.keys():
+            action = menu_dict[val.upper()]
 
-            if menu_dict[user_input.upper()] == l_menus_data.ACTION_OPEN:
+            if action == l_menus_data.ACTION_OPEN:
                 subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
                 return "RELOOP", card_filename
 
 
-            elif menu_dict[user_input.upper()] == l_menus_data.ACTION_MODIFY:
+            elif action == l_menus_data.ACTION_MODIFY:
 
                 hotkey_list, hotkey_dict = l_menus_funcs.prep_card_modify_menu(
                     actions_list=l_menus_data.CARDS_PLANNER_MODIFY_MENU.copy(),
@@ -264,27 +266,26 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
                 else:
                     return "RELOOP", card_filename
 
-            elif menu_dict[user_input.upper()] == l_menus_data.ACTION_SCHEDULE:
+            elif action == l_menus_data.ACTION_SCHEDULE:
                 print()
                 l_animators.animate_text_indented("This feature not fully available", indent_amt=2)
                 return "CARD REFOCUSED", None
 
 
-        elif user_input.upper() in l_menus_data.EXIT_MENU_DICT.keys():
+        elif val.lower() in {"x", "exit"}:
             return "EXIT MENU", None
 
-        elif user_input.upper() in l_menus_data.QUIT_MENU_DICT.keys() or \
-                user_input.lower() == 'quit':
-            print()
-            l_animators.animate_text_indented("Quit", indent_amt=2, finish_delay=.5)
+        elif val.lower() in {"q", "exit"}:
+            # Optional feature:
+            # print()
+            # l_animators.animate_text_indented("Quit", indent_amt=2, finish_delay=.5)
             return "QUIT", None
 
         else:
             print()
-            l_animators.list_printer(["In this context your options are hotkey letter such as 'a', 'c'"
-                                         , "and words 'quit' or 'exit' "],
-                                     indent_amt=4,
-                                     speed_interval=0)
+            l_animators.animate_text_indented(f"Unrecognized option {val} ..."
+                                              , indent_amt=4
+                                              , finish_delay=.5)
 
 
 def iterate_cards(var_list_cards, mode):
