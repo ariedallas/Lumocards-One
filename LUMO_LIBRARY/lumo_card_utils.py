@@ -68,8 +68,9 @@ def steps_preview(card_steps, steps_amt, steps_idx):
 
 def print_card_categories(indent_amt):
     indent_space = " " * indent_amt
+    iter_settings = sorted(settings.get("card categories").items())
 
-    for k, v in settings.get("card categories").items():
+    for k, v in iter_settings:
         print(f"{indent_space}{k} — {v}")
 
     for k, v in l_menus_data.Z_CATEGORY_DICT.items():
@@ -112,6 +113,9 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False
                                            update_category=category_change)
 
 def card_prefix_renamer(old_prefix, new_prefix):
+    if old_prefix == new_prefix:
+        return
+
     for f in l_files.get_all_cards_by_prefix(old_prefix):
         p, n = f.split("_")
         new_f = "_".join([new_prefix, n])
@@ -247,11 +251,13 @@ def clean_cards():
         for u in unique_txts:
             print(f"  {u}.txt", end=" ")
             user_input = input("——> [D]elete this or [C]reate .json file to pair it? >  ")
-            if user_input.lower() == "d":
+            val = user_input.strip()
+
+            if val.lower() == "d":
                 card_fullpath = get_card_abspath(f"{u}.txt", check_archives=True)
                 send2trash.send2trash(card_fullpath)
                 feedback(deleted=True)
-            elif user_input.lower() == "c":
+            elif val.lower() == "c":
                 default_json_card_handler(u)
             else:
                 print("        (You skipped this card for now.)")
@@ -263,11 +269,13 @@ def clean_cards():
         for u in unique_jsons:
             print(f"  {u}.json", end=" ")
             user_input = input("——> [D]elete this or [C]reate .txt file to pair it? >  ")
-            if user_input.lower() == "d":
+            val = user_input.strip()
+
+            if val.lower() == "d":
                 json_fullpath = l_json_utils.get_json_card_fullpath(f"{u}.json")
                 send2trash.send2trash(json_fullpath)
                 feedback(deleted=True)
-            elif user_input.lower() == "c":
+            elif val.lower() == "c":
                 pass
             else:
                 print("        (You skipped this card for now.)")

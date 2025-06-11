@@ -155,7 +155,9 @@ def letter_router(categories_dict, key):
             elif action == l_menus_data.ACTION_DELETE_THIS_CATEGORY:
                 confirmed = card_rename_confirmation(mode="DELETE",
                                                      old_prefix=key,
-                                                     prev_category=category_display)
+                                                     prev_category=category_display,
+                                                     new_prefix="Z",
+                                                     new_name="Default Category")
 
                 if confirmed:
                     del categories_dict[key]
@@ -323,8 +325,8 @@ def delete_category(categories_dict):
 def card_rename_confirmation(mode,
                              old_prefix,
                              prev_category,
-                             new_prefix=None,
-                             new_name=None):
+                             new_prefix,
+                             new_name):
     feedback = []
     amt = len(l_files.get_all_cards_by_prefix(old_prefix))
     new_category = f"{new_prefix} — {new_name.upper()}"
@@ -354,10 +356,9 @@ def card_rename_confirmation(mode,
 
     print()
     l_animators.list_printer(feedback,
-                             indent_amt=7, finish_delay=.5)
+                             indent_amt=7)
 
     user_input = input("\n  >  ")
-
     val = user_input.strip().lower()
 
     return True if val not in {"cancel", "no", "stop"} else False
