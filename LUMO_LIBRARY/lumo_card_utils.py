@@ -98,7 +98,7 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False
         print(f"  Renaming from '{curr_name}' to '{dst_name}' ")
 
     if ask_confirmation:
-        if not l_menus_funcs.proceed("Type 'no' or 'x' to cancel, otherwise press any key to continue >  ",
+        if not l_menus_funcs.proceed("Type 'no' or 'x' to cancel, otherwise press any key to continue",
                                      indent_amt=2):
             return "CANCELLED"
         os.rename(source, dest)

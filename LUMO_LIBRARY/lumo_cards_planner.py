@@ -63,7 +63,7 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
         found_tuple = l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered]
         route = found_tuple[1]
 
-        if route == 'menu':
+        if route == "menu":
             hotkey_dict, hotkey_list = l_menus_funcs.prep_card_run_menu(l_menus_data.CARDS_PLANNER_MACRO_MENU)
             status, possible_card_path = cardsrun_macro_menu(card_filename=card_filename,
                                                              card=card,
@@ -223,6 +223,8 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
 
 
 def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
+
+
     card_fullpath = l_card_utils.get_card_abspath(card_filename)
 
     l_card_utils.card_header(card, indent_amt=2)
@@ -236,15 +238,18 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
         user_input = input("\n    >  ")
         val = user_input.strip()
 
-        if val.upper() in menu_dict.keys():
-            action = menu_dict[val.upper()]
+        if val.upper() in menu_dict.keys() or \
+                val.lower() in l_menus_data.CARDS_PLANNER_MACRO_KEYWORDS:
+            action = menu_dict.get(val.upper())
 
-            if action == l_menus_data.ACTION_OPEN:
+            if action == l_menus_data.ACTION_OPEN or \
+                    val.lower() in {"open", "edit"}:
                 subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
                 return "RELOOP", card_filename
 
 
-            elif action == l_menus_data.ACTION_MODIFY:
+            elif action == l_menus_data.ACTION_MODIFY or \
+                    val.lower() in {"modify"}:
 
                 hotkey_list, hotkey_dict = l_menus_funcs.prep_card_modify_menu(
                     actions_list=l_menus_data.CARDS_PLANNER_MODIFY_MENU.copy(),
@@ -266,9 +271,12 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
                 else:
                     return "RELOOP", card_filename
 
-            elif action == l_menus_data.ACTION_SCHEDULE:
+            elif action == l_menus_data.ACTION_SCHEDULE or \
+                    val.lower() in {"schedule"}:
                 print()
-                l_animators.animate_text_indented("This feature not fully available", indent_amt=2)
+                l_animators.animate_text_indented("This feature not fully available..."
+                                                  , indent_amt=2
+                                                  , finish_delay=.5)
                 return "CARD REFOCUSED", None
 
 
@@ -283,7 +291,7 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
 
         else:
             print()
-            l_animators.animate_text_indented(f"Unrecognized option {val} ..."
+            l_animators.animate_text_indented(f"Unrecognized option '{val}' ..."
                                               , indent_amt=4
                                               , finish_delay=.5)
 

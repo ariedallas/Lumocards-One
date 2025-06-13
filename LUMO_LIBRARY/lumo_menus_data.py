@@ -6,14 +6,14 @@ LETTERS_CAPS = string.ascii_uppercase
 LETTERS_FILTERED = [L for L in LETTERS_CAPS if not (L == 'Q') and not (L == 'X')]
 
 INTEGERS_10 = list(range(1, 11))
-Z_CATEGORY_DICT = {"Z":  "Default Category"}
+Z_CATEGORY_DICT = {"Z": "Default Category"}
 
-ACTION_OPEN = "Open/Edit card in text editor"
-ACTION_MODIFY = "Refocus, Rename, Archive, or Delete"
-ACTION_SCHEDULE = "Schedule to ➝ Calendar"
-ACTION_SET_RECURRING = "Set as ➝ Recurring Card"
-ACTION_SET_RECURRING_2 = "Set/Update ➝ Recurring Card"
-ACTION_SET_CHECKLIST = "Set as ➝ Checklist Card"
+ACTION_OPEN = "Open | Edit: card in text editor"
+ACTION_MODIFY = "Modify: Refocus, Rename, Archive, or Delete"
+ACTION_SCHEDULE = "Schedule: to ➝ Calendar"
+ACTION_SET_RECURRING = "Recur: set as ➝ Recurring Card"
+ACTION_SET_RECURRING_2 = "Recur: set/update ➝ Recurring Card"
+ACTION_SET_CHECKLIST = "Checklist: set as ➝ Checklist Card"
 
 ACTION_SET_NEAR = "Set as ➝ Near Focus"
 ACTION_SET_MIDDLE = "Set as ➝ Middle Focus"
@@ -98,6 +98,13 @@ CARDS_PLANNER_MACRO_MENU = [
     , ACTION_SCHEDULE
 ]
 
+CARDS_PLANNER_MACRO_KEYWORDS = {
+    "open",
+    "edit",
+    "modify",
+    "schedule"
+}
+
 CARDS_PLANNER_MODIFY_MENU = [
     ACTION_SET_NEAR
     , ACTION_SET_MIDDLE
@@ -162,6 +169,7 @@ QUIT_MENU_DICT = {"Q": f"{ACTION_QUIT}"}
 
 QUIT_MENU_INT_LIST = [f"[3]  {ACTION_QUIT}"]
 QUIT_MENU_INT_DICT = {"3": f"{ACTION_QUIT}"}
+
 
 CARDS_PLANNER_COMPLETED_PHRASES = [
     "Nice!"
