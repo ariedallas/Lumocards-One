@@ -2,11 +2,8 @@
 
  pyinstaller LUMO_LIBRARY/__main__.py\
  	--name Lumogarden\
-	# --onedir\
-	# --distpath Lumogarden_Project\
-	# --contents-directory:./_int
-	--add-data CARDS:./USER_DATA/CARDS\
-	--add-data JOURNAL:./USER_DATA/JOURNAL\
-	--add-data PLANNER:./USER_DATA/PLANNER\
-	--add-data SUPPORT_FILES:./USER_DATA/SUPPORT_FILES\
+	--onedir\
+	--distpath Lumogarden_Project\
+	--add-data ./__USER_FILES__:./__USER_FILES__\
+	--add-data ./__SUPPORT_FILES__:./__SUPPORT_FILES__\
 	--add-binary micro:.\

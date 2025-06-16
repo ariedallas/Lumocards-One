@@ -1,5 +1,5 @@
 # LUMO_FILES
-.notes
+venv
 __SUPPORT_FILES__/venv
 __SUPPORT_FILES__/TEMP/*
 __SUPPORT_FILES__/lumo_to_arie_updater.py
