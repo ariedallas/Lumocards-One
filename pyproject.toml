@@ -24,6 +24,7 @@ dependencies = [
    "httplib2",
    "idna",
    "oauthlib",
+   "playsound3",
    "proto-plus",
    "protobuf",
    "pyasn1",
@@ -35,7 +36,7 @@ dependencies = [
    "rsa",
    "Send2Trash",
    "uritemplate",
-   "urllib3",
+   "urllib3"
 ]
 
 [tool.setuptools]

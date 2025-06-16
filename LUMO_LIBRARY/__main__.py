@@ -1,4 +1,6 @@
 import argparse
+import os.path
+import pathlib
 import subprocess
 import time
 
@@ -201,8 +203,6 @@ def root_loop(cli_parsed_args: argparse.Namespace, unknown: list[str]) -> None:
                               lumo_input="_",
                               contextual_menu=main_menu)
 
-
-
     while True:
         if status == "QUIT":
             break
@@ -213,7 +213,8 @@ def root_loop(cli_parsed_args: argparse.Namespace, unknown: list[str]) -> None:
 
         if status == "LUMO DUPLICATE":
             print()
-            l_animators.animate_text_indented("Try typing the keyword without 'lumo' first or use a shortcut letter.", indent_amt=2, finish_delay=1)
+            l_animators.animate_text_indented("Try typing the keyword without 'lumo' first or use a shortcut letter.",
+                                              indent_amt=2, finish_delay=1)
 
         LumoMenu.load_transition()
         if menu.name == "all":
@@ -238,7 +239,6 @@ def router(cli_input: Optional[argparse.Namespace],
            unknown_args: list[str],
            lumo_input: str,
            contextual_menu: LumoMenu) -> tuple[Optional[str], LumoMenu]:
-
     selected_prog: str
     from_cli: bool
     from_cli = _determine_from_cli(cli_input)
@@ -308,7 +308,6 @@ def router(cli_input: Optional[argparse.Namespace],
     elif (selected_prog.lower() in {"newcard"} or
           cli_prog.lower() in {"newcard"} or
           selected_prog_dict_value in {"New Card"}):
-
 
         if from_cli and (cli_input.card_category and cli_input.card_title):
             category, title = cli_input.card_category, cli_input.card_title

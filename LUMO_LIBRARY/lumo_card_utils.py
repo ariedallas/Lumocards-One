@@ -82,7 +82,7 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False
     curr_dir_name = pathlib.Path(str(curr_name_abspath)).parent.name
 
     if dst_dir == "Same Dir":
-        dst_dir = os.path.join(l_files.rootpath, "CARDS", curr_dir_name)
+        dst_dir = os.path.join(l_files.USER_FILES, "CARDS", curr_dir_name)
 
     category_change = (curr_name[0] != dst_name[0])
     dst_dir_name = pathlib.Path(dst_dir).name

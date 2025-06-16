@@ -40,7 +40,7 @@ def write_json(json_filename, json_data):
 
 
 def get_category_from_json_settings(var_ltr):
-    settings_fullpath = os.path.join(l_files.rootpath, "SUPPORT_FILES/settings.json")
+    settings_fullpath = os.path.join(l_files.ROOT_PATH, "__SUPPORT_FILES__/settings.json")
     with open(settings_fullpath) as fin:
         data = json.load(fin)
 

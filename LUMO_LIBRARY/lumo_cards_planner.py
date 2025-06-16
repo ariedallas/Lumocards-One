@@ -93,14 +93,14 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
                 return "RELOOP"
 
 
-        elif route == 'edit':
+        elif route == "edit":
             card_fullpath = l_card_utils.get_card_abspath(card_filename)
-            subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
+            subprocess.run([f"{l_files.micro} {card_fullpath}"], shell=True)
 
             return "RELOOP"
 
 
-        elif route == 'archive':
+        elif route == "archive":
             reviewed_cards.append(card_filename)
             archived_cards.append(card_filename)
             l_animators.list_printer(["Card completed: {}".format(l_files.curr_time_hr)],
@@ -108,14 +108,14 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
                                      )
 
 
-        elif route == 'delete':
+        elif route == "delete":
             deleted_cards.append(card_filename)
             reviewed_cards.append(card_filename)
             l_animators.list_printer([l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0]],
                                      indent_amt=2)
 
 
-        elif route == 'superquit':
+        elif route == "superquit":
             found_tuple = l_menus_data.CARDS_PLANNER_FEEDBACK.get(user_input_filtered)
             feedback = found_tuple[0]
             l_animators.animate_text_indented(feedback, indent_amt=2)
@@ -155,7 +155,7 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
         found_tuple = l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered]
         route = found_tuple[1]
 
-        if route == 'menu':
+        if route == "menu":
 
             hotkey_dict, hotkey_list = l_menus_funcs.prep_card_run_menu(l_menus_data.CARDS_PLANNER_MACRO_MENU)
             status, possible_card_path = cardsrun_macro_menu(card_filename=card_filename,
@@ -186,31 +186,31 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
                 return "RELOOP"
 
 
-        elif route == 'edit':
+        elif route == "edit":
 
             card_fullpath = os.path.join(l_files.recurring_cards_folder, card_filename)
 
             l_animators.animate_text_indented((l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered.lower()][0]),
                                               indent_amt=2)
-            subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
+            subprocess.run([f"{l_files.micro} {card_fullpath}"], shell=True)
 
             return "RELOOP"
 
 
-        elif route == 'archive':
+        elif route == "archive":
             next_occurrence = l_recurring.update_recurring_data(card_filename)
             reviewed_recurring_cards.append(card_filename)
             l_animators.animate_text_indented(f"Recurring card will reactivate next {next_occurrence}",
                                               indent_amt=2)
 
 
-        elif route == 'delete':
+        elif route == "delete":
             deleted_cards.append(card_filename)
             reviewed_recurring_cards.append(card_filename)
             print(l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0])
 
 
-        elif route == 'superquit':
+        elif route == "superquit":
             l_animators.animate_text_indented(l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0],
                                               indent_amt=2)
             return "SUPER QUIT"
@@ -244,7 +244,7 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
 
             if action == l_menus_data.ACTION_OPEN or \
                     val.lower() in {"open", "edit"}:
-                subprocess.run([f'{settings.get("text editor")} {card_fullpath}'], shell=True)
+                subprocess.run([f"{l_files.micro} {card_fullpath}"], shell=True)
                 return "RELOOP", card_filename
 
 
@@ -361,7 +361,7 @@ def review_and_write_recurring():
             remaining_cards = [x for x in reactivated_cards if x not in review_set]
 
     else:
-        l_animators.animate_text_indented(f'No recurring cards for today...', finish_delay=.5, indent_amt=2)
+        l_animators.animate_text_indented(f"No recurring cards for today...", finish_delay=.5, indent_amt=2)
 
 
 def planner_feedback(card_title, card_step):

@@ -192,7 +192,7 @@ def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_ho
             action = var_hotkey_dict.get(val.upper())
 
             if action == l_menus_data.ACTION_OPEN:
-                subprocess.run([f"{settings.get("text editor")} {card_fullpath}"], shell=True)
+                subprocess.run([f"{l_files.micro} {card_fullpath}"], shell=True)
                 return "RELOOP", var_card_filename
 
             elif action == l_menus_data.ACTION_MODIFY:

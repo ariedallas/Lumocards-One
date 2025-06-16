@@ -10,7 +10,7 @@ d, m, y = l_files.today_frmttd_spaces.split()
 def get_today_planner():
 	if os.path.exists(l_files.today_planner_fullpath):
 		print(f"Opening Planner file for {m} {d}, {y}...")
-		subprocess.run([f'{settings.get("text editor")} {l_files.today_planner_fullpath}'], shell=True)
+		subprocess.run([f"{l_files.micro} {l_files.today_planner_fullpath}"], shell=True)
 
 	print("\n")
 

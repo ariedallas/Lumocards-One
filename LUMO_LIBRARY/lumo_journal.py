@@ -55,9 +55,9 @@ def program_header():
 
 
 def main():
-    # program_header()
+    # program_header()0
     get_or_make_journal()
-    subprocess.run([f"{settings.get("text editor")} +9999999 {journal_abspath}"], shell=True)
+    subprocess.run([f"{l_files.micro} +9999999 {journal_abspath}"], shell=True)
 
 
 

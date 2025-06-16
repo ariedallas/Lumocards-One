@@ -1,0 +1,16 @@
+{
+    "card location": "CARDS_B_FOCUS_MIDDLE",
+    "card category abbreviation": "V",
+    "card category": "Diamonds",
+    "calendar event": null,
+    "calendar repeating event": null,
+    "recurring freq": 0,
+    "recurring freq time unit": null,
+    "last occurrence": null,
+    "card created": "2025-05-30 14:32:32",
+    "tags": [
+        "default tag a",
+        "default tag b",
+        "default tag c"
+    ]
+}

@@ -2,33 +2,36 @@ import datetime
 import itertools
 import os
 import pathlib
+import subprocess
 import time
+
+from os.path import dirname
 
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 
+
 # ---FILES--- #
-home = pathlib.Path.home()
-parent = pathlib.Path(__file__).parent.name
-parents = pathlib.Path(__file__).parents
-rootpath = pathlib.Path(__file__).parents[1]
-desktop = f"{home}/Desktop"
+ROOT_PATH = dirname(dirname(os.path.abspath(__file__)))
+USER_FILES = os.path.join(ROOT_PATH, "__USER_FILES__")
 
-cards_near_folder = os.path.join(rootpath, "CARDS/CARDS_A_FOCUS_NEAR")
-cards_middle_folder = os.path.join(rootpath, "CARDS/CARDS_B_FOCUS_MIDDLE")
-cards_dist_folder = os.path.join(rootpath, "CARDS/CARDS_C_FOCUS_DISTANT")
+cards_near_folder = os.path.join(USER_FILES, "CARDS/CARDS_A_FOCUS_NEAR")
+cards_middle_folder = os.path.join(USER_FILES, "CARDS/CARDS_B_FOCUS_MIDDLE")
+cards_dist_folder = os.path.join(USER_FILES, "CARDS/CARDS_C_FOCUS_DISTANT")
 
-checklist_cards_folder = os.path.join(rootpath, "CARDS/CARDS_E_CHECKLISTS")
-recurring_cards_folder = os.path.join(rootpath, "CARDS/CARDS_F_RECURRING")
-archived_cards_folder = os.path.join(rootpath, "CARDS/CARDS_G_ARCHIVED")
+checklist_cards_folder = os.path.join(USER_FILES, "CARDS/CARDS_E_CHECKLISTS")
+recurring_cards_folder = os.path.join(USER_FILES, "CARDS/CARDS_F_RECURRING")
+archived_cards_folder = os.path.join(USER_FILES, "CARDS/CARDS_G_ARCHIVED")
 
-journal_folder = os.path.join(rootpath, "JOURNAL")
-support_files_folder = os.path.join(rootpath, "SUPPORT_FILES")
-json_cards_folder = os.path.join(rootpath, "SUPPORT_FILES/JSON_CARDS")
-temp_folder = os.path.join(rootpath, "SUPPORT_FILES/TEMP")
-credentials_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_CREDENTIALS")
+journal_folder = os.path.join(USER_FILES, "JOURNAL")
+support_files_folder = os.path.join(ROOT_PATH, "__SUPPORT_FILES__")
+json_cards_folder = os.path.join(ROOT_PATH, "__SUPPORT_FILES__/JSON_CARDS")
+temp_folder = os.path.join(ROOT_PATH, "__SUPPORT_FILES__/TEMP")
+credentials_folder = os.path.join(ROOT_PATH, "__SUPPORT_FILES__/Z_CREDENTIALS")
 
-sounds_folder = os.path.join(rootpath, "SUPPORT_FILES/Z_SOUNDS")
-settings_fullpath = os.path.join(rootpath, "SUPPORT_FILES/settings.json")
+sounds_folder = os.path.join(ROOT_PATH, "__SUPPORT_FILES__/Z_SOUNDS")
+settings_fullpath = os.path.join(ROOT_PATH, "__SUPPORT_FILES__/settings.json")
+
+micro = os.path.join(ROOT_PATH, "micro")
 
 # ---TIME--- #
 today = datetime.datetime.today()
@@ -54,7 +57,7 @@ def isolate_date_units():
 
 
 # ---- PLANNER FILES ---- #
-planner_folder = os.path.join(rootpath, "PLANNER")
+planner_folder = os.path.join(USER_FILES, "PLANNER")
 today_planner_file = f"{today_frmttd.upper()}_planner.txt"
 today_planner_fullpath = os.path.join(planner_folder, today_planner_file)
 
@@ -166,4 +169,3 @@ def get_days_from_date(birth_year, birth_month, birth_day):
 
 if __name__ == '__main__':
     print("hello from main")
-
