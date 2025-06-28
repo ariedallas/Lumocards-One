@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_calendar_utils as l_cal_utils
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_cardsdisplay_boxformatter as l_boxify
 import LUMO_LIBRARY.lumo_filehandler as l_files
@@ -43,8 +44,6 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
 
     user_input = input("\n  >  ")
     user_input_filtered = l_card_utils.add_blank_space(user_input)
-
-    # ---- START OF MAIN IF/ELIF ---- #
 
     if user_input_filtered == " ":  # I.E. SKIPPED CARD
         l_animators.animate_text_indented("...", speed=.075, indent_amt=2)
@@ -223,8 +222,6 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
 
 
 def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
-
-
     card_fullpath = l_card_utils.get_card_abspath(card_filename)
 
     l_card_utils.card_header(card, indent_amt=2)
@@ -308,7 +305,7 @@ def iterate_cards(var_list_cards, mode):
         card = l_card_utils.filename_to_card(card_path)
 
         l_animators.list_printer(["", card_counter_feedback_text], indent_amt=2, speed_interval=0)
-        l_boxify.display_card(card)
+        l_boxify.display_card(card, simple_title=False)
 
         if mode == "main cards":
             status = cardsrun_macro_hotwords(card_filename=card_path, card=card, card_idx=card_no - 1)
@@ -323,6 +320,19 @@ def iterate_cards(var_list_cards, mode):
 
         elif status == "SUPER QUIT":
             return "SUPER QUIT"
+
+
+def iterate_cards_simple(var_list_cards):
+    total_cards = len(var_list_cards)
+
+    for idx, card in enumerate(var_list_cards):
+        card_no = idx + 1
+        card_counter_feedback_text = f"Card ({card_no}) of ({total_cards})".upper()
+
+        l_animators.list_printer(["", card_counter_feedback_text], indent_amt=2, speed_interval=0)
+        l_boxify.display_card(card, simple_title=True)
+
+        input("\n  >  ")
 
 
 def run_remaining_cards():
@@ -341,9 +351,12 @@ def review_and_write_recurring():
     reactivated_cards = l_recurring.get_recurring_cards()
 
     if reactivated_cards:
-        l_animators.animate_text_indented(f"{len(reactivated_cards)} cards were reactivated...",
-                                          finish_delay=.5,
-                                          indent_amt=2)
+        l_animators.list_printer([
+            f"RUNNING: {len(reactivated_cards)} REACTIVATED CARDS", ], indent_amt=2)
+
+        # l_animators.animate_text_indented(f" cards were reactivated...",
+        #                                   finish_delay=.5,
+        #                                   indent_amt=2)
 
         review_set = set(reviewed_recurring_cards)
         remaining_cards = [x for x in reactivated_cards if x not in review_set]
@@ -361,7 +374,26 @@ def review_and_write_recurring():
             remaining_cards = [x for x in reactivated_cards if x not in review_set]
 
     else:
-        l_animators.animate_text_indented(f"No recurring cards for today...", finish_delay=.5, indent_amt=2)
+        l_animators.list_printer([
+            f"NO RECURRING CARDS TODAY", ], indent_amt=2)
+
+
+def review_calendar_cards():
+    calendar_cards = [("Sample Calendar", ["...", "...", "..."])
+        , ("B", ["...", "...", "..."])]
+
+    # calli = l_cal_utils.get_today_events()
+
+    l_animators.list_printer([
+        f"RUNNING: CALENDAR CARDS", ], indent_amt=2)
+
+    iterate_cards_simple(calendar_cards)
+
+    return calendar_cards
+
+
+def write_calendar_cards(calendar_cards):
+    pass
 
 
 def planner_feedback(card_title, card_step):
@@ -448,6 +480,13 @@ def main():
 
         if user_input:
             review_and_write_recurring()
+
+        print()
+        user_input = l_menus_funcs.proceed("Proceed to Calendar Cards ( ➝ yes) >  ", indent_amt=2)
+
+        if user_input:
+            today_calendar_cards = review_calendar_cards()
+            write_calendar_cards(today_calendar_cards)
 
     update_cards()
 

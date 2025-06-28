@@ -2,8 +2,12 @@ import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 
 
-def display_card(var_card, display_qty=6, length=50, height=10):
-    f_card_name = l_card_utils.format_card_title(var_card[0])
+def display_card(var_card, simple_title, display_qty=6, length=50, height=10):
+    if simple_title:
+        f_card_name = var_card[0].upper()
+    else:
+        f_card_name = l_card_utils.format_card_title(var_card[0])
+
     todo_items = var_card[1]
     card_display_list = []
 

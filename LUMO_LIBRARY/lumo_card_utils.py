@@ -282,6 +282,8 @@ def clean_cards():
 
 
 def format_card_title(card_filename):
+
+
     try:
         subbed_underscores = card_filename.replace("_", " ")
 
@@ -291,7 +293,6 @@ def format_card_title(card_filename):
         result = "{}: {}".format(first, separated_by_caps)
 
     except ValueError:
-        print("exception runs")
         subbed_underscores = card_filename.replace("_", " ")
         result = camel_case_separator_b(subbed_underscores).upper()
 
