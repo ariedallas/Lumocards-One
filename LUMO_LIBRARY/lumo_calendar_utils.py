@@ -377,6 +377,73 @@ def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
     return day_blocks
 
 
+def get_today_events():
+    creds = get_creds()
+
+    time_min = today_date
+    time_max = today_date + relativedelta(days=1)
+
+    today_events = get_google_events(creds,
+                                     time_min=time_min,
+                                     time_max=time_max)
+
+    converted_events = [google_event_to_obj(e) for e in today_events]
+
+    return converted_events
+
+
+def get_formatted_event_info(event_dict):
+    summary = event_dict.get("summary", "")
+
+    s_time = event_dict.get("s")
+    e_time = event_dict.get("e")
+    s_date = event_dict.get("s_date")
+    e_date = event_dict.get("e_date")
+
+    description = event_dict.get("description")
+    location = event_dict.get("location")
+
+    if not s_time and not e_time:
+        time_info_f = "..."
+
+    elif s_time == "all day":
+        time_info_f = s_time
+
+    else:
+        time_info_f = f"{s_time} - {e_time}"
+
+    if not s_date and not e_date:
+        start_date_f = "..."
+        end_date_f = "..."
+
+    else:
+        start_date_f = s_date
+        end_date_f = e_date
+
+    if not description:
+        desc_list_limited = ["..."]
+    else:
+        descr_split = description.split("\n")
+        desc_list_limited = list_limiter(descr_split,
+                                         col_width=CalendarPageEvent.EVENT_VALUE,
+                                         row_limit=5)
+
+    if not location:
+        loc_list_limited = ["..."]
+    else:
+        loc_split = location.split("\n")
+        loc_list_limited = list_limiter(loc_split,
+                                        col_width=CalendarPageEvent.EVENT_VALUE,
+                                        row_limit=5)
+
+    return (summary,
+            time_info_f,
+            start_date_f,
+            end_date_f,
+            desc_list_limited,
+            loc_list_limited)
+
+
 class Event:
     def __init__(self,
                  summary,
@@ -643,46 +710,12 @@ class CalendarPageEvent:
 
 
     def display_editing_event(self, event_dict, header):
-        summary = event_dict.get("summary", "")
-
-        s_time = event_dict.get("s")
-        e_time = event_dict.get("e")
-        s_date = event_dict.get("s_date")
-        e_date = event_dict.get("e_date")
-
-        description = event_dict.get("description")
-        location = event_dict.get("location")
-
-        if not s_time and not e_time:
-            time_info_f = "..."
-
-        elif s_time == "all day":
-            time_info_f = s_time
-
-        else:
-            time_info_f = f"{s_time} - {e_time}"
-
-        if not s_date and not e_date:
-            start_date_f = "..."
-            end_date_f = "..."
-
-        else:
-            start_date_f = s_date
-            end_date_f = e_date
-
-        if not description:
-            desc_list_limited = ["..."]
-        else:
-            desc_list_limited = list_limiter([description],
-                                             col_width=CalendarPageEvent.EVENT_VALUE,
-                                             row_limit=5)
-
-        if not location:
-            loc_list_limited = ["..."]
-        else:
-            loc_list_limited = list_limiter([location],
-                                            col_width=CalendarPageEvent.EVENT_VALUE,
-                                            row_limit=5)
+        (summary,
+        time_info_f,
+        start_date_f,
+        end_date_f,
+        desc_list_limited,
+        loc_list_limited) = get_formatted_event_info(event_dict)
 
         self._row_editing_event_header(summary, header)
         print()
@@ -707,7 +740,6 @@ class CalendarPageEvent:
     #     l_animators.list_printer(whitespace_menu, indent_amt=2, speed_interval=0)
     #     print()
     #     l_animators.list_printer(whitespace_exit, indent_amt=2, speed_interval=0)
-
 
     def display_menu_columns(self, var_dict):
         menu_list = l_menus_funcs.menu_list_from_dict(var_dict)
@@ -1383,4 +1415,3 @@ if __name__ == "__main__":
     print(datetime.datetime(dt.year, dt.month, dt.day,
                             dt.hour, dt.minute, dt.second,
                             tzinfo=dateutil.tz.tzlocal()).isoformat())
-

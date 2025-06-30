@@ -305,7 +305,7 @@ def iterate_cards(var_list_cards, mode):
         card = l_card_utils.filename_to_card(card_path)
 
         l_animators.list_printer(["", card_counter_feedback_text], indent_amt=2, speed_interval=0)
-        l_boxify.display_card(card, simple_title=False)
+        l_boxify.display_card(card)
 
         if mode == "main cards":
             status = cardsrun_macro_hotwords(card_filename=card_path, card=card, card_idx=card_no - 1)
@@ -322,17 +322,23 @@ def iterate_cards(var_list_cards, mode):
             return "SUPER QUIT"
 
 
-def iterate_cards_simple(var_list_cards):
+def iterate_cards_calendar(var_list_cards):
     total_cards = len(var_list_cards)
 
-    for idx, card in enumerate(var_list_cards):
+    for idx, event_card in enumerate(var_list_cards):
         card_no = idx + 1
-        card_counter_feedback_text = f"Card ({card_no}) of ({total_cards})".upper()
+        card_counter_feedback_text = f"Calendar Card ({card_no}) of ({total_cards})".upper()
+
+        event_dict = event_card.format_as_editing_dict()
+        event_formatted = l_cal_utils.get_formatted_event_info(event_dict)
+
 
         l_animators.list_printer(["", card_counter_feedback_text], indent_amt=2, speed_interval=0)
-        l_boxify.display_card(card, simple_title=True)
+        l_boxify.display_card_event(event_formatted)
 
         input("\n  >  ")
+
+        l_animators.animate_text_indented(text="...", speed=.075, indent_amt=2)
 
 
 def run_remaining_cards():
@@ -353,10 +359,6 @@ def review_and_write_recurring():
     if reactivated_cards:
         l_animators.list_printer([
             f"RUNNING: {len(reactivated_cards)} REACTIVATED CARDS", ], indent_amt=2)
-
-        # l_animators.animate_text_indented(f" cards were reactivated...",
-        #                                   finish_delay=.5,
-        #                                   indent_amt=2)
 
         review_set = set(reviewed_recurring_cards)
         remaining_cards = [x for x in reactivated_cards if x not in review_set]
@@ -379,17 +381,17 @@ def review_and_write_recurring():
 
 
 def review_calendar_cards():
-    calendar_cards = [("Sample Calendar", ["...", "...", "..."])
+    temp = [("Sample Calendar", ["...", "...", "..."])
         , ("B", ["...", "...", "..."])]
 
-    # calli = l_cal_utils.get_today_events()
+    calendar_events = l_cal_utils.get_today_events()
 
     l_animators.list_printer([
         f"RUNNING: CALENDAR CARDS", ], indent_amt=2)
 
-    iterate_cards_simple(calendar_cards)
+    iterate_cards_calendar(calendar_events)
 
-    return calendar_cards
+    return temp
 
 
 def write_calendar_cards(calendar_cards):
@@ -465,6 +467,9 @@ def main():
 
     program_header()
     cards_intro()
+
+    # today_calendar_cards = review_calendar_cards()
+    # input("???")
 
     while True:
         status = run_remaining_cards()
