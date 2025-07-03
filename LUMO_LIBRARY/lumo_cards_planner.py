@@ -7,16 +7,16 @@ import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_calendar_utils as l_cal_utils
 import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_cardsdisplay_boxformatter as l_boxify
+import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 import LUMO_LIBRARY.lumo_recurring as l_recurring
 
-settings = l_files.get_json_settings()
-day, day_num, month, year = l_files.isolate_date_units()
-
 
 def cards_intro():
+    day, day_num, month, year = l_files.isolate_date_units()
+
     print()
 
     l_animators.list_printer([
@@ -50,8 +50,8 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
         reviewed_cards.append(card_filename)
 
     elif user_input_filtered in l_menus_data.NEGATIVE_USER_RESPONSES:  # I.E. QUIT
-        l_animators.animate_text_indented(text="Quitted card review.",
-                                          indent_amt=2)
+        # l_animators.animate_text_indented(text="Quitted card review.",
+        #                                   indent_amt=2)
         return False
 
     elif user_input_filtered[0].isnumeric():
@@ -332,7 +332,6 @@ def iterate_cards_calendar(var_list_cards):
         event_dict = event_card.format_as_editing_dict()
         event_formatted = l_cal_utils.get_formatted_event_info(event_dict)
 
-
         l_animators.list_printer(["", card_counter_feedback_text], indent_amt=2, speed_interval=0)
         l_boxify.display_card_event(event_formatted)
 
@@ -381,9 +380,6 @@ def review_and_write_recurring():
 
 
 def review_calendar_cards():
-    temp = [("Sample Calendar", ["...", "...", "..."])
-        , ("B", ["...", "...", "..."])]
-
     calendar_events = l_cal_utils.get_today_events()
 
     l_animators.list_printer([
@@ -391,18 +387,27 @@ def review_calendar_cards():
 
     iterate_cards_calendar(calendar_events)
 
-    return temp
 
+def translate_events_to_oneliners():
+    oneliners = []
+    calendar_events = l_cal_utils.get_today_events()
 
-def write_calendar_cards(calendar_cards):
-    pass
+    for idx, event_obj in enumerate(calendar_events):
+        event_dict = event_obj.format_as_editing_dict()
+        summary, time_info_f, _, _, descr_list_limited, loc_list_limited = l_cal_utils.get_formatted_event_info(
+            event_dict)
 
+        loc_f = "Loc: " + loc_list_limited[0]
+        descr_f = "Descr: " + descr_list_limited[0]
+        num = f"{idx + 1} - "
 
-def planner_feedback(card_title, card_step):
-    formatted_output = f"{card_title}: {card_step}"
-    full_message = f"Added: '{formatted_output}.' to planner."
-    l_animators.list_printer([full_message], indent_amt=2)
-    todays_cards.append(formatted_output)
+        main_info = (", ").join([summary, time_info_f])
+        secondary_info = (", ").join([descr_f, loc_f])
+
+        group = num + main_info + "    " + secondary_info
+        oneliners.append(group)
+
+    return oneliners
 
 
 def update_cards():
@@ -411,6 +416,12 @@ def update_cards():
         l_animators.animate_text_indented("ADDING TO PLANNER:", indent_amt=2)
         print()
         l_animators.list_printer(todays_cards, indent_amt=4)
+
+    if calendar_cards:
+        print()
+        l_animators.animate_text_indented("ADDING EVENTS TO PLANNER:", indent_amt=2)
+        print()
+        l_animators.list_printer(calendar_cards, indent_amt=4)
 
     if len(archived_cards) > 0:
         print()
@@ -434,7 +445,8 @@ def update_cards():
             l_card_utils.card_deleter(card)
 
     if not l_files.exists_planner_file():
-        l_animators.animate_text_indented("Creating Planner file for today...", indent_amt=2)
+        print()
+        l_animators.animate_text_indented("Creating planner file for today...", indent_amt=2, finish_delay=.5)
         l_files.make_today_planner()
 
     if len(todays_cards) > 0:
@@ -443,8 +455,32 @@ def update_cards():
         l_files.basic_wrtr("\n", l_files.today_planner_fullpath)
         l_files.basic_wrtr_list(todays_cards, l_files.today_planner_fullpath)
 
+    if len(calendar_cards) > 0:
+        l_files.basic_wrtr("\n", l_files.today_planner_fullpath)
+        l_files.basic_wrtr(f"CALENDAR CARDS: {l_files.curr_time_hr}", l_files.today_planner_fullpath)
+        l_files.basic_wrtr("\n", l_files.today_planner_fullpath)
+        l_files.basic_wrtr_list(calendar_cards, l_files.today_planner_fullpath)
+
+
     print()
     l_animators.animate_text_indented("This round of cards has completed.", indent_amt=2, finish_delay=1)
+
+
+def planner_feedback(card_title, card_step):
+    formatted_output = f"{card_title}: {card_step}"
+    full_message = f"Added: '{formatted_output}.' to planner."
+    l_animators.list_printer([full_message], indent_amt=2)
+    todays_cards.append(formatted_output)
+
+
+def already_reviewed():
+    day, day_num, month, year = l_files.isolate_date_units()
+    today_reference = f"{month} {day_num}, {day}"
+
+    settings = l_files.get_json_settings()
+    last_recorded_date = settings["calendar cards last review"]
+
+    return last_recorded_date == today_reference
 
 
 def program_header():
@@ -454,12 +490,13 @@ def program_header():
 
 
 def main():
-    global reviewed_cards, reviewed_recurring_cards, todays_cards, \
+    global reviewed_cards, reviewed_recurring_cards, todays_cards, calendar_cards, \
         reassigned_cards, reactivated_cards, archived_cards, deleted_cards
 
     reviewed_cards = []
     reviewed_recurring_cards = []
     todays_cards = []
+    calendar_cards = []
 
     reassigned_cards = []
     archived_cards = []
@@ -467,9 +504,6 @@ def main():
 
     program_header()
     cards_intro()
-
-    # today_calendar_cards = review_calendar_cards()
-    # input("???")
 
     while True:
         status = run_remaining_cards()
@@ -489,9 +523,22 @@ def main():
         print()
         user_input = l_menus_funcs.proceed("Proceed to Calendar Cards ( ➝ yes) >  ", indent_amt=2)
 
-        if user_input:
-            today_calendar_cards = review_calendar_cards()
-            write_calendar_cards(today_calendar_cards)
+        if user_input and not already_reviewed():
+            settings = l_files.get_json_settings()
+
+            day, day_num, month, year = l_files.isolate_date_units()
+            settings["calendar cards last review"] = f"{month} {day_num}, {day}"
+            l_json_utils.write_json(l_files.settings_fullpath, settings)
+
+            review_calendar_cards()
+            events_as_oneliners = translate_events_to_oneliners()
+
+            calendar_cards.extend(events_as_oneliners)
+
+        else:
+            l_animators.animate_text_indented("Skipping calendar cards; they have run once already",
+                                              indent_amt=2,
+                                              finish_delay=.5)
 
     update_cards()
 
