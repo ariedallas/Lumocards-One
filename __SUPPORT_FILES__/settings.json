@@ -1,7 +1,4 @@
 {
-    "search": {
-        "archived search results limit": 5
-    },
     "text editor": "micro",
     "card categories": {
         "P": "View",
@@ -10,6 +7,10 @@
         "V": "Diamonds",
         "D": "Ok"
     },
+    "search": {
+        "archived search results limit": 5
+    },
+    "calendar cards last review": "Jul 02, Wednesday",
     "pomodoro": {
         "pom_presets": {
             "preset_1": [
