@@ -1,7 +1,6 @@
 # LUMO_FILES
 venv
 __SUPPORT_FILES__/venv
-__SUPPORT_FILES__/TEMP/*
 __SUPPORT_FILES__/lumo_to_arie_updater.py
 __SUPPORT_FILES__/Z_CREDENTIALS/credentials.json
 __SUPPORT_FILES__/Z_CREDENTIALS/token.json
