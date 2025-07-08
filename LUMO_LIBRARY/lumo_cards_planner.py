@@ -94,7 +94,7 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
 
         elif route == "edit":
             card_fullpath = l_card_utils.get_card_abspath(card_filename)
-            subprocess.run([f"{l_files.micro} {card_fullpath}"], shell=True)
+            l_card_utils.t_editor(card_fullpath, False)
 
             return "RELOOP"
 
@@ -191,7 +191,7 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
 
             l_animators.animate_text_indented((l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered.lower()][0]),
                                               indent_amt=2)
-            subprocess.run([f"{l_files.micro} {card_fullpath}"], shell=True)
+            l_card_utils.t_editor(card_fullpath, False)
 
             return "RELOOP"
 
@@ -483,11 +483,21 @@ def already_reviewed():
     return last_recorded_date == today_reference
 
 
-def program_header():
+def program_header(header):
     print()
-    print("PLANNER")
+    print(header)
     print()
 
+def get_agenda():
+    today_has_agenda = os.path.exists(l_files.today_planner_fullpath)
+
+    if not today_has_agenda:
+        program_header("AGENDA")
+        l_animators.animate_text_indented("No planner file exists yet for today...", indent_amt=2)
+        l_animators.animate_text_indented("Returning to main Lumo menu.", indent_amt=2, finish_delay=.5)
+
+    else:
+        l_card_utils.t_editor(l_files.today_planner_fullpath, False)
 
 def main():
     global reviewed_cards, reviewed_recurring_cards, todays_cards, calendar_cards, \
@@ -502,7 +512,7 @@ def main():
     archived_cards = []
     deleted_cards = []
 
-    program_header()
+    program_header("PLANNER")
     cards_intro()
 
     while True:
@@ -536,7 +546,7 @@ def main():
             calendar_cards.extend(events_as_oneliners)
 
         else:
-            l_animators.animate_text_indented("Skipping calendar cards; they have run once already",
+            l_animators.animate_text_indented("Skipping calendar cards, they have run once already",
                                               indent_amt=2,
                                               finish_delay=.5)
 

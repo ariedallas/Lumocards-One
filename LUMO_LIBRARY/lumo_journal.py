@@ -6,6 +6,7 @@ import subprocess
 import time
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
+import LUMO_LIBRARY.lumo_card_utils as l_card_utils
 import LUMO_LIBRARY.lumo_filehandler as l_files
 
 settings = l_files.get_json_settings()
@@ -68,7 +69,7 @@ def program_header():
 
 def main():
     journal_abspath = get_or_make_journal()
-    subprocess.run([f"{l_files.micro} +9999999 {journal_abspath}"], shell=True)
+    l_card_utils.t_editor(journal_abspath, True)
 
 
 if __name__ == "__main__":

@@ -44,6 +44,11 @@ def display_selected_checklist(card_title, card_steps):
     l_animators.animate_text(card_title)
     print()
     cycler(card_steps)
+    print()
+
+    l_animators.animate_text_indented("Checklist done, press any key to to continue...", indent_amt=2)
+    input("\n  >  ")
+
 
 
 def program_header():
@@ -71,7 +76,7 @@ def main():
         else:
             print()
             l_animators.animate_text_indented(f"Unrecognized option '{val}' ...", indent_amt=2, finish_delay=.5)
-            subprocess.run(["clear"], shell=True)
+            l_files.clear()
             print("\n")
 
     if status == "QUIT":

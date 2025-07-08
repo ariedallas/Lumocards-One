@@ -10,6 +10,7 @@ from typing import (Optional,
 from LUMO_LIBRARY import (lumo_animationlibrary as l_animators,
                           lumo_cards_planner as l_cards,
                           lumo_checklist as l_checklist,
+                          lumo_filehandler as l_files,
                           lumo_journal as l_journal,
                           lumo_menus_data as l_menus_data,
                           lumo_newcard_2 as l_newcard,
@@ -28,7 +29,11 @@ def get_argument_parser() -> argparse.ArgumentParser:
         help=""
         , dest="route"
     )
-
+    sub_parser.add_parser(
+        "agenda"
+        , help="Show the created agenda/planner for the day"
+        , description="Show the created agenda/planner for the day"
+    )
     sub_parser.add_parser(
         "all"
         , help="Display the full Lumo menu of subprograms"
@@ -64,6 +69,11 @@ def get_argument_parser() -> argparse.ArgumentParser:
         , help="Opens a text editor to write in."
         , description="Creates a journal file with today's date and saves it to a 'JOURNAL' folder."
     )
+    sub_parser.add_parser(
+        "more"
+        , help="Display the full Lumo menu of subprograms"
+        , description="Display the full Lumo menu of subprograms"
+    )
     newcard = sub_parser.add_parser(
         "newcard"
         , help="Create a new card."
@@ -98,6 +108,11 @@ def get_argument_parser() -> argparse.ArgumentParser:
         "settings"
         , help="Open the lumo settings."
         , description="Interactive settings program to adjust program features."
+    )
+    sub_parser.add_parser(
+        "today"
+        , help="Show the created agenda/planner for the day"
+        , description="Show the created agenda/planner for the day"
     )
 
     return parser
@@ -153,7 +168,7 @@ class LumoMenu:
 
     @staticmethod
     def clear() -> None:
-        subprocess.run(["clear"], shell=True)
+        l_files.clear()
 
 
     @staticmethod
@@ -268,8 +283,16 @@ def router(cli_input: Optional[argparse.Namespace],
         time.sleep(.5)
         return None, main_menu
 
+    elif (selected_prog.lower() in {"agenda", "today"} or
+          cli_prog.lower() in {"agenda", "today"} or
+          selected_prog_dict_value in {"Agenda"}):
+
+        LumoMenu.load_transition()
+        l_cards.get_agenda()
+        return None, main_menu
+
     elif (selected_prog.lower() in {"all", "more"} or
-          cli_prog.lower() in {"all"} or
+          cli_prog.lower() in {"all", "more"} or
           selected_prog_dict_value in {":: all | more ::"}):
 
         return None, all_menu

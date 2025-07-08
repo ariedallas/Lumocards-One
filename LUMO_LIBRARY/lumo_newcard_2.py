@@ -159,7 +159,7 @@ def add_custom_or_default_steps():
         with open(scratchpad_file, "w") as fin:
             fin.write("")
 
-        subprocess.run([f"{l_files.micro} {scratchpad_file}"], shell=True)
+        l_card_utils.t_editor(scratchpad_file, False)
 
         with open(scratchpad_file, "r") as fin:
             steps = [l for l in fin.readlines()]

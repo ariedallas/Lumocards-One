@@ -20,6 +20,12 @@ default_card_steps = [
     , "..."
 ]
 
+def t_editor(var_path, cursor_to_eof):
+    if not cursor_to_eof:
+        subprocess.run(["micro", var_path])
+    else:
+        subprocess.run(["micro", "+9999999", var_path])
+
 
 def card_header(var_card, indent_amt=0):
     card_title = var_card[0]
@@ -473,9 +479,6 @@ def test_for_int(text: str) -> bool:
         return False
 
 
-def clear() -> None:
-    subprocess.run(["clear"], shell=True)
-
 
 def load_dots() -> None:
     print("\033[33;1m", end="")
@@ -484,12 +487,12 @@ def load_dots() -> None:
 
 
 def load_transition() -> None:
-    clear()
+    l_files.clear()
     print()
     load_dots()
 
 
 if __name__ == "__main__":
     print("Hello from main")
-    clean_cards()
+    # clean_cards()
 

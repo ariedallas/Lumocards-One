@@ -867,7 +867,7 @@ class CalendarPageDay:
 
 
     def display_day(self, events_limit, low):
-        subprocess.run(["clear"], shell=True)
+        l_files.clear()
         self._row_day_header()
 
         empty_event = Event("--- --- ---",

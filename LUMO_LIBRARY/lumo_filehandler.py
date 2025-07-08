@@ -31,7 +31,7 @@ credentials_folder = os.path.join(ROOT_PATH, "__SUPPORT_FILES__/Z_CREDENTIALS")
 sounds_folder = os.path.join(ROOT_PATH, "__SUPPORT_FILES__/Z_SOUNDS")
 settings_fullpath = os.path.join(ROOT_PATH, "__SUPPORT_FILES__/settings.json")
 
-micro = os.path.join(ROOT_PATH, "micro")
+micro = "micro"
 
 # ---TIME--- #
 today = datetime.datetime.today()
@@ -45,6 +45,13 @@ local_hour = local_time[3]
 
 curr_time = today.strftime("%H:%M:%S")
 curr_time_hr = "----------{}----------".format(curr_time)
+
+
+def clear() -> None:
+    try:
+        subprocess.run(["cls"])
+    except:
+        subprocess.run(["clear"])
 
 
 def isolate_date_units():

@@ -78,7 +78,7 @@ class Menu:
 
     @classmethod
     def clear(cls):
-        subprocess.run(["clear"], shell=True)
+        l_files.clear()
         print("\n")
 
 

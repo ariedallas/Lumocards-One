@@ -126,7 +126,7 @@ def get_empty_slots(diff_amt):
 
 
 def clear() -> None:
-    subprocess.run(["clear"], shell=True)
+    l_files.clear()
 
 
 def letter_router(categories_dict, key):

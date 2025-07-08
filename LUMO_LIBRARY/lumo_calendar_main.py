@@ -13,6 +13,7 @@ import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_calendar_actions as l_cal_actions
 import LUMO_LIBRARY.lumo_calendar_utils as l_cal_utils
 import LUMO_LIBRARY.lumo_calendar_parsing_2 as l_cal_parse
+import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
 from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
@@ -25,8 +26,7 @@ from LUMO_LIBRARY.lumo_calendar_utils import (CalendarPageDay,
 
 
 def clear() -> None:
-    subprocess.run(["clear"], shell=True)
-
+    l_files.clear()
 
 def feedback_not_implemented(indent_context):
     l_animators.animate_text_indented("This feature not yet implemented yet...",
