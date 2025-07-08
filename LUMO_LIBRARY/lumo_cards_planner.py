@@ -545,8 +545,11 @@ def main():
 
             calendar_cards.extend(events_as_oneliners)
 
+        elif user_input:
+            review_calendar_cards()
+
         else:
-            l_animators.animate_text_indented("Skipping calendar cards, they have run once already",
+            l_animators.animate_text_indented("Skipping calendar cards. (They may have already run)",
                                               indent_amt=2,
                                               finish_delay=.5)
 

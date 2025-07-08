@@ -4,6 +4,7 @@ import os
 import pathlib
 import subprocess
 import time
+import platform
 
 from os.path import dirname
 
@@ -48,10 +49,10 @@ curr_time_hr = "----------{}----------".format(curr_time)
 
 
 def clear() -> None:
-    try:
-        subprocess.run(["cls"])
-    except:
-        subprocess.run(["clear"])
+    if platform.system() == "Linux" or platform.system() == "Darwin":
+        subprocess.run(["clear"], shell=True)
+    elif platform.system() == "Windows":
+        subprocess.run(["cls"], shell=True)
 
 
 def isolate_date_units():
@@ -176,3 +177,4 @@ def get_days_from_date(birth_year, birth_month, birth_day):
 
 if __name__ == '__main__':
     print("hello from main")
+    clear()
