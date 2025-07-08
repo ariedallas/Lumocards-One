@@ -241,7 +241,7 @@ def cardsrun_macro_menu(card_filename, card, menu_dict, menu_list):
 
             if action == l_menus_data.ACTION_OPEN or \
                     val.lower() in {"open", "edit"}:
-                subprocess.run([f"{l_files.micro} {card_fullpath}"], shell=True)
+                l_card_utils.t_editor(card_fullpath, False)
                 return "RELOOP", card_filename
 
 
