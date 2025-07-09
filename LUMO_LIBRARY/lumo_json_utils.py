@@ -88,6 +88,7 @@ def flexible_json_updater(json_filename, location=None, update_category=False):
         json_data = read_and_get_json_data(json_filename)
 
         c_abbr = json_filename[0]
+        print(c_abbr)
         new_category = get_category_from_json_settings(c_abbr)
         json_data["card category abbreviation"] = c_abbr
         json_data["card category"] = new_category

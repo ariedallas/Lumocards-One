@@ -11,6 +11,7 @@ import LUMO_LIBRARY.lumo_filehandler as l_files
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
 import LUMO_LIBRARY.lumo_menus_data as l_menus_data
 import LUMO_LIBRARY.lumo_menus_funcs as l_menus_funcs
+from LUMO_LIBRARY.lumo_json_utils import flexible_json_updater
 
 settings = l_files.get_json_settings()
 
@@ -117,6 +118,8 @@ def card_renamer(curr_name, dst_name, dst_dir="Same Dir", ask_confirmation=False
         l_json_utils.rename_json_card(src_filename=curr_name, dest_filename=dst_name)
         l_json_utils.flexible_json_updater(json_filename=dst_name, location=dst_dir_name,
                                            update_category=category_change)
+
+
 
 def card_prefix_renamer(old_prefix, new_prefix):
     if old_prefix == new_prefix:
@@ -241,18 +244,63 @@ def feedback(is_recurring=False, schedule=None, deleted=False):
     print()
 
 
-def clean_cards():
+def card_clean_renamer(var_path):
+    p, n = var_path.split("_")
+    new_f = "_".join(["Z", n])
+    source = get_card_abspath(var_path, check_archives=True)
+    dest = os.path.join(
+        pathlib.Path(source).parent, new_f)
+
+    print(f"  Card '{var_path}' is getting renamed to '{new_f}'")
+    print(f"  This is because '{p}' is not currently a valid card category.")
+
+    os.rename(source, dest)
+
+def clean_cards_prefixes(test_mode):
+    if not test_mode:
+        program_header("CARD PREFIXES")
+
+    txt_paths = l_files.get_all_cards()
+
+    for full_path in txt_paths:
+        file_name = pathlib.Path(full_path).name
+        card_prefix = file_name[0]
+        if card_prefix not in l_files.get_category_prefixes() \
+                and card_prefix != "Z":
+
+            if test_mode:
+                return True
+
+            card_clean_renamer(file_name)
+
+
+    if not test_mode:
+        print()
+        l_animators.animate_text("All .txt cards should now have valid prefixes.", finish_delay=.5)
+
+def clean_cards_unpaired(test_mode):
     """Check to make sure that each .txt card is coupled with a .json card
     If not, ask the user to make either a .txt or .json file to pair
     or delete the solo card."""
-    txt_cards = l_files.get_all_cards()
-    json_cards = l_files.get_all_json_cards()
+    if not test_mode:
+        program_header("CARD UNPAIRED")
+
+    txt_paths = l_files.get_all_cards()
+    txt_cards = {pathlib.Path(card).stem for card in txt_paths}
+
+
+    json_paths = l_files.get_all_json_cards()
+    json_cards = {pathlib.Path(card).stem for card in json_paths}
+
 
     unique_txts = txt_cards.difference(json_cards)
     unique_jsons = json_cards.difference(txt_cards)
 
+    if (unique_txts or unique_jsons) and test_mode:
+        return True
+
     if unique_txts:
-        print(f"{len(unique_txts)} unique .txt file found:\n")
+        print(f"  {len(unique_txts)} unique .txt file found:\n")
 
         for u in unique_txts:
             print(f"  {u}.txt", end=" ")
@@ -268,9 +316,9 @@ def clean_cards():
             else:
                 print("        (You skipped this card for now.)")
 
-    print()
     if unique_jsons:
-        print(f"{len(unique_jsons)} unique .json file found:\n")
+        print()
+        print(f"  {len(unique_jsons)} unique .json file found:\n")
 
         for u in unique_jsons:
             print(f"  {u}.json", end=" ")
@@ -286,9 +334,51 @@ def clean_cards():
             else:
                 print("        (You skipped this card for now.)")
 
+    if not unique_txts and not unique_jsons and not test_mode:
+        print()
+        l_animators.animate_text("All cards are currently paired", finish_delay=.5)
 
+def clean_cards_updated_json(test_mode):
+    if not test_mode:
+        program_header("CARD MOVED")
+
+    txt_cards = l_files.get_all_cards()
+    json_cards = l_files.get_all_json_cards()
+
+    txt_tuples = [(pathlib.Path(card).parent.name, pathlib.Path(card).name) for card in txt_cards]
+
+    for tuple in txt_tuples:
+        txt_loc, card_name = tuple
+        txt_prefix = card_name[0]
+        try:
+            json_data = l_json_utils.read_and_get_json_data(card_name)
+            json_path = l_json_utils.get_json_card_fullpath(card_name)
+        except:
+            return True
+
+        json_loc = json_data["card location"]
+        json_cat = json_data["card category abbreviation"]
+
+
+        if not json_loc == txt_loc:
+            if test_mode:
+                return True
+
+            print(f"  Updating json location for '{card_name}' in '{txt_loc}'")
+            l_json_utils.flexible_json_updater(json_path, txt_loc)
+
+        if not txt_prefix == json_cat:
+            if test_mode:
+                return True
+
+            print(f"  Updating json category for '{card_name}'")
+            l_json_utils.flexible_json_updater(card_name, location=None, update_category=True)
+
+
+    if not test_mode:
+        print()
+        l_animators.animate_text("All moved cards have updated json info.", finish_delay=.5)
 def format_card_title(card_filename):
-
 
     try:
         subbed_underscores = card_filename.replace("_", " ")
@@ -491,8 +581,24 @@ def load_transition() -> None:
     print()
     load_dots()
 
+def program_header(header):
+    print()
+    print(header)
+    print()
+
+def main():
+    run_prefixes = clean_cards_prefixes(test_mode=True)
+    run_unpaired = clean_cards_unpaired(test_mode=True)
+    run_updated = clean_cards_updated_json(test_mode=True)
+
+    print(run_prefixes, run_unpaired, run_updated)
+    input("???")
+
+    program_header("CARDS CLEANER")
+    clean_cards_prefixes(False)
+    clean_cards_unpaired(False)
+    clean_cards_updated_json(False)
+
 
 if __name__ == "__main__":
-    print("Hello from main")
-    # clean_cards()
-
+    main()

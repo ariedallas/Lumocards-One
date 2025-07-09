@@ -39,6 +39,13 @@ ACTION_UPDATE_CATEGORY = "Update: this card category"
 ACTION_DELETE_CATEGORY = "Delete: a card category"
 ACTION_DELETE_THIS_CATEGORY = "Delete: this card category"
 
+SELECT_NEAR = "Near Cards"
+SELECT_MIDDLE = "Middle Cards"
+SELECT_DISTANT = "Distant Cards"
+SELECT_CHECKLIST = "Checklist Cards"
+SELECT_RECURRING = "Recurring Cards"
+SELECT_ARCHIVE = "Archived Cards"
+
 LUMO_MAIN = [
     "Cards Planner"
     , "New Card"
@@ -131,6 +138,14 @@ SEARCH_MODIFY_MENU = [
     , ACTION_DELETE
 ]
 
+BROWSER_MAIN_MENU = [
+    SELECT_NEAR
+    , SELECT_MIDDLE
+    , SELECT_DISTANT
+    , SELECT_CHECKLIST
+    , SELECT_RECURRING
+    , SELECT_ARCHIVE]
+
 NEWCARD_MAIN_MENU = [
     ACTION_OPEN
     , ACTION_MODIFY
@@ -170,7 +185,6 @@ QUIT_MENU_DICT = {"Q": f"{ACTION_QUIT}"}
 
 QUIT_MENU_INT_LIST = [f"[3]  {ACTION_QUIT}"]
 QUIT_MENU_INT_DICT = {"3": f"{ACTION_QUIT}"}
-
 
 CARDS_PLANNER_COMPLETED_PHRASES = [
     "Nice!"

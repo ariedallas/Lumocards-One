@@ -321,6 +321,91 @@ def main(initial_search_from_cli=None):
             # Optional feature: show quit message.
             # l_animators.animate_text("Quit Lumo: Search", finish_delay=.5)
 
+def browser():
+    l_card_utils.load_transition()
+
+    while True:
+        print()
+        print("BROWSER")
+        print()
+
+        d_menu, l_menu = l_menus_funcs.prep_menu_tuple(l_menus_data.BROWSER_MAIN_MENU)
+        l_animators.list_printer(l_menu, indent_amt=2, speed_interval=0)
+        print()
+        l_animators.list_printer(l_menus_data.QUIT_MENU_LIST, indent_amt=2, speed_interval=0)
+
+        user_input = input("\n  > ")
+        val = user_input.strip()
+
+        if val.upper() in d_menu.keys():
+
+            action = d_menu.get(val.upper())
+
+            if action == l_menus_data.SELECT_NEAR:
+                print()
+                l_animators.animate_text("NEAR FOCUS CARDS")
+                print()
+                for file in os.listdir(l_files.cards_near_folder):
+                    print(f"  {file}")
+
+                print()
+
+            elif action == l_menus_data.SELECT_MIDDLE:
+                print()
+                l_animators.animate_text("MIDDLE FOCUS CARDS")
+                print()
+                for file in os.listdir(l_files.cards_middle_folder):
+                    print(f"  {file}")
+
+                print()
+
+            elif action == l_menus_data.SELECT_DISTANT:
+                print()
+                l_animators.animate_text("DISTANT FOCUS CARDS")
+                print()
+                for file in os.listdir(l_files.cards_dist_folder):
+                    print(f"  {file}")
+
+                print()
+
+            elif action == l_menus_data.SELECT_CHECKLIST:
+                print()
+                l_animators.animate_text("CHECKLIST CARDS")
+                print()
+                for file in os.listdir(l_files.checklist_cards_folder):
+                    print(f"  {file}")
+
+                print()
+
+            elif action == l_menus_data.SELECT_RECURRING:
+                print()
+                l_animators.animate_text("RECURRING CARDS")
+
+                print()
+                for file in os.listdir(l_files.recurring_cards_folder):
+                    print(f"  {file}")
+
+                print()
+
+            elif action == l_menus_data.SELECT_ARCHIVE:
+                print()
+                l_animators.animate_text("ARCHIVED CARDS")
+                print()
+                for file in os.listdir(l_files.archived_cards_folder):
+                    print(f"  {file}")
+
+                print()
+
+            user_input = input("  Press any key to continue \n  or 'q' or 'quit' to quit \n\n  >  ")
+            val = user_input.strip()
+            l_files.clear()
+            if val.lower() in {"q", "quit"}:
+                return
+
+
+        elif val.lower() in {"q", "quit"}:
+            return
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
