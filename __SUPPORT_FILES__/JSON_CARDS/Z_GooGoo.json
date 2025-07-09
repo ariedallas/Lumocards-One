@@ -1,13 +1,13 @@
 {
-    "card location": "CARDS_A_FOCUS_NEAR",
-    "card category abbreviation": "Q",
-    "card category": "Qualm",
+    "card location": "CARDS_C_FOCUS_DISTANT",
+    "card category abbreviation": "Z",
+    "card category": "Default Category",
     "calendar event": null,
     "calendar repeating event": null,
     "recurring freq": 0,
     "recurring freq time unit": null,
     "last occurrence": null,
-    "card created": "2025-05-30 14:32:33",
+    "card created": "2025-07-08 23:58:18",
     "tags": [
         "default tag a",
         "default tag b",
