@@ -2,14 +2,13 @@ import datetime
 import itertools
 import os
 import pathlib
+import platform
+import string
 import subprocess
 import time
-import platform
-
 from os.path import dirname
 
 import LUMO_LIBRARY.lumo_json_utils as l_json_utils
-
 
 # ---FILES--- #
 ROOT_PATH = dirname(dirname(os.path.abspath(__file__)))
@@ -66,7 +65,13 @@ def isolate_date_units():
 
 # ---- PLANNER FILES ---- #
 planner_folder = os.path.join(USER_FILES, "PLANNER")
-today_planner_file = f"{today_frmttd.upper()}_planner.txt"
+
+LETTERS_THROUGH_L = string.ascii_lowercase[:12]
+curr_month_idx = today.month - 1
+curr_month_lttr = LETTERS_THROUGH_L[curr_month_idx].upper()
+
+planner_date = today.strftime(f"%Y_{curr_month_lttr}_%b_%d")
+today_planner_file = f"{planner_date}_planner.txt"
 today_planner_fullpath = os.path.join(planner_folder, today_planner_file)
 
 
