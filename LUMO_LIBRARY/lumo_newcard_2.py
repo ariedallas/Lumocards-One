@@ -155,7 +155,10 @@ def add_custom_or_default_steps():
     scratchpad_file = os.path.join(l_files.temp_folder, "scratchpad.txt")
     print()
 
-    if l_menus_funcs.proceed("Edit steps? ( ➝ yes) >  ", indent_amt=2):
+    if l_menus_funcs.proceed("Edit steps? ( ➝ yes) >  "
+            , indent_amt=2
+            , reference_list=l_menus_data.NEGATIVE_USER_RESPONSES):
+
         with open(scratchpad_file, "w") as fin:
             fin.write("")
 
@@ -385,10 +388,10 @@ def write_calendar_card_and_json(card_filename, folder, google_calendar_data, ad
 
     return formatted_card_fullpath, json_fullpath
 
+
 # ---- END: LUMO CALENDAR FUNCTIONS ---- #
 
 def program_header(reference_name=None):
-
     if reference_name:
         print()
         print(f"NEW CARD: {reference_name}")
@@ -398,6 +401,7 @@ def program_header(reference_name=None):
         print()
         print("NEW CARD")
         print()
+
 
 def main(card_category=None, card_title=None, from_lumo_menu=False):
     from_local_args = test_for_local_args()

@@ -204,16 +204,10 @@ CARDS_PLANNER_COMPLETED_PHRASES = [
 ]
 
 CARDS_PLANNER_FEEDBACK = {
-    "edit card": ("You are editing card: ", 'edit')
-    , "edit": ("You are editing card: ", 'edit')
-    , "mark": ("You have completed some steps:", 'edit')
-    , "change": ("You are editing card: ", 'edit')
+     "edit": ("You are editing card: ", 'edit')
     , "open": ("You are editing card: ", 'edit')
 
-    , "show full": ("Showing full card...", 'show full')
-    , "show all": ("Showing full card...", 'show full')
-    , "see all": ("Showing full card...", 'show full')
-    , "full card": ("Showing full card...", 'show full')
+    , "more": ("Showing full card...", 'show full')
     , "full": ("Showing full card...", 'show full')
     , "show": ("Showing full card...", 'show full')
 
@@ -225,31 +219,34 @@ CARDS_PLANNER_FEEDBACK = {
     , "deleted": ("Card set for deletion.", 'delete')
 
     , "done": (True, 'archive')
-    , "complete": (True, 'archive')
     , "completed": (True, 'archive')
     , "archive": (True, 'archive')
-    , "finished": (True, 'archive')
 
-    , "mark inactive": ("Card toggled to inactive cards.", 'toggle')
-    , "toggle": ("Card toggled to inactive cards.", 'toggle')
-    , "make inactive": ("Card toggled to inactive cards.", 'toggle')
-    , "inactive": ("Card toggled to inactive cards.", 'toggle')
-    , "deactivate": ("Card toggled to inactive cards.", 'toggle')
+    # , "mark inactive": ("Card toggled to inactive cards.", 'toggle')
+    # , "toggle": ("Card toggled to inactive cards.", 'toggle')
+    # , "make inactive": ("Card toggled to inactive cards.", 'toggle')
+    # , "inactive": ("Card toggled to inactive cards.", 'toggle')
+    # , "deactivate": ("Card toggled to inactive cards.", 'toggle')
 
     , "super quit": ("Super Quit, Goodbye!", 'superquit')
-    , "full quit": ("Super Quit, Goodbye!", 'superquit')
     , "superquit": ("Super Quit, Goodbye!", 'superquit')
 }
 
 NEGATIVE_USER_RESPONSES = [
-    "n"
-    , "no"
-    , "exit"
+     "exit"
     , "x"
     , "quit"
     , "q"
-    , "stop"
+    , "no"
+    , "n"
     , "cancel"
+    , "stop"
+]
+
+NEGATIVE_USER_RESPONSES_SHORT = [
+     "exit"
+    , "quit"
+
 ]
 
 if __name__ == "__main__":

@@ -52,7 +52,7 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
         l_animators.animate_text_indented("...", speed=.075, indent_amt=2)
         reviewed_cards.append(card_filename)
 
-    elif user_input_filtered in l_menus_data.NEGATIVE_USER_RESPONSES:  # I.E. QUIT
+    elif user_input_filtered in l_menus_data.NEGATIVE_USER_RESPONSES_SHORT:  # I.E. QUIT
         # l_animators.animate_text_indented(text="Quitted card review.",
         #                                   indent_amt=2)
         return False
@@ -145,8 +145,8 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
         l_animators.animate_text_indented(text="...", speed=.075, indent_amt=2)
         reviewed_recurring_cards.append(card_filename)
 
-    elif user_input_filtered in l_menus_data.NEGATIVE_USER_RESPONSES:  # I.E. QUIT
-        l_animators.animate_text_indented(text="Quitted card review.", indent_amt=2)
+    elif user_input_filtered in l_menus_data.NEGATIVE_USER_RESPONSES_SHORT:  # I.E. QUIT
+        # l_animators.animate_text_indented(text="Quitted card review.", indent_amt=2)
         return False
 
     elif user_input_filtered[0].isnumeric():
@@ -450,7 +450,7 @@ def update_cards():
         l_animators.list_printer(archived_cards, indent_amt=4)
         print()
 
-        if l_menus_funcs.proceed("( ➝ yes) >  ", indent_amt=2):
+        if l_menus_funcs.proceed("( ➝ yes) >  ", indent_amt=2, reference_list=l_menus_data.NEGATIVE_USER_RESPONSES):
             for card in archived_cards:
                 l_card_utils.near_focus_to_archive(card)
 
@@ -559,13 +559,17 @@ def main():
 
     if status == "EXIT CARD LIST":
         print()
-        user_input = l_menus_funcs.proceed("Proceed to Recurring Cards? ( ➝ yes) >  ", indent_amt=2)
+        user_input = l_menus_funcs.proceed("Proceed to Recurring Cards? ( ➝ yes) >  "
+                                           , indent_amt=2
+                                           , reference_list=l_menus_data.NEGATIVE_USER_RESPONSES)
 
         if user_input:
             review_and_write_recurring()
 
         print()
-        user_input = l_menus_funcs.proceed("Proceed to Calendar Cards ( ➝ yes) >  ", indent_amt=2)
+        user_input = l_menus_funcs.proceed("Proceed to Calendar Cards ( ➝ yes) >  "
+                                           , indent_amt=2
+                                           , reference_list=l_menus_data.NEGATIVE_USER_RESPONSES)
 
         if user_input:
 

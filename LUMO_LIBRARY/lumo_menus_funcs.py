@@ -6,7 +6,8 @@ import LUMO_LIBRARY.lumo_recurring as l_recurring
 import LUMO_LIBRARY.lumo_newcard_2 as l_newcard
 
 
-def proceed(input_text="... ", indent_amt=0, empty_means_true=True):
+def proceed(input_text="... ", indent_amt=0, empty_means_true=True
+            , reference_list=l_menus_data.NEGATIVE_USER_RESPONSES):
     indent_space = " " * indent_amt
 
     print(indent_space + input_text)
@@ -17,7 +18,7 @@ def proceed(input_text="... ", indent_amt=0, empty_means_true=True):
     if val == "":
         return True if empty_means_true else False
 
-    return True if val not in l_menus_data.NEGATIVE_USER_RESPONSES else False
+    return True if val not in reference_list else False
 
 
 def prep_newcard_menu(var_menu, var_letters, pop_letters=False):
