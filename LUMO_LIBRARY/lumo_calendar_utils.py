@@ -390,6 +390,9 @@ def get_today_events():
                                      time_min=time_min,
                                      time_max=time_max)
 
+    if not today_events:
+        today_events = []
+
     converted_events = [google_event_to_obj(e) for e in today_events]
 
     return converted_events
