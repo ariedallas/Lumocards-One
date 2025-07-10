@@ -361,6 +361,9 @@ def get_day_blocks(var_date=today_date, time_min=None, time_max=None):
                                             time_min=window_start,
                                             time_max=window_end)
 
+    if not google_month_events:
+        google_month_events = []
+
     converted_events = [google_event_to_obj(e) for e in google_month_events]
 
     day_blocks = []

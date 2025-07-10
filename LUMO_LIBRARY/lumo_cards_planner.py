@@ -579,7 +579,7 @@ def main():
                 print()
                 l_animators.list_printer(["Calendar is not currently configured -or-",
                                           "the calendar is incorrectly setup -or-",
-                                          "other reasons: i.e. there is no internet connection"
+                                          "other reasons: i.e. there is no internet connection",
                                           "",
                                           "In order to use this feature follow the README at the address below:",
                                           "https://github.com/ariedallas/Lumocards-One",
