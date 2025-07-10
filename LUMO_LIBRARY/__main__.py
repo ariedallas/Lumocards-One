@@ -9,6 +9,7 @@ from typing import (Optional,
 
 from LUMO_LIBRARY import (lumo_animationlibrary as l_animators,
                           lumo_cards_planner as l_cards,
+                          lumo_card_utils as l_card_utils,
                           lumo_checklist as l_checklist,
                           lumo_filehandler as l_files,
                           lumo_journal as l_journal,
@@ -258,6 +259,7 @@ def router(cli_input: Optional[argparse.Namespace],
     from_cli: bool
     from_cli = _determine_from_cli(cli_input)
 
+
     if not from_cli:
         key = lumo_input.upper()
         selected_prog_dict_value = contextual_menu.menu.get(key, "_")
@@ -304,7 +306,21 @@ def router(cli_input: Optional[argparse.Namespace],
         from LUMO_LIBRARY import lumo_calendar_main as l_calendar
 
         LumoMenu.load_transition()
-        l_calendar.main()
+
+        try:
+            l_calendar.main()
+        except:
+            l_card_utils.program_header("CALENDAR")
+            l_animators.list_printer(["Calendar is not currently configured -or-",
+                                      "the calendar is incorrectly setup.",
+                                      "other reasons: i.e. there is no internet connection",
+                                      "",
+                                      "In order to use this feature follow the README at the address below:",
+                                      "https://github.com/ariedallas/Lumocards-One",
+                                      "and check out the video link for setup."], indent_amt=2)
+            print()
+            print("  Type any key to continue")
+            input("\n  >  ")
         return None, main_menu
 
 
@@ -395,6 +411,8 @@ def router(cli_input: Optional[argparse.Namespace],
 
 
 def main() -> None:
+    l_card_utils.cards_cleaner()
+
     global parser
 
     parser = get_argument_parser()

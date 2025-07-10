@@ -50,12 +50,17 @@ def delete_cards_from_folder(var_dir):
         print(f"deleted card: {card}")
         os.remove(f"{var_dir}/{card}")
 
+def make_alot_near_cards():
+    for num in range(5):
+        for ltr in category_letters:
+            filename = f"{ltr}_NearCard{num}.txt"
+            l_newcard.write_card_and_json(filename, l_files.cards_near_folder, add_custom_steps=sample_steps)
+
 
 def near_cards():
     for n, ltr in zip(range(1, 9), category_letters):
         filename = f"{ltr}_NearCard{n}.txt"
         l_newcard.write_card_and_json(filename, l_files.cards_near_folder, add_custom_steps=sample_steps)
-
 
 def middle_cards():
     for n, ltr in zip(range(1, 9), category_letters):

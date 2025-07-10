@@ -2,6 +2,7 @@ import os
 import random
 import subprocess
 import sys
+from os.path import exists
 
 import LUMO_LIBRARY.lumo_animationlibrary as l_animators
 import LUMO_LIBRARY.lumo_calendar_utils as l_cal_utils
@@ -108,13 +109,14 @@ def cardsrun_macro_hotwords(card_filename, card, card_idx):
                                      indent_amt=2
                                      )
 
-
         elif route == "delete":
             deleted_cards.append(card_filename)
             reviewed_cards.append(card_filename)
             l_animators.list_printer([l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0]],
                                      indent_amt=2)
 
+        elif route == "show full":
+            return "SHOW FULL"
 
         elif route == "superquit":
             found_tuple = l_menus_data.CARDS_PLANNER_FEEDBACK.get(user_input_filtered)
@@ -210,6 +212,9 @@ def cardsrun_recurring_macro_hotwords(card_filename, card, card_idx):
             reviewed_recurring_cards.append(card_filename)
             print(l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0])
 
+
+        elif route == "show full":
+            return "SHOW FULL"
 
         elif route == "superquit":
             l_animators.animate_text_indented(l_menus_data.CARDS_PLANNER_FEEDBACK[user_input_filtered][0],
@@ -314,11 +319,20 @@ def iterate_cards(var_list_cards, mode):
         elif mode == "recurring cards":
             status = cardsrun_recurring_macro_hotwords(card_filename=card_path, card=card, card_idx=card_no - 1)
 
+        if status == "SHOW FULL" and mode == "main cards":
+            l_animators.animate_text_indented("Same card showing up to 20 steps", indent_amt=2)
+            l_boxify.display_card(card, 20)
+            status = cardsrun_macro_hotwords(card_filename=card_path, card=card, card_idx=card_no - 1)
+        elif status == "SHOW FULL" and mode == "recurring cards":
+            l_animators.animate_text_indented("Same card showing up to 20 steps", indent_amt=2)
+            l_boxify.display_card(card, 20)
+            status = cardsrun_recurring_macro_hotwords(card_filename=card_path, card=card, card_idx=card_no - 1)
+
         if not status:
             return "EXIT CARD LIST"
 
-        elif status == "RELOOP":
-            return status
+        elif status == "RELOOP" or status == "SHOW FULL":
+            return "RELOOP"
 
         elif status == "SUPER QUIT":
             return "SUPER QUIT"
@@ -414,16 +428,20 @@ def translate_events_to_oneliners():
 
 def update_cards():
     print()
+
+    uniq_cal_events = prune_calendar_duplicates(calendar_cards)
+
     if todays_cards:
         l_animators.animate_text_indented("ADDING TO PLANNER:", indent_amt=2)
         print()
         l_animators.list_printer(todays_cards, indent_amt=4)
 
-    if calendar_cards:
+
+    if uniq_cal_events:
         print()
         l_animators.animate_text_indented("ADDING EVENTS TO PLANNER:", indent_amt=2)
         print()
-        l_animators.list_printer(calendar_cards, indent_amt=4)
+        l_animators.list_printer(uniq_cal_events, indent_amt=4)
 
     if len(archived_cards) > 0:
         print()
@@ -457,11 +475,11 @@ def update_cards():
         l_files.basic_wrtr("\n", l_files.today_planner_fullpath)
         l_files.basic_wrtr_list(todays_cards, l_files.today_planner_fullpath)
 
-    if len(calendar_cards) > 0:
+    if len(uniq_cal_events) > 0 :
         l_files.basic_wrtr("\n", l_files.today_planner_fullpath)
         l_files.basic_wrtr(f"CALENDAR CARDS: {l_files.curr_time_hr}", l_files.today_planner_fullpath)
         l_files.basic_wrtr("\n", l_files.today_planner_fullpath)
-        l_files.basic_wrtr_list(calendar_cards, l_files.today_planner_fullpath)
+        l_files.basic_wrtr_list(uniq_cal_events, l_files.today_planner_fullpath)
 
 
     print()
@@ -475,15 +493,27 @@ def planner_feedback(card_title, card_step):
     todays_cards.append(formatted_output)
 
 
-def already_reviewed():
-    day, day_num, month, year = l_files.isolate_date_units()
-    today_reference = f"{month} {day_num}, {day}"
+def prune_calendar_duplicates(cards_list):
+    uniq = []
 
+    if not os.path.exists(l_files.today_planner_fullpath):
+        return cards_list
+
+    with open(l_files.today_planner_fullpath) as fin:
+        all_lines = [l.strip() for l in fin.readlines()]
+
+        for line in cards_list:
+            if line not in all_lines:
+                uniq.append(line)
+
+    return uniq
+
+
+def update_calendar_review():
     settings = l_files.get_json_settings()
-    last_recorded_date = settings["calendar cards last review"]
-
-    return last_recorded_date == today_reference
-
+    day, day_num, month, year = l_files.isolate_date_units()
+    settings["calendar cards last review"] = f"{month} {day_num}, {day}"
+    l_json_utils.write_json(l_files.settings_fullpath, settings)
 
 def program_header(header):
     print()
@@ -502,8 +532,10 @@ def get_agenda():
         l_card_utils.t_editor(l_files.today_planner_fullpath, False)
 
 def main():
+
     global reviewed_cards, reviewed_recurring_cards, todays_cards, calendar_cards, \
         reassigned_cards, reactivated_cards, archived_cards, deleted_cards
+
 
     reviewed_cards = []
     reviewed_recurring_cards = []
@@ -535,23 +567,30 @@ def main():
         print()
         user_input = l_menus_funcs.proceed("Proceed to Calendar Cards ( ➝ yes) >  ", indent_amt=2)
 
-        if user_input and not already_reviewed():
-            settings = l_files.get_json_settings()
+        if user_input:
 
-            day, day_num, month, year = l_files.isolate_date_units()
-            settings["calendar cards last review"] = f"{month} {day_num}, {day}"
-            l_json_utils.write_json(l_files.settings_fullpath, settings)
+            try:
+                review_calendar_cards()
+                events_as_oneliners = translate_events_to_oneliners()
+                calendar_cards.extend(events_as_oneliners)
 
-            review_calendar_cards()
-            events_as_oneliners = translate_events_to_oneliners()
 
-            calendar_cards.extend(events_as_oneliners)
+            except:
+                print()
+                l_animators.list_printer(["Calendar is not currently configured -or-",
+                                          "the calendar is incorrectly setup -or-",
+                                          "other reasons: i.e. there is no internet connection"
+                                          "",
+                                          "In order to use this feature follow the README at the address below:",
+                                          "https://github.com/ariedallas/Lumocards-One",
+                                          "and check out the video link for setup."], indent_amt=2)
+                print()
+                print("  Type any key to continue")
+                input("\n  >  ")
 
-        elif user_input:
-            review_calendar_cards()
 
         else:
-            l_animators.animate_text_indented("Skipping calendar cards. (They may have already run)",
+            l_animators.animate_text_indented("Skipping calendar cards",
                                               indent_amt=2,
                                               finish_delay=.5)
 

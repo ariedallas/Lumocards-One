@@ -14,6 +14,7 @@ import LUMO_LIBRARY.lumo_recurring as l_recurring
 letters = string.ascii_lowercase
 letters_filtered = [l.upper() for l in letters if not (l == "q") and not (l == "x")]
 settings = l_files.get_json_settings()
+alphanum_1080 = l_menus_data.ALPHANUMERIC_TO_1080()
 
 
 def test_match(queried):
@@ -73,20 +74,17 @@ def big_zipper_prep(searchterm):
 def big_zipper(var_total_matches):
     total_amt_matches = sum([len(m) for m in var_total_matches])
 
-    if total_amt_matches > 24:
-        return total_amt_matches, None, None
-
-    letters_filtered_copy = letters_filtered.copy()
+    alphanum_1080_list = alphanum_1080.copy()
+    alphanum_1080_dict = alphanum_1080.copy()
 
     print()
 
-    near_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[0]]
-    mid_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[1]]
-    dist_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[2]]
-    recurring_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[3]]
-    checklist_matches_setup = [f"[{letters_filtered_copy.pop(0)}] {match}" for match in var_total_matches[4]]
-    archived_matches_setup = [f"[{letters_filtered_copy.pop(0)}] ({len(var_total_matches[5])})"] if len(
-        var_total_matches[5]) > 0 else []
+    near_matches_setup = [f"[{alphanum_1080_list.pop(0)}] {match}" for match in var_total_matches[0]]
+    mid_matches_setup = [f"[{alphanum_1080_list.pop(0)}] {match}" for match in var_total_matches[1]]
+    dist_matches_setup = [f"[{alphanum_1080_list.pop(0)}] {match}" for match in var_total_matches[2]]
+    recurring_matches_setup = [f"[{alphanum_1080_list.pop(0)}] {match}" for match in var_total_matches[3]]
+    checklist_matches_setup = [f"[{alphanum_1080_list.pop(0)}] {match}" for match in var_total_matches[4]]
+    archived_matches_setup = [f"[{alphanum_1080_list.pop(0)}] {match}" for match in var_total_matches[5]]
 
     near_matches_formatted = ["NEAR FOCUS CARDS:"] + near_matches_setup
     mid_matches_formatted = ["MIDDLE FOCUS CARDS:"] + mid_matches_setup
@@ -95,25 +93,22 @@ def big_zipper(var_total_matches):
     checklist_matches_formatted = ["CHECKLIST CARDS:"] + checklist_matches_setup
     archived_matches_formatted = ["ARCHIVED CARDS:"] + archived_matches_setup
 
-    used_letters = [letter for letter in letters_filtered if letter not in letters_filtered_copy]
+    used_idxs = [letter for letter in alphanum_1080 if letter not in alphanum_1080_list]
 
     big_zipp = [near_matches_formatted, mid_matches_formatted, dist_matches_formatted
         , recurring_matches_formatted, checklist_matches_formatted, archived_matches_formatted]
 
-    return total_amt_matches, big_zipp, used_letters
+    matches_dict = {}
+    for match_set in var_total_matches:
+        for match in match_set:
+            matches_dict.update({f"{alphanum_1080_dict.pop(0)}": match})
+
+    return total_amt_matches, big_zipp, matches_dict, used_idxs
 
 
 def select_card_from_found(searchterm):
     found_matches, shortcut_file_matches = big_zipper_prep(searchterm=searchterm)
-    total_amt_matches, all_matches_formatted, used_letters = big_zipper(found_matches)
-
-    if total_amt_matches > 24:
-        print()
-        l_animators.list_printer([f"More than 24 possible matches for term \'{searchterm}\'...",
-                                  "Try something more specific."]
-                                 , indent_amt=2)
-
-        return None, None, False
+    total_amt_matches, all_matches_formatted, matches_dict, used_idxs = big_zipper(found_matches)
 
     if total_amt_matches == 0:
         l_animators.animate_text_indented(f"No matches found for your term \'{searchterm}\'... "
@@ -121,12 +116,6 @@ def select_card_from_found(searchterm):
                                           , finish_delay=.5)
         print()
         return None, None, False
-
-    if len(all_matches_formatted[5]) > 1:
-        archived_matches_line = all_matches_formatted[5][1]
-        archives_letter = archived_matches_line[1]
-    else:
-        archives_letter = None
 
     for matches_list in all_matches_formatted:
         if len(matches_list) > 1:
@@ -140,20 +129,10 @@ def select_card_from_found(searchterm):
         user_input = input("\n  > ")
         val = user_input.strip()
 
-        if val.upper() == archives_letter:
-            print()
-            l_animators.list_printer(["Archived cards are not shown in this mode, but",
-                                      "the number indicator is shown for reference.",
-                                      f"i.e. there is/are ({len(found_matches[5])}) archived cards that match."]
-                                     , indent_amt=2
-                                     , speed_interval=0)
-            continue
 
-        # TODO: change this to be if ... in dict.keys() etc.
-        if val.isalpha() and len(val) == 1 and (val.upper() in used_letters):
-            letter_as_idx = ord(val.lower()) - 97
+        if val.upper() in matches_dict.keys():
 
-            chosen_file = shortcut_file_matches[letter_as_idx]
+            chosen_file = matches_dict[val.upper()]
             card = l_card_utils.filename_to_card(chosen_file, check_archives=True)
 
             return card, chosen_file, False
@@ -166,15 +145,13 @@ def select_card_from_found(searchterm):
 
         else:
             print()
-            l_animators.list_printer(["You entered something other than one letter ",
-                                      "- or - ",
-                                      "You entered a letter that doesn't match anything."],
+            l_animators.list_printer(["You entered a option that doesn't match anything."],
                                      indent_amt=2,
                                      speed_interval=0)
 
 
 def cardsearch_main_options(var_card, var_card_filename, var_hotkey_dict, var_hotkey_list):
-    card_fullpath = l_card_utils.get_card_abspath(var_card_filename)
+    card_fullpath = l_card_utils.get_card_abspath(var_card_filename, check_archives=True)
 
     l_card_utils.card_header(var_card)
 
@@ -408,6 +385,7 @@ def browser():
 
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "match_term"

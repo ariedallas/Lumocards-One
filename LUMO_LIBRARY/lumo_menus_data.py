@@ -5,6 +5,15 @@ import string
 LETTERS_CAPS = string.ascii_uppercase
 LETTERS_FILTERED = [L for L in LETTERS_CAPS if not (L == 'Q') and not (L == 'X')]
 
+def ALPHANUMERIC_TO_1080():
+    ALPHANUMERIC_TO_1000 = LETTERS_FILTERED.copy()
+
+    for num in range (1, 45):
+        for ltr in LETTERS_FILTERED:
+            ALPHANUMERIC_TO_1000.append(f"{ltr}{num}")
+
+    return ALPHANUMERIC_TO_1000
+
 INTEGERS_10 = list(range(1, 11))
 Z_CATEGORY_DICT = {"Z": "Default Category"}
 
@@ -242,3 +251,7 @@ NEGATIVE_USER_RESPONSES = [
     , "stop"
     , "cancel"
 ]
+
+if __name__ == "__main__":
+    test = ALPHANUMERIC_TO_1080()
+    print((test))

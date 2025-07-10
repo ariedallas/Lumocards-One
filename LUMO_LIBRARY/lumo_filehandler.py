@@ -101,7 +101,7 @@ def get_all_json_cards():
     return all_json_cards
 
 def get_all_cards():
-    all_txt_cards =  set(itertools.chain(
+    all_txt_cards =  list(itertools.chain(
     [os.path.join(cards_near_folder, f) for f in os.listdir(cards_near_folder)],
     [os.path.join(cards_middle_folder, f) for f in os.listdir(cards_middle_folder)],
     [os.path.join(cards_dist_folder, f) for f in os.listdir(cards_dist_folder)],
