@@ -1,16 +1,14 @@
 {
     "text editor": "micro",
     "card categories": {
-        "P": "View",
-        "Q": "Qualm",
-        "R": "Rainbow",
-        "V": "Diamonds",
-        "D": "Ok"
+        "A": "Work",
+        "B": "Household",
+        "C": "Errands",
+        "D": "Finances"
     },
     "search": {
         "archived search results limit": 5
     },
-    "calendar cards last review": "Jul 05, Saturday",
     "pomodoro": {
         "pom_presets": {
             "preset_1": [
