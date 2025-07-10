@@ -1,0 +1,16 @@
+{
+    "card location": "CARDS_B_FOCUS_MIDDLE",
+    "card category abbreviation": "A",
+    "card category": "Work",
+    "calendar event": null,
+    "calendar repeating event": null,
+    "recurring freq": 0,
+    "recurring freq time unit": null,
+    "last occurrence": null,
+    "card created": "2025-07-09 22:51:43",
+    "tags": [
+        "default tag a",
+        "default tag b",
+        "default tag c"
+    ]
+}
