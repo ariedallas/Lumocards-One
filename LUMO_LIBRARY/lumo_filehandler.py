@@ -102,13 +102,13 @@ def get_all_json_cards():
 
 def get_all_cards():
     all_txt_cards =  list(itertools.chain(
-    [os.path.join(cards_near_folder, f) for f in os.listdir(cards_near_folder)],
-    [os.path.join(cards_middle_folder, f) for f in os.listdir(cards_middle_folder)],
-    [os.path.join(cards_dist_folder, f) for f in os.listdir(cards_dist_folder)],
+    [os.path.join(cards_near_folder, f) for f in os.listdir(cards_near_folder) if f.endswith(".txt")],
+    [os.path.join(cards_middle_folder, f) for f in os.listdir(cards_middle_folder) if f.endswith(".txt")],
+    [os.path.join(cards_dist_folder, f) for f in os.listdir(cards_dist_folder) if f.endswith(".txt")],
 
-    [os.path.join(checklist_cards_folder, f) for f in os.listdir(checklist_cards_folder)],
-    [os.path.join(recurring_cards_folder, f) for f in os.listdir(recurring_cards_folder)],
-    [os.path.join(archived_cards_folder, f) for f in os.listdir(archived_cards_folder)],
+    [os.path.join(checklist_cards_folder, f) for f in os.listdir(checklist_cards_folder) if f.endswith(".txt")],
+    [os.path.join(recurring_cards_folder, f) for f in os.listdir(recurring_cards_folder) if f.endswith(".txt")],
+    [os.path.join(archived_cards_folder, f) for f in os.listdir(archived_cards_folder) if f.endswith(".txt")],
 ))
     return all_txt_cards
 
