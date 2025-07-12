@@ -1,44 +1,60 @@
 # Lumocards
 
 ---
-Lumocards One is the first stable version of a particular information system tool.<br /> 
-It's like a todo app, a calendar, and planner rolled into a CLI / Terminal application. [needs link]<br />
+Lumocards One is a personal information system tool.<br /> 
+It's a todo app, planner, calendar, and journal made for the CLI / Terminal application.
 
 It's currently available for MacOS / Linux.<br />
 It also requires the use of Python 3 on your computer. 
 
 This README is meant for a wide audience of persons who may be more or less familiar with computers and software development.<br />
 As such, it's a bit more wordy to explain a few more details.
+---
+## Requirements:
+- Python version 3.12 or greater (download here: https://www.python.org/)
+- Micro text editor (download here: https://micro-editor.github.io/)
 
 ## Getting Started
 
-After downloading / cloning this folder:
+### The entire installation is available as a YouTube video here: <br> 
+https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s 
+
+### After downloading / cloning this folder:
 - Unzip the folder, if you downloaded a zip folder.
-- Open the terminal.
-- Navigate to where this folder is on your computer. (This can be googled if unclear).
-- Alternatively, you can open the folder in your file browser and right click to open it in the terminal. 
-- You can confirm your ready by printing the current working directory which should end with: `/Lumocards-One**`
-
-
-- If that looks good, type in the following or paste the lines below.
-- Note: make sure to include the period shown in the last line below.
-
+- Open the terminal and navigate to this folder. 
+- You can confirm you're in the right spot if your current working directory ends with something like: `/Lumocards-One**`
+- Then depending on your computer type, enter in the following or paste the lines below.
+### MacOs / Linux:
 
 ````
-    source ./lumo_install.sh && lumo_install
-    lumo_activate
-    python3 -m pip install -e .
+    python3 -m venv venv
+    source venv/bin/activate
+    py -m pip install -e .
 ````
-Anytime from this point onwards, when you want to start a Lumo session, you will first need to activate lumo.<br />
-This is always done by first navigating to the Lumocards folder in the terminal and then by retyping: `source ./lumo_install.sh && lumo_activate`.<br />
+### Windows
+In Powershell:
+````
+    py -m venv venv
+    .\venv\Scripts\Activate.ps1
+    py -m pip install -e .
+````
+In CMD:
+````
+    py -m venv venv
+    .\venv\Scripts\activate.bat
+    py -m pip install -e .
+````
+### Additional Notes
+Note #1: make sure to include the period shown in the last line below.
 
+Note #2: Anytime from this point onwards, when you want to use Lumo you will first need to activate lumo.<br />
+This is always done by first navigating to the Lumocards folder in the terminal and then by retyping: <br> 
+`source venv/bin/activate` for Mac/Linux <br>
+`.\venv\Scripts\activate` for Windows (or a similar command)
+
+On most computers you should be able to tell if your environment is activated because your terminal prompt will change. <br>
 Once activated, you are ready to use Lumo.
 Lumo is a group of sub-programs that you launch with keywords.
-
-**Optional Reading: This activation step starts a virtual environment, which Lumo uses to keep your computer tidy.
-On most computers you should be able to tell if your environment is activated because your terminal prompt will change.
-
-[I don't understand why it will currently break without the -e]
 
 ## How to: Using Keywords
 If the previous section goes well, the following keywords are now available:
