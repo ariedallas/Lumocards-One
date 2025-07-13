@@ -65,6 +65,9 @@ Once activated, you are ready to use Lumo.
 ## How to: Using Keywords
 To test if everything is working well, type "lumo" into the terminal / command line. You should see a menu come up like this:
 
+<img width="959" height="483" alt="lumo_menu" src="https://github.com/user-attachments/assets/d7a979ca-3814-42b3-bbae-d13920fdcfb8" />
+
+
 If the previous section goes well, the following keywords are now available:
 ````
 	lumo           ->  Launches the main Lumo Menu: 'LUMOCARDS' .
