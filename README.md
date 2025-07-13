@@ -4,10 +4,7 @@
 Lumocards One is a personal information system tool.<br /> 
 It's a todo app, planner, calendar, and journal made for the CLI / Terminal application.
 
-It's currently available for MacOS / Linux.<br />
-It also requires the use of Python 3 on your computer. 
-
-This readme is meant for a wide audience of persons who may be more or less familiar with computers and software development.<br />
+It's currently available for MacOS / Linux / Windows.<br />
 
 ---
 ## Requirements:
@@ -16,7 +13,9 @@ This readme is meant for a wide audience of persons who may be more or less fami
 
 ## Getting Started
 
-### The entire installation is available on YouTube here: <br> 
+### The entire installation and tutorial is available on YouTube. 
+Text-based instructions continue below and mirror the YouTube video. 
+
 https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s 
 
 
@@ -63,73 +62,93 @@ On most computers you should be able to tell if your environment is activated be
 Once activated, you are ready to use Lumo.
 
 ## How to: Using Keywords
-To test if everything is working well, type "lumo" into the terminal / command line. You should see a menu come up like this:
+To test if everything is working well, type `lumo` into the terminal / command line. You should see a menu come up like this:
 
 <img width="959" height="483" alt="lumo_menu" src="https://github.com/user-attachments/assets/d7a979ca-3814-42b3-bbae-d13920fdcfb8" />
 
 
-If the previous section goes well, the following keywords are now available:
+### Available keywords
 ````
-	lumo           ->  Launches the main Lumo Menu: 'LUMOCARDS' .
 	
-	lumo all       ->  Show all the Lumo sub-programs.
-	
-	lumo calendar  ->  Launch the calendar program to schedule events (cards).
-	    (note this will require additional setup)	    
+	about     ->  Show the about section.
+	all       ->  Show all the Lumo sub-programs.
+	agenda    ->  Show the agenda created for today.
+	calendar  ->  Launch the calendar program to view events in days or weeks format.
+   	              (note this will require additional setup, see the YouTube video)	    
 	    
-	lumo checklist ->  Launch a program to review checklists and processes.
-	lumo journal   ->  Create or continue a journal entry for today.
-	lumo newcard   ->  Create a new card in Lumo
-	lumo planner   ->  Launches the daily planner to review Near Focus Cards.
-	lumo pomodoro  ->  Set up a focus timer and a break timer
-	lumo search    ->  Search for a card
-	lumo settings  ->  Open the settings menu; adjust various settings
-	lumo timer     ->  Set a single custom timer
+	checklist ->  Launch a program to review checklists and processes.
+	journal   ->  Create or continue a journal entry for today.
+	newcard   ->  Create a new card in Lumo.
+	planner   ->  Launches the daily planner to review Near Focus Cards.
+	pomodoro  ->  Set up a focus timer and a break timer.
+	search    ->  Search for a card.
+	settings  ->  Edit categories for cards.
 ````
 
 ### About the Lumo Keyword
-The Lumo keyword `lumo` is only used to start a session from the terminal.<br /> Once you are inside the Lumo Menu, you can access the keywords by<br />
-typing them without the prefix 'lumo'. For example,  you would just type 'timer' instead of 'lumo timer'. 
+The Lumo keyword `lumo` is only used to launch the main menu or to directly launch subprograms keywords by<br />
+ such as `lumo journal`. Once you are inside the main menu however, you launch subprograms with the keyword alone, i.e. `journal`
 
-### About Shortcut Letters
-Sub-programs, i.e. the keywords in the Lumo Menu are paired with shortcut letters that appears to the left of the keyword.<br />
-You can use these shortcut letters by typing the letter (lower or uppercase) and pressing enter.
-
+### Keyword: About
+Type `about` from inside the Lumo Menu.
 ### Keyword: All
-Use `lumo all` from the terminal -or- `all` from  the Lumo Menu
-
+Type `lumo all` from the terminal -or- `all` from  the Lumo Menu.
 
 This keyword shows a full menu of every sub-program that is available. 
 
 ### Keyword: Calendar
-Use `lumo calendar` from the terminal -or- `calendar` from the Lumo Menu.
+Type `lumo calendar` from the terminal -or- `calendar` from the Lumo Menu.
 
+This keyword show a basic representation of your connected Google Calendar with limited features. 
 ### Keyword: Checklist
-...
+Type `lumo checklist` from the terminal -or- `checklist` from the Lumo Menu.
+
+This keyword launches a checklist menu which you can use to review routine checklists that you set up as 'cards'.
 ### Keyword: Journal
-...
+Type `lumo journal` from the terminal -or- `journal` from the Lumo Menu. 
+
+This keyword launches a text editor with today's date already printed in the file and creates a .txt file with the date <br> included in the name. 
+I.e. 2025_A_Jan_01_journal.txt. (The captial A is to keep all of January files together, and B for February and so on.)
 ### Keyword: Newcard
-Use `lumo newcard` from the terminal -or- `newcard`, `new card` from inside the Lumo Menu.
+Type `lumo newcard` from the terminal -or- `newcard`, `new card` from inside the Lumo Menu.<br>
+
+You can also make cards directly from the terminal with `lumo newcard <category> <card title>`.<br> Such as `lumo newcard b my shopping list` where 'b' represents the card category and 'my shopping list' is the title. <br>
+Note: you cannot type `newcard <category> <card title>` from the Lumo Menu, only `newcard`.
+
+This keyword starts the process to create new cards which take a card category and a card title, along with optional steps for each card. 
+Cards can be made for various locations: 
+- Near Focus 
+- Middle Focus
+- Distant Focus
+- Recurring
+- Checklist
+
 ### Keyword: Planner
-...
+Type `lumo planner` or `lumo cards` or `lumo cards planner` from the terminal or `planner` or `cards` or `cards planner` from  the Lumo Menu. 
+
+This keyword launches the process to setup a daily agenda which reviews three card categories and combines them to create a finished planner.txt file that users can reference when organizing their day. The three categories of cards are:
+- Near Focus Cards
+- Recurring Cards
+- Calendar Cards
+
 ### Keyword: Pomodoro
-...
+Type `lumo pomodoro` from the terminal or `pomodoro` from the Lumo Menu. 
+
+This keyword launches the pomodoro-style timer complete with two presets and a settings option.
 ### Keyword: Search
-...
+Type `lumo search` from the terminal or `search` from the Lumo Menu. 
+<br> From the terminal you can also type: `lumo search <myterm>` to directly search for a card from the terminal. <br>
+
+As an example `lumo search hat`. <br>
+Note: the term must be one word, and cannot be more than one word. Partial words are ok! <br>
+Note: you cannot type `search <searchterm>` from the Lumo Menu, only `search`.
+
+This keyword launches the search program to look through cards.
+
 ### Keyword: Settings
-...
-### Keyword: Timer
-...
-<br />
 
 ---
+## Additional Info and Important Reminders
 
-## Settings
-### Json Settings Etc.
-...
-<br />
 
----
-
-## About
-Hopefully this tool can be of help to you. 
+### Important to Know 
