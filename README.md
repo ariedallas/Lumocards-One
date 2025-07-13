@@ -7,8 +7,8 @@ It's a todo app, planner, calendar, and journal made for the CLI / Terminal appl
 It's currently available for MacOS / Linux.<br />
 It also requires the use of Python 3 on your computer. 
 
-This README is meant for a wide audience of persons who may be more or less familiar with computers and software development.<br />
-As such, it's a bit more wordy to explain a few more details.
+This readme is meant for a wide audience of persons who may be more or less familiar with computers and software development.<br />
+
 ---
 ## Requirements:
 - Python version 3.12 or greater (download here: https://www.python.org/)
@@ -16,11 +16,11 @@ As such, it's a bit more wordy to explain a few more details.
 
 ## Getting Started
 
-### The entire installation is available as a YouTube video here: <br> 
+### The entire installation is available on YouTube here: <br> 
 https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s 
 
 
-<img width="512" height="296" alt="hey" src="https://github.com/user-attachments/assets/57ed6d60-8b77-4952-9ac3-d3d76841b17c" />
+<a href="https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s"><img width="512" height="296" alt="hey" src="https://github.com/user-attachments/assets/57ed6d60-8b77-4952-9ac3-d3d76841b17c"></a>
 
 
 ### After downloading / cloning this folder:
@@ -49,18 +49,22 @@ In CMD:
     py -m pip install -e .
 ````
 ### Additional Notes
-Note #1: make sure to include the period shown in the last line below.
+Note #1: make sure to include the period shown in the last line below (after the '-e')
 
-Note #2: Anytime from this point onwards, when you want to use Lumo you will first need to activate lumo.<br />
-This is always done by first navigating to the Lumocards folder in the terminal and then by retyping: <br> 
+Note #2: Anytime from this point onwards, when you want to use Lumo, you will first need to activate lumo. This is always done by first navigating to the Lumocards folder in the terminal and then by retyping: <br> 
 `source venv/bin/activate` for Mac/Linux <br>
-`.\venv\Scripts\activate` for Windows (or a similar command)
+`.\venv\Scripts\activate.ps1` for Windows, or a similar command like `\activate.bat`
+
+This activation process can be simplified by adding lines to a .bashrc file on Mac/Linux <br>
+or a $PROFILE file on Windows, or by making a custom script. 
 
 On most computers you should be able to tell if your environment is activated because your terminal prompt will change. <br>
+
 Once activated, you are ready to use Lumo.
-Lumo is a group of sub-programs that you launch with keywords.
 
 ## How to: Using Keywords
+To test if everything is working well, type "lumo" into the terminal / command line. You should see a menu come up like this:
+
 If the previous section goes well, the following keywords are now available:
 ````
 	lumo           ->  Launches the main Lumo Menu: 'LUMOCARDS' .
