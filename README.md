@@ -31,21 +31,32 @@ https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s
 
 ````
     python3 -m venv venv
+````
+Then,
+````
     source venv/bin/activate
+````
+Then,
+````
     py -m pip install -e .
 ````
 ### Windows
-In Powershell:
+**In Powershell:**
 ````
     py -m venv venv
+````
+Then,
+````
     .\venv\Scripts\Activate.ps1
+````
+Then,
+````
     py -m pip install -e .
 ````
-In CMD:
+**In CMD:** <br>
+Do the same as Powershell except activate with the line below.
 ````
-    py -m venv venv
     .\venv\Scripts\activate.bat
-    py -m pip install -e .
 ````
 ### Additional Notes
 Note #1: make sure to include the period shown in the last line below (after the '-e')
