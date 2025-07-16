@@ -142,7 +142,7 @@ def card_deleter(card_filename):
     l_animators.list_printer([f"{card_filename} ➝ Type 'no' or 'x' to cancel deletion",
                               "or press any other key to confirm deletion"], indent_amt=2)
     print()
-    if not l_menus_funcs.proceed(">  ", indent_amt=2, reference_list=l_menus_data.NEGATIVE_USER_RESPONSES):
+    if not l_menus_funcs.proceed("", indent_amt=2, reference_list=l_menus_data.NEGATIVE_USER_RESPONSES):
         return "CANCELLED"
     card_fullpath = get_card_abspath(card_filename, check_archives=True)
     json_fullpath = l_json_utils.get_json_card_fullpath(card_filename)

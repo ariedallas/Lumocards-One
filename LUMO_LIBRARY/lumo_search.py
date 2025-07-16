@@ -43,7 +43,7 @@ def iterate_and_find(searchterm, folder):
         if digit_match:
             possible_files.append(item)
 
-    return possible_files
+    return set(possible_files)
 
 
 def reshow_match(chosen_file):

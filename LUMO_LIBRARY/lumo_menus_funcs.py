@@ -10,8 +10,10 @@ def proceed(input_text="... ", indent_amt=0, empty_means_true=True
             , reference_list=l_menus_data.NEGATIVE_USER_RESPONSES):
     indent_space = " " * indent_amt
 
-    print(indent_space + input_text)
-    print()
+    if input_text:
+        print(indent_space + input_text)
+        print()
+
     user_input = input(f"{indent_space}>  ")
     val = user_input.strip().lower()
 
