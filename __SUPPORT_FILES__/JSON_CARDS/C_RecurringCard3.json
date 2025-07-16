@@ -1,16 +1,16 @@
 {
-    "card location": "CARDS_F_RECURRING",
-    "card category abbreviation": "C",
-    "card category": "Errands",
-    "calendar event": null,
-    "calendar repeating event": null,
-    "recurring freq": 4,
-    "recurring freq time unit": "Day",
-    "last occurrence": "Jul 06 2025, Sunday",
-    "card created": "2025-07-09 22:51:43",
-    "tags": [
-        "default tag a",
-        "default tag b",
-        "default tag c"
-    ]
+  "card location": "CARDS_F_RECURRING",
+  "card category abbreviation": "C",
+  "card category": "Errands",
+  "calendar event": null,
+  "calendar repeating event": null,
+  "recurring freq": 4,
+  "recurring freq time unit": "Day",
+  "last occurrence": "Jul 12 2025, Saturday",
+  "card created": "2025-07-16 13:12:32",
+  "tags": [
+    "default tag a",
+    "default tag b",
+    "default tag c"
+  ]
 }

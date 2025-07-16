@@ -1,13 +1,13 @@
 {
     "card location": "CARDS_C_FOCUS_DISTANT",
-    "card category abbreviation": "B",
-    "card category": "Household",
+    "card category abbreviation": "A",
+    "card category": "Work",
     "calendar event": null,
     "calendar repeating event": null,
     "recurring freq": 0,
     "recurring freq time unit": null,
     "last occurrence": null,
-    "card created": "2025-07-10 12:07:52",
+    "card created": "2025-07-16 13:12:32",
     "tags": [
         "default tag a",
         "default tag b",

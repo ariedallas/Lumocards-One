@@ -1,13 +1,13 @@
 {
-    "card location": "CARDS_C_FOCUS_DISTANT",
-    "card category abbreviation": "Z",
-    "card category": "Default Category",
+    "card location": "CARDS_E_CHECKLISTS",
+    "card category abbreviation": "A",
+    "card category": "Work",
     "calendar event": null,
     "calendar repeating event": null,
     "recurring freq": 0,
     "recurring freq time unit": null,
     "last occurrence": null,
-    "card created": "2025-07-10 12:10:25",
+    "card created": "2025-07-16 13:12:32",
     "tags": [
         "default tag a",
         "default tag b",
