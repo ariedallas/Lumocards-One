@@ -373,7 +373,7 @@ def browser():
 
                 print()
 
-            user_input = input("  Press any key to continue \n  or 'q' or 'quit' to quit \n\n  >  ")
+            user_input = input("  Press any key to return to Browser menu, \n  or 'q' or 'quit' to quit \n\n  >  ")
             val = user_input.strip()
             l_files.clear()
             if val.lower() in {"q", "quit"}:

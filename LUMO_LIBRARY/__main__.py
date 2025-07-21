@@ -41,6 +41,11 @@ def get_argument_parser() -> argparse.ArgumentParser:
         , description="Display the full Lumo menu of subprograms"
     )
     sub_parser.add_parser(
+        "browser"
+        , help="Show cards based by type"
+        , description="Show cards based by type"
+    )
+    sub_parser.add_parser(
         "calendar"
         , help="Display the calendar in Lumo."
         , description="The calendar can be used to schedule events and sync them to Google Calendar."
@@ -298,6 +303,14 @@ def router(cli_input: Optional[argparse.Namespace],
           selected_prog_dict_value in {":: all | more ::"}):
 
         return None, all_menu
+
+    elif (selected_prog.lower() in {"browser"} or
+        cli_prog.lower() in {"browser"} or
+        selected_prog_dict_value in {"Browser"}):
+
+        # LumoMenu.load_transition()
+        l_search.browser()
+        return None, main_menu
 
     elif (selected_prog.lower() in {"calendar"} or
           cli_prog.lower() in {"calendar"} or
