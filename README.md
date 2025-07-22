@@ -10,7 +10,7 @@ It's currently available for MacOS / Linux / Windows.<br />
 ## Preview Video:
 https://www.youtube.com/watch?v=B6Djui-SRJE
 
-<a href="https://www.youtube.com/watch?v=B6Djui-SRJE"><img width="512" height="296" alt="hey" src="https://github.com/user-attachments/assets/57ed6d60-8b77-4952-9ac3-d3d76841b17c"></a>
+<a href="https://www.youtube.com/watch?v=B6Djui-SRJE"><img width="512" height="296" alt="hey" src="https://github.com/user-attachments/assets/f06b780c-32b7-4a34-879e-9bf529b41d93"></a>
 
 ---
 
