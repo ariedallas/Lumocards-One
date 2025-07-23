@@ -39,7 +39,7 @@ Click this link to download:
 <a href="https://github.com/ariedallas/Lumocards-One/archive/refs/heads/main.zip">Download the Lumocards-One project folder</a>
 
 **- OR -or** <br>
-On the main project page click the green button marked "Code" and then click "Download ZIP".
+On the main project page click the button near the top of the screen marked "Code" and then click "Download ZIP".
 
 **- OR SEE PICTURE -** <br>
 <img width="734" height="864" alt="LUMO_download" src="https://github.com/user-attachments/assets/1ea8208a-0856-47a0-8be2-776e74636531" />
