@@ -22,7 +22,7 @@ https://www.youtube.com/watch?v=B6Djui-SRJE
 - Python version 3.12 or greater (download here: https://www.python.org/)
 - Micro text editor (download here: https://micro-editor.github.io/)
 
-## Getting Started
+## YouTube Install Process
 
 ### The entire installation and tutorial is available on YouTube. 
 Text-based instructions continue below and mirror the YouTube video. 
@@ -31,6 +31,8 @@ https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s
 
 
 <a href="https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s"><img width="512" height="296" alt="hey" src="https://github.com/user-attachments/assets/57ed6d60-8b77-4952-9ac3-d3d76841b17c"></a>
+
+## Getting Started
 
 ### Download the Lumocards Project Folder:
 Click this link to download:
