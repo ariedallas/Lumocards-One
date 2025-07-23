@@ -39,7 +39,7 @@ Click this link below to download:
 **or**
 On the main project page click the green button marked "Code" and then click "Download ZIP".
 
-**picture:**
+**picture:** <br>
 <img width="734" height="864" alt="LUMO_download" src="https://github.com/user-attachments/assets/1ea8208a-0856-47a0-8be2-776e74636531" />
 
 
