@@ -39,6 +39,8 @@ Or find the buttons in the picture below.<br>
 <img width="734" height="864" alt="LUMO_download" src="https://github.com/user-attachments/assets/1ea8208a-0856-47a0-8be2-776e74636531" />
 
 <br>
+<br>
+<br>
 
 ---
 ### After downloading / cloning this folder
