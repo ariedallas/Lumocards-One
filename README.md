@@ -45,7 +45,7 @@ Or find the buttons in the picture below.<br>
 ---
 ### After downloading / cloning this folder
 - Unzip the folder, if you downloaded a zip folder.
-- Open the terminal and navigate to this folder. 
+- Open the terminal and navigate to this folder. You can get an idea of how to do this from watching part of the YouTube install video here: https://youtu.be/rJgoYZR6Twk?si=6Dc3geClP9hsSUW-&t=312
 - You can confirm you're in the right spot if your current working directory ends with something like: `/Lumocards-One**`
 - Then depending on your computer type, enter in the following or paste the lines below.
 ### MacOs / Linux
