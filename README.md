@@ -44,6 +44,7 @@ On the main project page click the button near the top of the screen marked "Cod
 <br>
 <br>
 <br>
+
 ### After downloading / cloning this folder
 - Unzip the folder, if you downloaded a zip folder.
 - Open the terminal and navigate to this folder. 
