@@ -10,7 +10,7 @@ the bulk of your organizing and day planning can be done from one computer progr
 It's currently available for MacOS / Linux / Windows.<br />
 Lumocards is still not fully functional and is considered a prototype for an information management system.
 
-## Preview Video:
+## Preview Video
 https://www.youtube.com/watch?v=B6Djui-SRJE
 
 <a href="https://www.youtube.com/watch?v=B6Djui-SRJE"><img width="296" height="296" alt="hey" src="https://github.com/user-attachments/assets/f06b780c-32b7-4a34-879e-9bf529b41d93"></a>
@@ -18,7 +18,7 @@ https://www.youtube.com/watch?v=B6Djui-SRJE
 ---
 
 ---
-## Requirements:
+## Requirements
 - Python version 3.12 or greater (download here: https://www.python.org/)
 - Micro text editor (download here: https://micro-editor.github.io/)
 
@@ -45,12 +45,12 @@ On the main project page click the green button marked "Code" and then click "Do
 <img width="734" height="864" alt="LUMO_download" src="https://github.com/user-attachments/assets/1ea8208a-0856-47a0-8be2-776e74636531" />
 
 
-### After downloading / cloning this folder:
+### After downloading / cloning this folder
 - Unzip the folder, if you downloaded a zip folder.
 - Open the terminal and navigate to this folder. 
 - You can confirm you're in the right spot if your current working directory ends with something like: `/Lumocards-One**`
 - Then depending on your computer type, enter in the following or paste the lines below.
-### MacOs / Linux:
+### MacOs / Linux
 
 ````
     python3 -m venv venv
