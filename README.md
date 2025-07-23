@@ -34,7 +34,7 @@ https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s
 
 ### Download the Lumocards Project Folder:
 Click this link below to download:
-<a href="https://github.com/ariedallas/Lumocards-One/archive/refs/heads/main.zip"></a>
+<a href="https://github.com/ariedallas/Lumocards-One/archive/refs/heads/main.zip">Download the Lumocards-One project folder</a>
 
 **or**
 On the main project page click the green button marked "Code" and then click "Download ZIP".
