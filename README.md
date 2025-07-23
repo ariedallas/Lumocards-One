@@ -2,10 +2,13 @@
 
 ---
 Lumocards One is a personal information system tool.<br /> 
-It's a todo app, planner, calendar, and journal made for the CLI / Terminal application.
-It's meant to offer a single application that can be a reference for everything you need to be tracking. 
+It's a todo app, planner, calendar, and journal made for the CLI / Terminal / Powershell Etc. <br>
+
+It's meant to be a single point of reference for everything you track in your life, so that 
+the bulk of your organizing and day planning can be done from one computer program in a distraction-free, minimalist format. 
 
 It's currently available for MacOS / Linux / Windows.<br />
+Lumocards is still not fully functional and is considered a prototype for an information management system.
 
 ## Preview Video:
 https://www.youtube.com/watch?v=B6Djui-SRJE
