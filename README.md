@@ -18,10 +18,6 @@ https://www.youtube.com/watch?v=B6Djui-SRJE
 ---
 
 ## Installation Video
-
-### The entire installation and tutorial is available on YouTube. 
-Text-based instructions continue below and mirror the YouTube video. 
-
 https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s 
 
 
