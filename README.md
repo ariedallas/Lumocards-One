@@ -35,6 +35,7 @@ https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s
 Click this link to download:
 <a href="https://github.com/ariedallas/Lumocards-One/archive/refs/heads/main.zip">Download the Lumocards-One project folder</a>
 
+Or find the buttons in the picture below.<br>
 <img width="734" height="864" alt="LUMO_download" src="https://github.com/user-attachments/assets/1ea8208a-0856-47a0-8be2-776e74636531" />
 
 <br>
