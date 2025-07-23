@@ -91,6 +91,7 @@ To test if everything is working well, type `lumo` into the terminal / command l
 	
 	about     ->  Show the about section.
 	all       ->  Show all the Lumo sub-programs.
+	browser   ->  Basic display for cards from various folders.
 	agenda    ->  Show the agenda created for today.
 	calendar  ->  Launch the calendar program to view events in days or weeks format.
    	              (note this will require additional setup, see the YouTube video)	    
@@ -110,10 +111,17 @@ The Lumo keyword `lumo` is only used to launch the main menu or to directly laun
 
 ### Keyword: About
 Type `about` from inside the Lumo Menu.
+
 ### Keyword: All
 Type `lumo all` from the terminal -or- `all` from  the Lumo Menu.
 
 This keyword shows a full menu of every sub-program that is available. 
+
+### Keyword: Browser
+Type `lumo browser` from the terminal -or- `browser` from  the Lumo Menu.
+
+This keyword shows a menu that can display cards from various folders.
+e.g. 'CARDS_A_FOCUS_NEAR'.
 
 ### Keyword: Calendar
 Type `lumo calendar` from the terminal -or- `calendar` from the Lumo Menu.
@@ -150,6 +158,25 @@ This keyword launches the process to setup a daily agenda which reviews three ca
 - Recurring Cards
 - Calendar Cards
 
+__When going through Near Focus Cards and Recurring Cards:__
+
+Users will see the `>` symbol displayed after every card. In this mode, there are certain keywords that are available:
+- Typing any word(s) that are not keywords will add the note you write to the finished agenda file. For example <br>
+if you typed, "My short note" this would be added to your agenda file at the end of the Cards Planner process.
+
+
+- Pressing 'Enter' or 'Return' as an empty space will skip to the next card.
+- Typing integers such as `1` or lists of integers such as  `1,2,4` will select steps from a card.
+- `menu` or `help` or `options` will show the menu for each card.
+- `show` or `more` or `full` will display more steps (if available) from the card.   
+- `open` or `edit` will open the card in the text editor.
+- `delete` will delete the card at the end of Cards Planner.
+- `archive` or `completed` or `done` to move the card to Archived Cards at the end of the Cards Planner.
+- `quit` will skip to the next phase, Recurring Cards or Calendar Cards
+- `superquit` will stop the Cards Planner and finish creating the agenda up to the point you quit.
+
+** __When going through Calendar Cards typing anything has no effect.__ **
+
 ### Keyword: Pomodoro
 Type `lumo pomodoro` from the terminal or `pomodoro` from the Lumo Menu. 
 
@@ -165,9 +192,13 @@ Note: you cannot type `search <searchterm>` from the Lumo Menu, only `search`.
 This keyword launches the search program to look through cards.
 
 ### Keyword: Settings
+Type `lumo settings` from the terminal or `settings` from the Lumo Menu. <br> 
+This launches the categories manager to change the card categories names and prefix letters. 
 
 ---
 ## Additional Info and Important Reminders
+DO NOT rename any of the folders in the "\_\_USER_FILES\_\_" folder </br>
+or in the "\_\_SUPPORT_FILES\_\_" folder. Don't rename any of the folders!
 
-
-### Important to Know 
+If you move the main Lumocards folder, it may break and you will need to </br>
+pip install the project again using `python3 -m pip install -e .`
