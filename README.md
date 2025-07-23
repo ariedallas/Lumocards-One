@@ -42,9 +42,8 @@ On the main project page click the button near the top of the screen marked "Cod
 <img width="734" height="864" alt="LUMO_download" src="https://github.com/user-attachments/assets/1ea8208a-0856-47a0-8be2-776e74636531" />
 
 <br>
----
-<br>
 
+---
 ### After downloading / cloning this folder
 - Unzip the folder, if you downloaded a zip folder.
 - Open the terminal and navigate to this folder. 
