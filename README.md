@@ -32,6 +32,16 @@ https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s
 
 <a href="https://www.youtube.com/watch?v=rJgoYZR6Twk&t=29s"><img width="512" height="296" alt="hey" src="https://github.com/user-attachments/assets/57ed6d60-8b77-4952-9ac3-d3d76841b17c"></a>
 
+### Download the Lumocards Project Folder:
+Click this link below to download:
+<a href="https://github.com/ariedallas/Lumocards-One/archive/refs/heads/main.zip"></a>
+
+**or**
+On the main project page click the green button marked "Code" and then click "Download ZIP".
+
+**picture:**
+<img width="734" height="864" alt="LUMO_download" src="https://github.com/user-attachments/assets/1ea8208a-0856-47a0-8be2-776e74636531" />
+
 
 ### After downloading / cloning this folder:
 - Unzip the folder, if you downloaded a zip folder.
